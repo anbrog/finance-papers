@@ -116,6 +116,8 @@ def main():
     print(f"\nTop 10 authors:")
     for i, author in enumerate(rankings[:10], 1):
         print(f"{i}. {author['Author']} - {author['Papers']} papers, {author['Citations']} citations")
+    
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
