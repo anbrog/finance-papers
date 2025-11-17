@@ -6,6 +6,7 @@ import streamlit as st
 import sqlite3
 import json
 import os
+import sys
 import subprocess
 import pandas as pd
 from datetime import datetime
@@ -417,7 +418,7 @@ def main():
                     progress_bar.progress(current_step / total_steps)
                     status_text.text(f"Updating {journal.upper()} {year}...")
                     
-                    cmd = ['python3', 'src/getpapers_openalex.py', journal, str(year)]
+                    cmd = [sys.executable, 'src/getpapers_openalex.py', journal, str(year)]
                     if force_update:
                         cmd.append('--force')
                     
@@ -457,7 +458,7 @@ def main():
                 status_text.text("Fetching working papers...")
                 
                 csv_path = os.path.join(DB_DIR, csv_file)
-                cmd = ['python3', 'src/get_wp.py', csv_path, str(wp_year_update)]
+                cmd = [sys.executable, 'src/get_wp.py', csv_path, str(wp_year_update)]
                 
                 try:
                     result = subprocess.run(
