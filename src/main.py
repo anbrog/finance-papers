@@ -450,6 +450,43 @@ Next steps:
 
 {'='*80}
 """)
+    
+    # Ask about updating static website
+    print("\n" + "="*80)
+    update_web = ""
+    while update_web not in ['y', 'n']:
+        update_web = input("Update static website data (GitHub Pages)? (y/n): ").lower().strip()
+        if not update_web:
+            print("Please enter 'y' or 'n'")
+    
+    if update_web == 'y':
+        print("\n" + "="*80)
+        print("Updating static website data...")
+        print("="*80 + "\n")
+        
+        # Export rankings to JSON
+        export_cmd = [sys.executable, 'src/export_rankings.py']
+        result = run_command(export_cmd, "Exporting rankings to JSON")
+        
+        if result == 0:
+            # Git commands
+            print("\nCommitting and pushing to GitHub...")
+            git_commands = [
+                (['git', 'add', 'docs/data/rankings.json'], "Staging changes"),
+                (['git', 'commit', '-m', 'Update rankings data'], "Committing changes"),
+                (['git', 'push'], "Pushing to GitHub")
+            ]
+            
+            for cmd, desc in git_commands:
+                result = run_command(cmd, desc)
+                if result != 0:
+                    print(f"⚠️  Git command failed: {desc}")
+                    break
+            else:
+                print("\n✅ Static website data updated successfully!")
+                print("   View at: https://anbrog.github.io/finance-papers/")
+        else:
+            print("⚠️  Export failed, skipping git push")
 
 if __name__ == "__main__":
     main()
