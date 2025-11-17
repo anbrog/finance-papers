@@ -1,0 +1,11 @@
+[general]
+email = ""
+
+[server]
+headless = true
+port = $PORT
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false

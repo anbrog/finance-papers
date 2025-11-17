@@ -1,0 +1,244 @@
+#!/bin/bash
+
+# print_db - Command line interface for database print functions
+# Usage: ./print_db [command] [options]
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Function to show help
+show_help() {
+    echo "📚 Database Print Commands:"
+    echo "  ./print_db forthcoming [jf|aer]     - Show forthcoming articles"
+    echo "  ./print_db stats                    - Show database statistics"  
+    echo "  ./print_db latest [N] [jf|aer]      - Show N latest articles"
+    echo "  ./print_db help                     - Show this help"
+    echo ""
+    echo "Examples:"
+    echo "  ./print_db forthcoming              # All forthcoming articles"
+    echo "  ./print_db forthcoming jf           # Only JF forthcoming articles"
+    echo "  ./print_db forthcoming aer          # Only AER forthcoming articles"
+    echo "  ./print_db stats                    # Database statistics"
+    echo "  ./print_db latest                   # Latest 5 articles"
+    echo "  ./print_db latest 10                # Latest 10 articles"
+    echo "  ./print_db latest 5 jf              # Latest 5 JF articles"
+    echo "  ./print_db latest 10 aer            # Latest 10 AER articles"
+}
+
+# Function to run Python commands
+run_python() {
+    cd "$SCRIPT_DIR"
+    python -c "$1"
+}
+
+# Main command processing
+case "${1:-help}" in
+    "forthcoming")
+        if [ -n "$2" ]; then
+            # Journal filter provided
+            if [[ "$2" != "jf" && "$2" != "aer" ]]; then
+                echo "❌ Journal filter must be 'jf' or 'aer'"
+                exit 1
+            fi
+            run_python "
+import save_db
+import sqlite3
+import os
+
+def print_forthcoming_articles(journal=None, db_filename='articles.db'):
+    output_dir = 'out/data'
+    db_filepath = os.path.join(output_dir, db_filename)
+    
+    if not os.path.exists(db_filepath):
+        print('❌ No database found')
+        return
+    
+    conn = sqlite3.connect(db_filepath)
+    cursor = conn.cursor()
+    
+    # Query for forthcoming articles
+    if journal:
+        cursor.execute('''
+            SELECT journal, title, authors, volume, issue, article_link, abstract, scraped_at 
+            FROM articles 
+            WHERE journal = ? AND (issue = 'forthcoming' OR volume = 'forthcoming')
+            ORDER BY journal, scraped_at DESC
+        ''', (journal.lower(),))
+        journal_filter = f' {journal.upper()}'
+    else:
+        cursor.execute('''
+            SELECT journal, title, authors, volume, issue, article_link, abstract, scraped_at 
+            FROM articles 
+            WHERE issue = 'forthcoming' OR volume = 'forthcoming'
+            ORDER BY journal, scraped_at DESC
+        ''')
+        journal_filter = ''
+    
+    articles = cursor.fetchall()
+    conn.close()
+    
+    if not articles:
+        print(f'📰 No{journal_filter} forthcoming articles found in database')
+        return
+    
+    print(f'📰 {len(articles)}{journal_filter} Forthcoming Articles:')
+    print('=' * 80)
+    
+    current_journal = None
+    for i, row in enumerate(articles, 1):
+        journal_name, title, authors, volume, issue, article_link, abstract, scraped_at = row
+        
+        # Add journal header if it changes
+        if current_journal != journal_name.upper():
+            if current_journal is not None:
+                print()  # Add spacing between journals
+            current_journal = journal_name.upper()
+            print(f'\\n🏛️  {current_journal} FORTHCOMING ARTICLES:')
+            print('-' * 50)
+        
+        print(f'\\n=== Article {i} ===')
+        print(f'Title: {title}')
+        if authors:
+            print(f'Authors: {authors}')
+        if article_link:
+            print(f'Link: {article_link}')
+        if abstract and abstract.strip():
+            # Truncate long abstracts
+            abstract_preview = abstract[:200] + '...' if len(abstract) > 200 else abstract
+            print(f'Abstract: {abstract_preview}')
+        print(f'Scraped: {scraped_at}')
+
+print_forthcoming_articles('$2')
+"
+        else
+            # No filter - show all
+            run_python "
+import save_db
+import sqlite3
+import os
+
+def print_forthcoming_articles(journal=None, db_filename='articles.db'):
+    output_dir = 'out/data'
+    db_filepath = os.path.join(output_dir, db_filename)
+    
+    if not os.path.exists(db_filepath):
+        print('❌ No database found')
+        return
+    
+    conn = sqlite3.connect(db_filepath)
+    cursor = conn.cursor()
+    
+    # Query for forthcoming articles
+    if journal:
+        cursor.execute('''
+            SELECT journal, title, authors, volume, issue, article_link, abstract, scraped_at 
+            FROM articles 
+            WHERE journal = ? AND (issue = 'forthcoming' OR volume = 'forthcoming')
+            ORDER BY journal, scraped_at DESC
+        ''', (journal.lower(),))
+        journal_filter = f' {journal.upper()}'
+    else:
+        cursor.execute('''
+            SELECT journal, title, authors, volume, issue, article_link, abstract, scraped_at 
+            FROM articles 
+            WHERE issue = 'forthcoming' OR volume = 'forthcoming'
+            ORDER BY journal, scraped_at DESC
+        ''')
+        journal_filter = ''
+    
+    articles = cursor.fetchall()
+    conn.close()
+    
+    if not articles:
+        print(f'📰 No{journal_filter} forthcoming articles found in database')
+        return
+    
+    print(f'📰 {len(articles)}{journal_filter} Forthcoming Articles:')
+    print('=' * 80)
+    
+    current_journal = None
+    for i, row in enumerate(articles, 1):
+        journal_name, title, authors, volume, issue, article_link, abstract, scraped_at = row
+        
+        # Add journal header if it changes
+        if current_journal != journal_name.upper():
+            if current_journal is not None:
+                print()  # Add spacing between journals
+            current_journal = journal_name.upper()
+            print(f'\\n🏛️  {current_journal} FORTHCOMING ARTICLES:')
+            print('-' * 50)
+        
+        print(f'\\n=== Article {i} ===')
+        print(f'Title: {title}')
+        if authors:
+            print(f'Authors: {authors}')
+        if article_link:
+            print(f'Link: {article_link}')
+        if abstract and abstract.strip():
+            # Truncate long abstracts
+            abstract_preview = abstract[:200] + '...' if len(abstract) > 200 else abstract
+            print(f'Abstract: {abstract_preview}')
+        print(f'Scraped: {scraped_at}')
+
+print_forthcoming_articles()
+"
+        fi
+        ;;
+    
+    "stats")
+        run_python "
+import save_db
+print('📊 Database Statistics:')
+print(f'Total articles: {save_db.get_article_count()}')
+print(f'JF articles: {save_db.get_article_count(\"jf\")}')
+print(f'AER articles: {save_db.get_article_count(\"aer\")}')
+"
+        ;;
+    
+    "latest")
+        # Default limit is 5
+        limit="${2:-5}"
+        journal_filter="$3"
+        
+        # Validate limit is a number
+        if ! [[ "$limit" =~ ^[0-9]+$ ]]; then
+            echo "❌ Limit must be a number"
+            exit 1
+        fi
+        
+        # Validate journal filter if provided
+        if [ -n "$journal_filter" ] && [[ "$journal_filter" != "jf" && "$journal_filter" != "aer" ]]; then
+            echo "❌ Journal filter must be 'jf' or 'aer'"
+            exit 1
+        fi
+        
+        if [ -n "$journal_filter" ]; then
+            run_python "
+import save_db
+print(f'📰 Latest $limit $journal_filter articles:')
+latest = save_db.get_latest_articles(journal='$journal_filter', limit=$limit)
+for i, article in enumerate(latest, 1):
+    print(f'{i}. [{article[\"journal\"].upper()}] {article[\"title\"][:60]}...')
+"
+        else
+            run_python "
+import save_db
+print(f'📰 Latest $limit articles:')
+latest = save_db.get_latest_articles(limit=$limit)
+for i, article in enumerate(latest, 1):
+    print(f'{i}. [{article[\"journal\"].upper()}] {article[\"title\"][:60]}...')
+"
+        fi
+        ;;
+    
+    "help"|"-h"|"--help")
+        show_help
+        ;;
+    
+    *)
+        echo "❌ Unknown command: $1"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac

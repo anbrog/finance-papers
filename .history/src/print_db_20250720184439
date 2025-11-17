@@ -1,0 +1,343 @@
+#!/bin/bash
+
+# print_db - Command line interface for database print functions
+# Usage: ./print_db [command] [options]
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DB_PATH="$SCRIPT_DIR/out/data/articles.db"
+
+# Function to show interactive menu
+show_menu() {
+    echo "📚 Database Print Commands - Interactive Menu"
+    echo "=============================================="
+    echo "1) Show database statistics"
+    echo "2) Show all forthcoming articles"
+    echo "3) Show JF forthcoming articles"
+    echo "4) Show AER forthcoming articles"
+    echo "5) Show latest 5 articles"
+    echo "6) Show latest 10 articles"
+    echo "7) Show latest 5 JF articles"
+    echo "8) Show latest 5 AER articles"
+    echo "9) Show help"
+    echo "0) Exit"
+    echo ""
+    echo -n "Please select an option (0-9): "
+    read -r choice
+    echo ""
+    
+    case "$choice" in
+        1)
+            check_database
+            echo "📊 Database Statistics:"
+            echo "Total articles: $(get_article_count)"
+            echo "JF articles: $(get_article_count 'jf')"
+            echo "AER articles: $(get_article_count 'aer')"
+            ;;
+        2)
+            check_database
+            print_forthcoming_articles
+            ;;
+        3)
+            check_database
+            print_forthcoming_articles "jf"
+            ;;
+        4)
+            check_database
+            print_forthcoming_articles "aer"
+            ;;
+        5)
+            check_database
+            echo "📰 Latest 5 articles:"
+            query="SELECT journal, title FROM articles ORDER BY scraped_at DESC LIMIT 5;"
+            sqlite3 "$DB_PATH" -separator $'\t' "$query" | {
+                article_num=1
+                while IFS=$'\t' read -r journal title; do
+                    if [ ${#title} -gt 60 ]; then
+                        title_preview="${title:0:60}..."
+                    else
+                        title_preview="$title"
+                    fi
+                    journal_upper=$(echo "$journal" | tr '[:lower:]' '[:upper:]')
+                    echo "$article_num. [$journal_upper] $title_preview"
+                    ((article_num++))
+                done
+            }
+            ;;
+        6)
+            check_database
+            echo "📰 Latest 10 articles:"
+            query="SELECT journal, title FROM articles ORDER BY scraped_at DESC LIMIT 10;"
+            sqlite3 "$DB_PATH" -separator $'\t' "$query" | {
+                article_num=1
+                while IFS=$'\t' read -r journal title; do
+                    if [ ${#title} -gt 60 ]; then
+                        title_preview="${title:0:60}..."
+                    else
+                        title_preview="$title"
+                    fi
+                    journal_upper=$(echo "$journal" | tr '[:lower:]' '[:upper:]')
+                    echo "$article_num. [$journal_upper] $title_preview"
+                    ((article_num++))
+                done
+            }
+            ;;
+        7)
+            check_database
+            echo "📰 Latest 5 JF articles:"
+            query="SELECT journal, title FROM articles WHERE journal = 'jf' ORDER BY scraped_at DESC LIMIT 5;"
+            sqlite3 "$DB_PATH" -separator $'\t' "$query" | {
+                article_num=1
+                while IFS=$'\t' read -r journal title; do
+                    if [ ${#title} -gt 60 ]; then
+                        title_preview="${title:0:60}..."
+                    else
+                        title_preview="$title"
+                    fi
+                    journal_upper=$(echo "$journal" | tr '[:lower:]' '[:upper:]')
+                    echo "$article_num. [$journal_upper] $title_preview"
+                    ((article_num++))
+                done
+            }
+            ;;
+        8)
+            check_database
+            echo "📰 Latest 5 AER articles:"
+            query="SELECT journal, title FROM articles WHERE journal = 'aer' ORDER BY scraped_at DESC LIMIT 5;"
+            sqlite3 "$DB_PATH" -separator $'\t' "$query" | {
+                article_num=1
+                while IFS=$'\t' read -r journal title; do
+                    if [ ${#title} -gt 60 ]; then
+                        title_preview="${title:0:60}..."
+                    else
+                        title_preview="$title"
+                    fi
+                    journal_upper=$(echo "$journal" | tr '[:lower:]' '[:upper:]')
+                    echo "$article_num. [$journal_upper] $title_preview"
+                    ((article_num++))
+                done
+            }
+            ;;
+        9)
+            show_help
+            ;;
+        0)
+            echo "👋 Goodbye!"
+            exit 0
+            ;;
+        *)
+            echo "❌ Invalid option. Please select 0-9."
+            echo ""
+            show_menu
+            ;;
+    esac
+}
+
+# Function to show help
+show_help() {
+    echo "📚 Database Print Commands:"
+    echo "  ./print_db forthcoming [jf|aer]     - Show forthcoming articles"
+    echo "  ./print_db stats                    - Show database statistics"  
+    echo "  ./print_db latest [N] [jf|aer]      - Show N latest articles"
+    echo "  ./print_db help                     - Show this help"
+    echo ""
+    echo "Examples:"
+    echo "  ./print_db forthcoming              # All forthcoming articles"
+    echo "  ./print_db forthcoming jf           # Only JF forthcoming articles"
+    echo "  ./print_db forthcoming aer          # Only AER forthcoming articles"
+    echo "  ./print_db stats                    # Database statistics"
+    echo "  ./print_db latest                   # Latest 5 articles"
+    echo "  ./print_db latest 10                # Latest 10 articles"
+    echo "  ./print_db latest 5 jf              # Latest 5 JF articles"
+    echo "  ./print_db latest 10 aer            # Latest 10 AER articles"
+    echo ""
+    echo "Note: Run './print_db' without arguments for interactive menu"
+}
+    echo "📚 Database Print Commands:"
+    echo "  ./print_db forthcoming [jf|aer]     - Show forthcoming articles"
+    echo "  ./print_db stats                    - Show database statistics"  
+    echo "  ./print_db latest [N] [jf|aer]      - Show N latest articles"
+    echo "  ./print_db help                     - Show this help"
+    echo ""
+    echo "Examples:"
+    echo "  ./print_db forthcoming              # All forthcoming articles"
+    echo "  ./print_db forthcoming jf           # Only JF forthcoming articles"
+    echo "  ./print_db forthcoming aer          # Only AER forthcoming articles"
+    echo "  ./print_db stats                    # Database statistics"
+    echo "  ./print_db latest                   # Latest 5 articles"
+    echo "  ./print_db latest 10                # Latest 10 articles"
+    echo "  ./print_db latest 5 jf              # Latest 5 JF articles"
+    echo "  ./print_db latest 10 aer            # Latest 10 AER articles"
+}
+
+# Function to check if database exists
+check_database() {
+    if [ ! -f "$DB_PATH" ]; then
+        echo "❌ No database found at $DB_PATH"
+        exit 1
+    fi
+}
+
+# Function to get article count
+get_article_count() {
+    local journal="$1"
+    if [ -n "$journal" ]; then
+        sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM articles WHERE journal = '$journal';"
+    else
+        sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM articles;"
+    fi
+}
+
+# Function to print forthcoming articles
+print_forthcoming_articles() {
+    local journal="$1"
+    local journal_filter=""
+    
+    if [ -n "$journal" ]; then
+        journal_filter=" $journal"
+        query="SELECT journal, title, authors, volume, issue, article_link, abstract, scraped_at 
+               FROM articles 
+               WHERE journal = '$journal' AND (issue = 'forthcoming' OR volume = 'forthcoming')
+               ORDER BY journal, scraped_at DESC;"
+    else
+        query="SELECT journal, title, authors, volume, issue, article_link, abstract, scraped_at 
+               FROM articles 
+               WHERE issue = 'forthcoming' OR volume = 'forthcoming'
+               ORDER BY journal, scraped_at DESC;"
+    fi
+    
+    # Get count first
+    if [ -n "$journal" ]; then
+        count=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM articles WHERE journal = '$journal' AND (issue = 'forthcoming' OR volume = 'forthcoming');")
+    else
+        count=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM articles WHERE issue = 'forthcoming' OR volume = 'forthcoming';")
+    fi
+    
+    if [ "$count" -eq 0 ]; then
+        echo "📰 No${journal_filter} forthcoming articles found in database"
+        return
+    fi
+    
+    echo "📰 $count$(echo "$journal_filter" | tr '[:lower:]' '[:upper:]') Forthcoming Articles:"
+    echo "================================================================================"
+    
+    # Use sqlite3 with custom formatting
+    sqlite3 "$DB_PATH" -separator $'\t' "$query" | {
+        article_num=1
+        current_journal=""
+        
+        while IFS=$'\t' read -r journal_name title authors volume issue article_link abstract scraped_at; do
+            # Add journal header if it changes
+            journal_upper=$(echo "$journal_name" | tr '[:lower:]' '[:upper:]')
+            if [ "$current_journal" != "$journal_upper" ]; then
+                if [ -n "$current_journal" ]; then
+                    echo ""  # Add spacing between journals
+                fi
+                current_journal="$journal_upper"
+                echo ""
+                echo "🏛️  $current_journal FORTHCOMING ARTICLES:"
+                echo "--------------------------------------------------"
+            fi
+            
+            echo ""
+            echo "=== Article $article_num ==="
+            echo "Title: $title"
+            [ -n "$authors" ] && echo "Authors: $authors"
+            [ -n "$article_link" ] && echo "Link: $article_link"
+            if [ -n "$abstract" ] && [ "$abstract" != "" ]; then
+                # Truncate long abstracts to 200 characters
+                if [ ${#abstract} -gt 200 ]; then
+                    abstract_preview="${abstract:0:200}..."
+                else
+                    abstract_preview="$abstract"
+                fi
+                echo "Abstract: $abstract_preview"
+            fi
+            echo "Scraped: $scraped_at"
+            
+            ((article_num++))
+        done
+    }
+}
+
+# Main command processing
+case "${1:-menu}" in
+    "forthcoming")
+        check_database
+        if [ -n "$2" ]; then
+            # Journal filter provided
+            if [[ "$2" != "jf" && "$2" != "aer" ]]; then
+                echo "❌ Journal filter must be 'jf' or 'aer'"
+                exit 1
+            fi
+            print_forthcoming_articles "$2"
+        else
+            # No filter - show all
+            print_forthcoming_articles
+        fi
+        ;;
+    
+    "stats")
+        check_database
+        echo "📊 Database Statistics:"
+        echo "Total articles: $(get_article_count)"
+        echo "JF articles: $(get_article_count 'jf')"
+        echo "AER articles: $(get_article_count 'aer')"
+        ;;
+    
+    "latest")
+        check_database
+        # Default limit is 5
+        limit="${2:-5}"
+        journal_filter="$3"
+        
+        # Validate limit is a number
+        if ! [[ "$limit" =~ ^[0-9]+$ ]]; then
+            echo "❌ Limit must be a number"
+            exit 1
+        fi
+        
+        # Validate journal filter if provided
+        if [ -n "$journal_filter" ] && [[ "$journal_filter" != "jf" && "$journal_filter" != "aer" ]]; then
+            echo "❌ Journal filter must be 'jf' or 'aer'"
+            exit 1
+        fi
+        
+        # Build SQL query
+        if [ -n "$journal_filter" ]; then
+            query="SELECT journal, title FROM articles WHERE journal = '$journal_filter' ORDER BY scraped_at DESC LIMIT $limit;"
+            journal_upper=$(echo "$journal_filter" | tr '[:lower:]' '[:upper:]')
+            echo "📰 Latest $limit $journal_upper articles:"
+        else
+            query="SELECT journal, title FROM articles ORDER BY scraped_at DESC LIMIT $limit;"
+            echo "📰 Latest $limit articles:"
+        fi
+        
+        # Execute query and format output
+        sqlite3 "$DB_PATH" -separator $'\t' "$query" | {
+            article_num=1
+            while IFS=$'\t' read -r journal title; do
+                # Truncate title to 60 characters
+                if [ ${#title} -gt 60 ]; then
+                    title_preview="${title:0:60}..."
+                else
+                    title_preview="$title"
+                fi
+                journal_upper=$(echo "$journal" | tr '[:lower:]' '[:upper:]')
+                echo "$article_num. [$journal_upper] $title_preview"
+                ((article_num++))
+            done
+        }
+        ;;
+    
+    "help"|"-h"|"--help")
+        show_help
+        ;;
+    
+    *)
+        echo "❌ Unknown command: $1"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac

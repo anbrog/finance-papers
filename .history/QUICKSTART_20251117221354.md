@@ -1,0 +1,162 @@
+# Finance Papers - Quick Reference
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+## Main Command
+
+```bash
+finance-papers              # Run complete workflow (incremental)
+finance-papers --force      # Run complete workflow (all years)
+```
+
+This is the only globally available command. It provides an interactive workflow that:
+1. Prompts whether to update journal articles (y/n/years)
+2. Prompts which years to use for ranking (Enter for all, or specify years)
+3. Ranks authors and displays top 250
+4. Optionally generates author list CSV
+5. Prompts whether to update working papers (y/n)
+6. Displays working papers rankings
+
+**Update Journal Articles Options:**
+- Type `y`: Update using incremental/force mode years
+- Type `n`: Skip update
+- Type `2024`: Update only 2024
+- Type `2023-2025`: Update years 2023, 2024, and 2025
+- Type `2023,2024,2025`: Update specific comma-separated years
+
+**Ranking Year Selection:**
+- Press Enter: Use all available years (default)
+- Type `2024`: Use only 2024
+- Type `2023-2025`: Use years 2023, 2024, and 2025
+
+## Individual Scripts (via Python)
+
+If you need to run individual components, use Python directly from the project directory:
+
+### Fetch Journal Articles
+```bash
+python3 src/getpapers_openalex.py jf 2024          # Fetch Journal of Finance 2024
+python3 src/getpapers_openalex.py rfs 2024         # Fetch Review of Financial Studies 2024
+python3 src/getpapers_openalex.py jfe 2024         # Fetch Journal of Financial Economics 2024
+python3 src/getpapers_openalex.py top3 2024        # Fetch all three journals
+python3 src/getpapers_openalex.py jf 2024 --force  # Force update (refresh citations)
+```
+
+### Query Journal Articles
+```bash
+python3 src/query_openalex_db.py rank-authors top3 --250              # Rank top 250 authors
+python3 src/query_openalex_db.py rank-authors top3 --250 --citations  # Rank by citations
+python3 src/query_openalex_db.py rank-authors jf 2024 --250           # Rank from JF 2024
+python3 src/query_openalex_db.py make-author-list top3 --250          # Generate CSV
+python3 src/query_openalex_db.py list-articles jf 2024                # List all articles
+python3 src/query_openalex_db.py list-articles top3 --author="Fama"   # Search by author
+```
+
+### Working Papers
+```bash
+python3 src/get_wp.py author_list.csv 2024        # Fetch working papers
+python3 src/get_wp.py author_list.csv 2024 --N 50 # Limit to first 50 authors
+
+python3 src/query_wp_db.py rank --250                # Rank authors by WPs
+python3 src/query_wp_db.py rank 2024 --250           # Rank for specific year
+python3 src/query_wp_db.py list                      # List all working papers
+python3 src/query_wp_db.py list 2024                 # List for specific year
+python3 src/query_wp_db.py list --author="Fama"      # Filter by author
+python3 src/query_wp_db.py list --N 50               # Limit results
+```
+
+### Research Agendas
+```bash
+python3 src/extract_research_agendas.py 250         # Extract agendas for top 250
+python3 src/extract_research_agendas.py 250 --display  # Show previously saved results
+```
+
+## Database Files
+
+All databases are stored in `out/data/`:
+
+- `openalex_{journal}_{year}.db` - Journal articles
+- `working_papers.db` or `working_papers_{year}.db` - Working papers
+- `author_list_top3_*.csv` - Generated author rankings
+
+## Tips
+
+1. **Start with the main workflow**: `finance-papers`
+   - Interactive prompts guide you through the process
+   - Choose what to update (y/n/years)
+   - Specify custom years for updates if needed
+   - Choose which years for ranking (default: all)
+   - Automatically displays results
+
+2. **Default ranking uses all years**:
+   - Most comprehensive author rankings
+   - Just press Enter when prompted for years
+   - Best for overall research productivity analysis
+
+3. **Use specific years when needed**:
+   - Type `2024` for recent work only
+   - Type `2023-2025` for recent period
+   - Useful for tracking recent trends
+
+4. **Use --force carefully**: Only needed when:
+   - Building initial database
+   - Want to refresh all citation counts
+   - Need to reprocess all years
+
+5. **Incremental mode** (default):
+   - Only updates latest year (2025)
+   - Fast and efficient for daily use
+   - Keeps historical data intact
+
+6. **Working papers**:
+   - Fetched for top 250 authors only
+   - Can limit with --N flag for testing
+   - Includes institutional affiliations
+
+7. **Research agendas**:
+   - Uses OpenAI API (requires OPENAI_API_KEY env var)
+   - Save results with first run
+   - View later with --display flag
+
+## Common Workflows
+
+### Daily Update
+```bash
+finance-papers
+# Type 'y' for journal articles (or specify years like '2024')
+# Press Enter for all years ranking
+# Type 'y' for working papers
+```
+
+### Quick Check
+```bash
+python3 src/query_openalex_db.py rank-authors top3 --250
+python3 src/query_wp_db.py list --N 30
+```
+
+### Initial Setup
+```bash
+finance-papers --force
+python3 src/extract_research_agendas.py 250
+```
+
+### Search Specific Author
+```bash
+python3 src/query_openalex_db.py list-articles top3 --author="Cochrane"
+python3 src/query_wp_db.py list --author="Cochrane"
+```
+
+## Environment Variables
+
+- `OPENAI_API_KEY` - Required for extract-agendas
+- `OPENALEX_MAILTO` - Optional, for OpenAlex API politeness
+
+## Uninstall
+
+```bash
+pip uninstall finance-papers
+```

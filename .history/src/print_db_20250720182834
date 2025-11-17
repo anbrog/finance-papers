@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# print_db - Command line interface for database print functions
+# Usage: ./print_db [command] [options]
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Function to show help
+show_help() {
+    echo "📚 Database Print Commands:"
+    echo "  ./print_db forthcoming [jf|aer]     - Show forthcoming articles"
+    echo "  ./print_db stats                    - Show database statistics"  
+    echo "  ./print_db latest [N] [jf|aer]      - Show N latest articles"
+    echo "  ./print_db help                     - Show this help"
+    echo ""
+    echo "Examples:"
+    echo "  ./print_db forthcoming              # All forthcoming articles"
+    echo "  ./print_db forthcoming jf           # Only JF forthcoming articles"
+    echo "  ./print_db forthcoming aer          # Only AER forthcoming articles"
+    echo "  ./print_db stats                    # Database statistics"
+    echo "  ./print_db latest                   # Latest 5 articles"
+    echo "  ./print_db latest 10                # Latest 10 articles"
+    echo "  ./print_db latest 5 jf              # Latest 5 JF articles"
+    echo "  ./print_db latest 10 aer            # Latest 10 AER articles"
+}
+
+# Function to run Python commands
+run_python() {
+    cd "$SCRIPT_DIR"
+    python -c "$1"
+}
+
+# Main command processing
+case "${1:-help}" in
+    "forthcoming")
+        if [ -n "$2" ]; then
+            # Journal filter provided
+            if [[ "$2" != "jf" && "$2" != "aer" ]]; then
+                echo "❌ Journal filter must be 'jf' or 'aer'"
+                exit 1
+            fi
+            run_python "import save_db; save_db.print_forthcoming_articles('$2')"
+        else
+            # No filter - show all
+            run_python "import save_db; save_db.print_forthcoming_articles()"
+        fi
+        ;;
+    
+    "stats")
+        run_python "
+import save_db
+print('📊 Database Statistics:')
+print(f'Total articles: {save_db.get_article_count()}')
+print(f'JF articles: {save_db.get_article_count(\"jf\")}')
+print(f'AER articles: {save_db.get_article_count(\"aer\")}')
+"
+        ;;
+    
+    "latest")
+        # Default limit is 5
+        limit="${2:-5}"
+        journal_filter="$3"
+        
+        # Validate limit is a number
+        if ! [[ "$limit" =~ ^[0-9]+$ ]]; then
+            echo "❌ Limit must be a number"
+            exit 1
+        fi
+        
+        # Validate journal filter if provided
+        if [ -n "$journal_filter" ] && [[ "$journal_filter" != "jf" && "$journal_filter" != "aer" ]]; then
+            echo "❌ Journal filter must be 'jf' or 'aer'"
+            exit 1
+        fi
+        
+        if [ -n "$journal_filter" ]; then
+            run_python "
+import save_db
+print(f'📰 Latest $limit $journal_filter articles:')
+latest = save_db.get_latest_articles(journal='$journal_filter', limit=$limit)
+for i, article in enumerate(latest, 1):
+    print(f'{i}. [{article[\"journal\"].upper()}] {article[\"title\"][:60]}...')
+"
+        else
+            run_python "
+import save_db
+print(f'📰 Latest $limit articles:')
+latest = save_db.get_latest_articles(limit=$limit)
+for i, article in enumerate(latest, 1):
+    print(f'{i}. [{article[\"journal\"].upper()}] {article[\"title\"][:60]}...')
+"
+        fi
+        ;;
+    
+    "help"|"-h"|"--help")
+        show_help
+        ;;
+    
+    *)
+        echo "❌ Unknown command: $1"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac

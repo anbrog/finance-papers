@@ -1,0 +1,9 @@
+include README.md
+include requirements.txt
+include LICENSE
+recursive-include src *.py
+recursive-exclude src __pycache__
+recursive-exclude src *.pyc
+recursive-exclude out *
+recursive-exclude .venv *
+recursive-exclude venv *

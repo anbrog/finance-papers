@@ -1,0 +1,105 @@
+#TODO Below is a table of universities. For each university find the names of 1-5 people who work in asset pricing and are the most published according to Google Scholar. Add their names in the columns Person 1 to Person 5. If there are less than 5 people, leave the remaining columns blank.
+
+
+| Rank | University | Articles | Score | Country | Person 1 | Person 2 | Person 3 | Person 4 | Person 5 |
+|------|-------------|-----------|--------|----------|-----------|-----------|-----------|-----------|-----------|
+| 1 | University of Pennsylvania (The Wharton School) | 285 | 142.00 | USA | Jules van Binsbergen |  |  |  |  |
+| 2 | Harvard University (Harvard Business School) | 227 | 107.49 | USA |  |  |  |  |  |
+| 3 | Columbia University (Columbia Business School) | 230 | 103.25 | USA |  |  |  |  |  |
+| 4 | New York University (NYU) (Leonard N Stern School of Business) | 210 | 93.04 | USA |  |  |  |  |  |
+| 5 | University of Chicago (Booth School of Business) | 214 | 93.02 | USA |  |  |  |  |  |
+| 6 | University of Southern California (Marshall School of Business) | 172 | 81.32 | USA |  |  |  |  |  |
+| 7 | Stanford University (Graduate School of Business) | 187 | 80.63 | USA |  |  |  |  |  |
+| 8 | Massachusetts Institute of Technology (Sloan School of Management) | 203 | 79.20 | USA |  |  |  |  |  |
+| 9 | Cornell University (SC Johnson College of Business) | 164 | 68.73 | USA |  |  |  |  |  |
+| 10 | University of Texas at Dallas (Naveen Jindal School of Management) | 137 | 67.33 | USA |  |  |  |  |  |
+| 11 | University of California at Los Angeles (Anderson School of Management) | 137 | 62.85 | USA |  |  |  |  |  |
+| 12 | University of California at Berkeley (Walter A. Haas School of Business) | 136 | 62.54 | USA |  |  |  |  |  |
+| 13 | Washington University in St. Louis (Olin School of Business) | 149 | 62.18 | USA |  |  |  |  |  |
+| 14 | University of Toronto (Joseph L. Rotman School of Management) | 158 | 61.23 | Canada |  |  |  |  |  |
+| 15 | Duke University (The Fuqua School of Business) | 131 | 59.71 | USA |  |  |  |  |  |
+| 16 | Northwestern University (Kellogg School of Management) | 132 | 56.83 | USA |  |  |  |  |  |
+| 17 | Yale University (School of Management) | 126 | 54.91 | USA |  |  |  |  |  |
+| 18 | University of London (London Business School) | 138 | 54.54 | United Kingdom |  |  |  |  |  |
+| 19 | University of Hong Kong (Faculty of Business and Economics / HKU Business School) | 135 | 52.61 | China |  |  |  |  |  |
+| 20 | Indiana University at Bloomington (Kelley School of Business) | 120 | 50.49 | USA |  |  |  |  |  |
+| 21 | University of Michigan at Ann Arbor (Ross School of Business) | 107 | 49.92 | USA |  |  |  |  |  |
+| 22 | University of North Carolina at Chapel Hill (Kenan-Flagler Business School) | 111 | 49.84 | USA |  |  |  |  |  |
+| 23 | INSEAD (School of Business) | 114 | 48.62 | France |  |  |  |  |  |
+| 24 | Ohio State University (Fisher College of Business) | 108 | 46.09 | USA |  |  |  |  |  |
+| 25 | Boston College (Carroll School of Management) | 109 | 45.82 | USA |  |  |  |  |  |
+| 26 | University of Texas at Austin (McCombs School of Business) | 94 | 44.19 | USA |  |  |  |  |  |
+| 27 | HEC Paris (School of Business) | 97 | 43.57 | France |  |  |  |  |  |
+| 28 | University of Illinois at Urbana-Champaign (Gies College of Business) | 97 | 42.27 | USA |  |  |  |  |  |
+| 29 | The Chinese University of Hong Kong (CUHK Business School) | 104 | 41.65 | China |  |  |  |  |  |
+| 30 | University of Washington at Seattle (Michael G. Foster School of Business) | 92 | 40.93 | USA |  |  |  |  |  |
+| 31 | National University of Singapore (NUS Business School) | 105 | 40.08 | Singapore |  |  |  |  |  |
+| 32 | University of Minnesota at Twin Cities (Carlson School of Management) | 93 | 39.58 | USA |  |  |  |  |  |
+| 33 | University of Maryland at College Park (Robert H. Smith School of Business) | 88 | 36.98 | USA |  |  |  |  |  |
+| 34 | Carnegie Mellon University (Tepper School of Business) | 71 | 36.10 | USA |  |  |  |  |  |
+| 35 | Purdue University (Mitchell E. Daniels, Jr. School of Business) | 77 | 35.61 | USA |  |  |  |  |  |
+| 36 | Boston University (Questrom School of Business) | 97 | 35.58 | USA |  |  |  |  |  |
+| 37 | University of Colorado at Boulder (Leeds School of Business) | 77 | 35.55 | USA |  |  |  |  |  |
+| 38 | Imperial College London (Imperial College Business School) | 95 | 35.37 | United Kingdom |  |  |  |  |  |
+| 39 | Hong Kong University of Science and Technology (HKUST Business School) | 81 | 34.24 | China |  |  |  |  |  |
+| 40 | Pennsylvania State University (Smeal College of Business) | 77 | 34.01 | USA |  |  |  |  |  |
+| 41 | University of Utah (David Eccles School of Business) | 74 | 31.81 | USA |  |  |  |  |  |
+| 42 | University of British Columbia (Sauder School of Business) | 69 | 31.46 | Canada |  |  |  |  |  |
+| 43 | University of Notre Dame (Mendoza College of Business) | 71 | 31.44 | USA |  |  |  |  |  |
+| 44 | Tilburg University (TiSEM School of Economics and Management) | 78 | 30.80 | Netherlands |  |  |  |  |  |
+| 45 | Johns Hopkins University (Carey Business School) | 72 | 29.31 | USA |  |  |  |  |  |
+| 46 | Dartmouth College (Tuck School of Business) | 66 | 29.21 | USA |  |  |  |  |  |
+| 47 | Arizona State University (W.P. Carey School of Business) | 70 | 29.14 | USA |  |  |  |  |  |
+| 48 | University of California at San Diego (Rady School of Management) | 72 | 28.99 | USA |  |  |  |  |  |
+| 49 | Emory University (Goizueta Business School) | 65 | 28.57 | USA |  |  |  |  |  |
+| 50 | Singapore Management University (Lee Kong Chian School of Business) | 76 | 28.51 | Singapore |  |  |  |  |  |
+| 51 | London School of Economics and Political Science (LSE) | 64 | 28.15 | United Kingdom |  |  |  |  |  |
+| 52 | University of Wisconsin at Madison (Wisconsin School of Business) | 71 | 28.10 | USA |  |  |  |  |  |
+| 53 | Georgia Institute of Technology (Scheller College of Business) | 55 | 26.97 | USA |  |  |  |  |  |
+| 54 | Georgetown University (The McDonough School of Business) | 66 | 26.77 | USA |  |  |  |  |  |
+| 55 | McGill University (Desautels Faculty of Management) | 71 | 25.86 | Canada |  |  |  |  |  |
+| 56 | Copenhagen Business School | 70 | 24.76 | Denmark |  |  |  |  |  |
+| 57 | University of Warwick (Warwick Business School) | 60 | 24.40 | United Kingdom |  |  |  |  |  |
+| 58 | Nanyang Technological University (Nanyang Business School) | 54 | 23.26 | Singapore |  |  |  |  |  |
+| 59 | Erasmus University Rotterdam (Rotterdam School of Management) | 61 | 23.00 | Netherlands |  |  |  |  |  |
+| 60 | Frankfurt School of Finance and Management | 54 | 22.50 | Germany |  |  |  |  |  |
+| 61 | City University of Hong Kong (College of Business) | 57 | 22.32 | China |  |  |  |  |  |
+| 62 | University of New South Wales (UNSW Business School) | 58 | 21.73 | Australia |  |  |  |  |  |
+| 63 | Southern Methodist University (Cox School of Business) | 47 | 21.50 | USA |  |  |  |  |  |
+| 64 | University of Rochester (Simon Business School) | 51 | 21.20 | USA |  |  |  |  |  |
+| 65 | Michigan State University (Broad College of Business) | 51 | 21.16 | USA |  |  |  |  |  |
+| 66 | University of Florida (Warrington College of Business) | 55 | 20.73 | USA |  |  |  |  |  |
+| 67 | City University of New York, Baruch College (Zicklin School of Business) | 46 | 20.14 | USA |  |  |  |  |  |
+| 68 | University of California at Irvine (Paul Merage School of Business) | 47 | 19.97 | USA |  |  |  |  |  |
+| 69 | Hong Kong Polytechnic University (Faculty of Business) | 56 | 19.73 | China |  |  |  |  |  |
+| 70 | University of Miami (Herbert Business School) | 39 | 19.40 | USA |  |  |  |  |  |
+| 71 | Oxford University (Said Business School) | 53 | 19.31 | United Kingdom |  |  |  |  |  |
+| 72 | University of Virginia (Darden School of Business) | 53 | 19.22 | USA |  |  |  |  |  |
+| 73 | University of Arizona (Eller College of Management) | 45 | 19.11 | USA |  |  |  |  |  |
+| 74 | University of Melbourne (Melbourne Business School) | 45 | 18.95 | Australia |  |  |  |  |  |
+| 75 | University of Houston (C.T. Bauer College of Business) | 41 | 18.66 | USA |  |  |  |  |  |
+| 76 | Stockholm School of Economics (SSE) | 46 | 18.51 | Sweden |  |  |  |  |  |
+| 77 | University of Illinois at Chicago (College of Business Administration) | 44 | 18.06 | USA |  |  |  |  |  |
+| 78 | University of Cambridge (Judge Business School) | 43 | 17.67 | United Kingdom |  |  |  |  |  |
+| 79 | Rice University (Jones Graduate School of Business) | 38 | 17.41 | USA |  |  |  |  |  |
+| 80 | Peking University (Guanghua School of Management) | 45 | 17.06 | China |  |  |  |  |  |
+| 81 | Shanghai University of Finance and Economics (SUFE) | 46 | 17.02 | China |  |  |  |  |  |
+| 82 | Texas A&M University (Mays Business School) | 40 | 16.50 | USA |  |  |  |  |  |
+| 83 | Brigham Young University (Marriott School of Management) | 38 | 16.46 | USA |  |  |  |  |  |
+| 84 | PBCSF Tsinghua University (PBC School of Finance) | 45 | 16.19 | China |  |  |  |  |  |
+| 85 | Georgia State University (Robinson School of Business) | 40 | 16.06 | USA |  |  |  |  |  |
+| 86 | Northeastern University (D'Amore-McKim School of Business) | 35 | 16.05 | USA |  |  |  |  |  |
+| 87 | Princeton University (Bendheim Center for Finance) | 41 | 15.87 | USA |  |  |  |  |  |
+| 88 | University of Georgia (Terry College of Business) | 33 | 15.29 | USA |  |  |  |  |  |
+| 89 | City, University of London (Bayes Business School) | 41 | 15.16 | United Kingdom |  |  |  |  |  |
+| 90 | Goethe-University of Frankfurt | 40 | 14.92 | Germany |  |  |  |  |  |
+| 91 | The Chinese University of Hong Kong, Shenzhen (School of Management and Economics) | 45 | 14.81 | China |  |  |  |  |  |
+| 92 | University of Amsterdam (Amsterdam Business School) | 33 | 14.74 | Netherlands |  |  |  |  |  |
+| 93 | BI Norwegian Business School | 31 | 14.69 | Norway |  |  |  |  |  |
+| 94 | University of Connecticut (School of Business) | 36 | 14.68 | USA |  |  |  |  |  |
+| 95 | University of Mannheim (Business School) | 36 | 14.61 | Germany |  |  |  |  |  |
+| 96 | University of Navarra (IESE Business School) | 37 | 14.54 | Spain |  |  |  |  |  |
+| 97 | Renmin University of China (School of Business) | 48 | 14.49 | China |  |  |  |  |  |
+| 98 | University of Pittsburgh (Katz Graduate School of Business) | 35 | 14.48 | USA |  |  |  |  |  |
+| 99 | Rutgers University (Rutgers Business School) | 39 | 14.19 | USA |  |  |  |  |  |
+| 100 | Bocconi University (SDA School of Management) | 52 | 14.13 | Italy |  |  |  |  |  |

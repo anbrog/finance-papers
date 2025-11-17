@@ -1,0 +1,287 @@
+#!/bin/bash
+
+# scrape - Unified scraping interface for academic journals
+# Usage: ./scrape [journal] [options]
+
+# Required parameters for Raycast:
+# @raycast.schemaVersion 1
+# @raycast.title Scrape Papers
+# @raycast.mode fullOutput
+
+# Optional parameters:
+# @raycast.icon 📝
+# @raycast.argument1 { "type": "text", "placeholder": "Enter something" }
+# @raycast.packageName scrape-papers (type all,jf,aer as options)
+
+# Documentation:
+# @raycast.description Scrapes papers from Fin top3 and Econ top5
+# @raycast.author andreas_brogger
+# @raycast.authorURL https://raycast.com/andreas_brogger
+
+# Get the directory where this script is located
+# Follow symbolic links to get the real script location
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_SOURCE" ]; do
+    SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+    SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+    [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+SRC_DIR="$SCRIPT_DIR/../src"
+PROJECT_DIR="$SCRIPT_DIR/.."
+
+# Function to find and activate virtual environment
+setup_python_env() {
+    # Check for virtual environment in order of preference
+    if [ -d "$PROJECT_DIR/.venv" ]; then
+        VENV_PATH="$PROJECT_DIR/.venv"
+    elif [ -d "$PROJECT_DIR/venv" ]; then
+        VENV_PATH="$PROJECT_DIR/venv"
+    else
+        echo "⚠️  No virtual environment found. Please create one with:"
+        echo "   python3 -m venv .venv"
+        echo "   source .venv/bin/activate"
+        echo "   pip install -r requirements.txt"
+        exit 1
+    fi
+    
+    # Set the Python executable path
+    PYTHON_CMD="$VENV_PATH/bin/python"
+    
+    # Check if the virtual environment Python exists
+    if [ ! -f "$PYTHON_CMD" ]; then
+        echo "❌ Virtual environment Python not found at $PYTHON_CMD"
+        echo "Please recreate your virtual environment"
+        exit 1
+    fi
+    
+    echo "🐍 Using Python from virtual environment: $VENV_PATH"
+}
+
+# Function to show help
+show_help() {
+    echo "🔧 Academic Journal Scraper"
+    echo "Usage: scrape [journal] [options]"
+    echo ""
+    echo "Commands:"
+    echo "  scrape all                        - Run all scrapers (JF + AER + QJE + RFS)"
+    echo "  scrape jf [volume] [issue]        - Scrape Journal of Finance"
+    echo "  scrape aer [volume] [issue]       - Scrape American Economic Review"
+    echo "  scrape qje [volume] [issue]       - Scrape Quarterly Journal of Economics"
+    echo "  scrape rfs                        - Scrape Review of Financial Studies (forthcoming only)"
+    echo "  scrape forthcoming                - Scrape all forthcoming articles"
+    echo "  scrape help                       - Show this help"
+    echo ""
+    echo "JF Examples:"
+    echo "  scrape jf                         - Scrape latest JF issue (default)"
+    echo "  scrape jf 80 3                   - Scrape JF Volume 80, Issue 3"
+    echo "  scrape jf 80                     - Scrape JF Volume 80, all issues"
+    echo "  scrape jf forthcoming            - Scrape JF forthcoming articles"
+    echo ""
+    echo "AER Examples:"
+    echo "  scrape aer                        - Scrape latest AER issue (default)"
+    echo "  scrape aer 114 1                 - Scrape AER Volume 114, Issue 1"
+    echo "  scrape aer forthcoming           - Scrape AER forthcoming articles"
+    echo ""
+    echo "QJE Examples:"
+    echo "  scrape qje                        - Scrape QJE advance articles (default)"
+    echo "  scrape qje 140 2                 - Scrape QJE Volume 140, Issue 2"
+    echo "  scrape qje 140                   - Scrape QJE Volume 140, all issues"
+    echo "  scrape qje forthcoming           - Scrape QJE advance articles"
+    echo ""
+    echo "RFS Examples:"
+    echo "  scrape rfs                        - Scrape RFS advance articles"
+    echo "  scrape rfs forthcoming           - Scrape RFS advance articles"
+    echo ""
+    echo "All scraped data is saved to the unified database at ../out/data/articles.db"
+    echo "Use 'articles' command to view and query the scraped data"
+}
+
+# Function to run JF scraper
+run_jf_scraper() {
+    setup_python_env
+    echo "🏛️  Running Journal of Finance scraper..."
+    
+    # Change to project directory so relative paths work correctly
+    cd "$PROJECT_DIR"
+    
+    if [ "$1" = "forthcoming" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-jf-forth.py"
+    elif [ -n "$1" ] && [ -n "$2" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-jf.py" "$1" "$2"
+    elif [ -n "$1" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-jf.py" "$1"
+    else
+        "$PYTHON_CMD" "$SRC_DIR/scrape-jf.py"
+    fi
+}
+
+# Function to run AER scraper
+run_aer_scraper() {
+    setup_python_env
+    echo "📊 Running American Economic Review scraper..."
+    
+    # Change to project directory so relative paths work correctly
+    cd "$PROJECT_DIR"
+    
+    if [ "$1" = "forthcoming" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-aer-forth.py"
+    elif [ -n "$1" ] && [ -n "$2" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-aer.py" "$1" "$2"
+    elif [ -n "$1" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-aer.py" "$1"
+    else
+        "$PYTHON_CMD" "$SRC_DIR/scrape-aer.py"
+    fi
+}
+
+# Function to run QJE scraper
+run_qje_scraper() {
+    setup_python_env
+    echo "📚 Running Quarterly Journal of Economics scraper..."
+    
+    # Change to project directory so relative paths work correctly
+    cd "$PROJECT_DIR"
+    
+    if [ "$1" = "forthcoming" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-qje-forth.py"
+    elif [ -n "$1" ] && [ -n "$2" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-qje.py" "$1" "$2"
+    elif [ -n "$1" ]; then
+        "$PYTHON_CMD" "$SRC_DIR/scrape-qje.py" "$1"
+    else
+        # Default to forthcoming articles for QJE
+        "$PYTHON_CMD" "$SRC_DIR/scrape-qje-forth.py"
+    fi
+}
+
+# Function to run RFS scraper
+run_rfs_scraper() {
+    setup_python_env
+    echo "📈 Running Review of Financial Studies scraper..."
+    
+    # Change to project directory so relative paths work correctly
+    cd "$PROJECT_DIR"
+    
+    # RFS only has forthcoming articles available (advance articles)
+    "$PYTHON_CMD" "$SRC_DIR/scrape-rfs.py"
+}
+
+# Function to run all scrapers
+run_all_scrapers() {
+    setup_python_env
+    echo "🚀 Running all academic journal scrapers..."
+    echo ""
+    
+    # Change to project directory so relative paths work correctly
+    cd "$PROJECT_DIR"
+    
+    # Run JF scraper
+    echo "🏛️  Running Journal of Finance scraper..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-jf.py"
+    echo ""
+    
+    # Run AER scraper  
+    echo "📊 Running American Economic Review scraper..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-aer.py"
+    echo ""
+    
+    # Run QJE scraper (default issues)
+    echo "📚 Running Quarterly Journal of Economics scraper..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-qje.py"
+    echo ""
+    
+    # Run forthcoming scrapers
+    echo "📰 Running forthcoming articles scrapers..."
+    echo "🏛️  Scraping JF forthcoming articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-jf-forth.py"
+    echo ""
+    echo "📊 Scraping AER forthcoming articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-aer-forth.py"
+    echo ""
+    
+    echo "📚 Scraping QJE advance articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-qje-forth.py"
+    echo ""
+    
+    echo "📈 Scraping RFS advance articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-rfs.py"
+    echo ""
+    echo "📚 Scraping QJE advance articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-qje-forth.py"
+    
+    echo ""
+    echo "✅ All scrapers completed!"
+    echo "Use 'articles stats' to see database statistics"
+}
+
+# Function to run forthcoming scrapers
+run_forthcoming_scrapers() {
+    setup_python_env
+    echo "📰 Running forthcoming articles scrapers..."
+    echo ""
+    
+    # Change to project directory so relative paths work correctly
+    cd "$PROJECT_DIR"
+    
+    echo "🏛️  Scraping JF forthcoming articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-jf-forth.py"
+    echo ""
+    
+    echo "📊 Scraping AER forthcoming articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-aer-forth.py"
+    echo ""
+    
+    echo "📚 Scraping QJE advance articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-qje-forth.py"
+    echo ""
+    
+    echo "📈 Scraping RFS advance articles..."
+    "$PYTHON_CMD" "$SRC_DIR/scrape-rfs.py"
+    
+    echo ""
+    echo "✅ Forthcoming scrapers completed!"
+    echo "Use 'articles forthcoming' to view forthcoming articles"
+}
+
+# Main command processing
+case "${1:-all}" in
+    "all")
+        run_all_scrapers
+        ;;
+    
+    "jf")
+        shift  # Remove 'jf' from arguments
+        run_jf_scraper "$@"
+        ;;
+    
+    "aer")
+        shift  # Remove 'aer' from arguments
+        run_aer_scraper "$@"
+        ;;
+    
+    "qje")
+        shift  # Remove 'qje' from arguments
+        run_qje_scraper "$@"
+        ;;
+    
+    "rfs")
+        shift  # Remove 'rfs' from arguments
+        run_rfs_scraper "$@"
+        ;;
+    
+    "forthcoming"|"forth")
+        run_forthcoming_scrapers
+        ;;
+    
+    "help"|"-h"|"--help")
+        show_help
+        ;;
+    
+    *)
+        echo "❌ Unknown command: $1"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac
