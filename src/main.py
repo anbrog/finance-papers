@@ -464,8 +464,9 @@ Next steps:
         print("Updating static website data...")
         print("="*80 + "\n")
         
-        # Export rankings to JSON
-        export_cmd = [sys.executable, 'src/export_rankings.py']
+        # Export rankings to JSON (use absolute path from project root)
+        export_script = os.path.join(project_root, 'src', 'export_rankings.py')
+        export_cmd = [sys.executable, export_script]
         result = run_command(export_cmd, "Exporting rankings to JSON")
         
         if result == 0:
