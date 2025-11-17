@@ -485,22 +485,29 @@ Next steps:
         result = run_command(export_cmd, "Exporting rankings to JSON")
         
         if result == 0:
-            # Git commands
-            print("\nCommitting and pushing to GitHub...")
-            git_commands = [
-                (['git', 'add', 'docs/data/rankings.json'], "Staging changes"),
-                (['git', 'commit', '-m', 'Update rankings data'], "Committing changes"),
-                (['git', 'push'], "Pushing to GitHub")
-            ]
+            # Check if there are any changes to commit
+            print("\nChecking for changes...")
+            check_result = run_git_command(['git', 'diff', '--quiet', 'docs/data/rankings.json'], "Checking for changes")
             
-            for cmd, desc in git_commands:
-                result = run_git_command(cmd, desc)
-                if result != 0:
-                    print(f"⚠️  Git command failed: {desc}")
-                    break
+            if check_result != 0:  # Non-zero means there are changes
+                # Git commands
+                print("\nCommitting and pushing to GitHub...")
+                git_commands = [
+                    (['git', 'add', 'docs/data/rankings.json'], "Staging changes"),
+                    (['git', 'commit', '-m', 'Update rankings data'], "Committing changes"),
+                    (['git', 'push'], "Pushing to GitHub")
+                ]
+                
+                for cmd, desc in git_commands:
+                    result = run_git_command(cmd, desc)
+                    if result != 0:
+                        print(f"⚠️  Git command failed: {desc}")
+                        break
+                else:
+                    print("\n✅ Static website data updated successfully!")
+                    print("   View at: https://anbrog.github.io/finance-papers/")
             else:
-                print("\n✅ Static website data updated successfully!")
-                print("   View at: https://anbrog.github.io/finance-papers/")
+                print("ℹ️  No changes detected in rankings data - skipping commit")
         else:
             print("⚠️  Export failed, skipping git push")
 
