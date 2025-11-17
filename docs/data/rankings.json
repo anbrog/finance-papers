@@ -1,10 +1,1752 @@
 [
   {
-    "Rank": 1,
-    "Author": "Example Author",
+    "Author": "Bryan Kelly",
+    "Papers": 7,
+    "Citations": 886,
+    "Latest Paper": "Equity Term Structures without Dividend Strips Data",
+    "Latest Date": "2024-10-24"
+  },
+  {
+    "Author": "Kai Li",
+    "Papers": 7,
+    "Citations": 455,
+    "Latest Paper": "Dissecting Corporate Culture Using Generative AI",
+    "Latest Date": "2025-09-30"
+  },
+  {
+    "Author": "Itay Goldstein",
+    "Papers": 6,
+    "Citations": 81,
+    "Latest Paper": "The Next Chapter of Big Data in Finance",
+    "Latest Date": "2024-12-09"
+  },
+  {
+    "Author": "Wei Jiang",
     "Papers": 5,
-    "Citations": 120,
-    "Latest Paper": "Example paper title",
-    "Latest Date": "2024-01-01"
+    "Citations": 266,
+    "Latest Paper": "Surviving the fintech disruption",
+    "Latest Date": "2025-05-27"
+  },
+  {
+    "Author": "Janet Gao",
+    "Papers": 5,
+    "Citations": 157,
+    "Latest Paper": "Private equity in the hospital industry",
+    "Latest Date": "2025-05-26"
+  },
+  {
+    "Author": "Mariassunta Giannetti",
+    "Papers": 5,
+    "Citations": 152,
+    "Latest Paper": "Central bank liquidity reallocation and bank lending: Evidence from the tiering system",
+    "Latest Date": "2025-04-05"
+  },
+  {
+    "Author": "Viral V. Acharya",
+    "Papers": 5,
+    "Citations": 92,
+    "Latest Paper": "Exorbitant privilege? Quantitative easing and the bond market subsidy of prospective fallen angels",
+    "Latest Date": "2025-05-15"
+  },
+  {
+    "Author": "Zhengyang Jiang",
+    "Papers": 5,
+    "Citations": 91,
+    "Latest Paper": "Understanding the strength of the dollar",
+    "Latest Date": "2025-04-04"
+  },
+  {
+    "Author": "Antoinette Schoar",
+    "Papers": 5,
+    "Citations": 88,
+    "Latest Paper": "Household Portfolios and Retirement Saving over the Life Cycle",
+    "Latest Date": "2025-08-12"
+  },
+  {
+    "Author": "Margarita Tsoutsoura",
+    "Papers": 5,
+    "Citations": 75,
+    "Latest Paper": "Entrepreneurship and the gig economy: Evidence from U.S. tax returns",
+    "Latest Date": "2025-09-12"
+  },
+  {
+    "Author": "Alberto G. Rossi",
+    "Papers": 5,
+    "Citations": 69,
+    "Latest Paper": "How costly are cultural biases? Evidence from FinTech",
+    "Latest Date": "2025-11-14"
+  },
+  {
+    "Author": "Snehal Banerjee",
+    "Papers": 5,
+    "Citations": 63,
+    "Latest Paper": "Feedback Effects and Systematic Risk Exposures",
+    "Latest Date": "2025-01-30"
+  },
+  {
+    "Author": "David Hirshleifer",
+    "Papers": 5,
+    "Citations": 62,
+    "Latest Paper": "War Discourse and the Cross Section of Expected Stock Returns",
+    "Latest Date": "2025-09-01"
+  },
+  {
+    "Author": "Jonathan A. Parker",
+    "Papers": 5,
+    "Citations": 46,
+    "Latest Paper": "Household Portfolios and Retirement Saving over the Life Cycle",
+    "Latest Date": "2025-08-12"
+  },
+  {
+    "Author": "Cecilia Parlatore",
+    "Papers": 5,
+    "Citations": 34,
+    "Latest Paper": "Information-based pricing in specialized lending",
+    "Latest Date": "2025-07-23"
+  },
+  {
+    "Author": "Francisco Gomes",
+    "Papers": 5,
+    "Citations": 20,
+    "Latest Paper": "Asset Pricing and Risk‐Sharing Implications of Alternative Pension Plan Systems",
+    "Latest Date": "2025-10-07"
+  },
+  {
+    "Author": "Dacheng Xiu",
+    "Papers": 4,
+    "Citations": 229,
+    "Latest Paper": "Continuous-Time Fama-MacBeth Regressions",
+    "Latest Date": "2025-09-11"
+  },
+  {
+    "Author": "Michael Schwert",
+    "Papers": 4,
+    "Citations": 188,
+    "Latest Paper": "The marginal value of public pension wealth: Evidence from border house prices",
+    "Latest Date": "2025-07-28"
+  },
+  {
+    "Author": "Sabrina T Howell",
+    "Papers": 4,
+    "Citations": 177,
+    "Latest Paper": "Regulatory arbitrage or random errors? Implications of race prediction algorithms in fair lending an",
+    "Latest Date": "2024-05-11"
+  },
+  {
+    "Author": "Thierry Foucault",
+    "Papers": 4,
+    "Citations": 133,
+    "Latest Paper": "Equilibrium Data Mining and Data Abundance",
+    "Latest Date": "2024-10-27"
+  },
+  {
+    "Author": "Erica Xuewei Jiang",
+    "Papers": 4,
+    "Citations": 124,
+    "Latest Paper": "Collateral value uncertainty and mortgage credit provision",
+    "Latest Date": "2025-04-09"
+  },
+  {
+    "Author": "Mikhail Chernov",
+    "Papers": 4,
+    "Citations": 124,
+    "Latest Paper": "Nonstandard Errors",
+    "Latest Date": "2024-04-17"
+  },
+  {
+    "Author": "Ruidi Huang",
+    "Papers": 4,
+    "Citations": 111,
+    "Latest Paper": "The Impact of Minority Representation at Mortgage Lenders",
+    "Latest Date": "2025-02-11"
+  },
+  {
+    "Author": "Svetlana Bryzgalova",
+    "Papers": 4,
+    "Citations": 108,
+    "Latest Paper": "Forest through the Trees: Building Cross‐Sections of Stock Returns",
+    "Latest Date": "2025-09-02"
+  },
+  {
+    "Author": "Stijn Van Nieuwerburgh",
+    "Papers": 4,
+    "Citations": 106,
+    "Latest Paper": "What Drives Variation in the U.S. Debt‐to‐Output Ratio? The Dogs that Did not Bark",
+    "Latest Date": "2024-06-11"
+  },
+  {
+    "Author": "Constantine Yannelis",
+    "Papers": 4,
+    "Citations": 97,
+    "Latest Paper": "Discount factors and monetary policy: Evidence from dual-listed stocks",
+    "Latest Date": "2025-11-08"
+  },
+  {
+    "Author": "Vyacheslav Fos",
+    "Papers": 4,
+    "Citations": 76,
+    "Latest Paper": "Gig labor: Trading safety nets for steering wheels",
+    "Latest Date": "2024-11-07"
+  },
+  {
+    "Author": "Anthony Lee Zhang",
+    "Papers": 4,
+    "Citations": 62,
+    "Latest Paper": "Data and welfare in credit markets",
+    "Latest Date": "2025-10-16"
+  },
+  {
+    "Author": "Leonid Kogan",
+    "Papers": 4,
+    "Citations": 45,
+    "Latest Paper": "Near-Rational Equilibria in Heterogeneous-Agent Models: A Verification Method",
+    "Latest Date": "2025-05-03"
+  },
+  {
+    "Author": "ANTOINETTE SCHOAR",
+    "Papers": 4,
+    "Citations": 39,
+    "Latest Paper": "Report of the Editor of <i>The Journal of Finance</i> for the Year 2024",
+    "Latest Date": "2025-03-18"
+  },
+  {
+    "Author": "Pingle Wang",
+    "Papers": 4,
+    "Citations": 35,
+    "Latest Paper": "Are All ESG Funds Created Equal? Only Some Funds Are Committed",
+    "Latest Date": "2025-10-06"
+  },
+  {
+    "Author": "Howard Kung",
+    "Papers": 4,
+    "Citations": 30,
+    "Latest Paper": "Q: Risk, rents, or growth?",
+    "Latest Date": "2025-01-09"
+  },
+  {
+    "Author": "Lukas Schmid",
+    "Papers": 4,
+    "Citations": 19,
+    "Latest Paper": "Institutional Corporate Bond Pricing",
+    "Latest Date": "2025-09-02"
+  },
+  {
+    "Author": "Song Ma",
+    "Papers": 4,
+    "Citations": 10,
+    "Latest Paper": "Technological Obsolescence",
+    "Latest Date": "2025-10-24"
+  },
+  {
+    "Author": "Stavros Panageas",
+    "Papers": 4,
+    "Citations": 8,
+    "Latest Paper": "Value without Employment",
+    "Latest Date": "2025-10-07"
+  },
+  {
+    "Author": "Zacharias Sautner",
+    "Papers": 3,
+    "Citations": 1400,
+    "Latest Paper": "Limited attention to detail in financial markets: Evidence from reduced-form and structural estimati",
+    "Latest Date": "2024-03-04"
+  },
+  {
+    "Author": "Laurence van Lent",
+    "Papers": 3,
+    "Citations": 1072,
+    "Latest Paper": "The Global Impact of Brexit Uncertainty",
+    "Latest Date": "2023-11-02"
+  },
+  {
+    "Author": "Laura T. Starks",
+    "Papers": 3,
+    "Citations": 840,
+    "Latest Paper": "Presidential Address: Sustainable Finance and ESG Issues—<i>Value</i>versus<i>Values</i>",
+    "Latest Date": "2023-06-19"
+  },
+  {
+    "Author": "Anastassia Fedyk",
+    "Papers": 3,
+    "Citations": 770,
+    "Latest Paper": "Artificial intelligence, firm growth, and product innovation",
+    "Latest Date": "2023-11-23"
+  },
+  {
+    "Author": "Marcin Kacperczyk",
+    "Papers": 3,
+    "Citations": 719,
+    "Latest Paper": "Global volatility and firm-level capital flows",
+    "Latest Date": "2025-04-30"
+  },
+  {
+    "Author": "Patrick Bolton",
+    "Papers": 3,
+    "Citations": 687,
+    "Latest Paper": "Jensen and Meckling at 50",
+    "Latest Date": "2025-06-11"
+  },
+  {
+    "Author": "Tania Babina",
+    "Papers": 3,
+    "Citations": 681,
+    "Latest Paper": "Customer data access and fintech entry: Early evidence from open banking",
+    "Latest Date": "2025-04-07"
+  },
+  {
+    "Author": "Albert J. Menkveld",
+    "Papers": 3,
+    "Citations": 289,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Amit Goyal",
+    "Papers": 3,
+    "Citations": 221,
+    "Latest Paper": "Stealthy shorts: Informed liquidity supply",
+    "Latest Date": "2025-08-20"
+  },
+  {
+    "Author": "Paul Goldsmith-Pinkham",
+    "Papers": 3,
+    "Citations": 220,
+    "Latest Paper": "Heterogeneous Real Estate Agents and the Housing Cycle",
+    "Latest Date": "2024-08-30"
+  },
+  {
+    "Author": "Mathias S. Kruttli",
+    "Papers": 3,
+    "Citations": 173,
+    "Latest Paper": "LTCM Redux? Hedge fund Treasury trading, funding fragility, and risk constraints",
+    "Latest Date": "2025-04-23"
+  },
+  {
+    "Author": "Sumudu W. Watugala",
+    "Papers": 3,
+    "Citations": 173,
+    "Latest Paper": "LTCM Redux? Hedge fund Treasury trading, funding fragility, and risk constraints",
+    "Latest Date": "2025-04-23"
+  },
+  {
+    "Author": "Turan G. Bali",
+    "Papers": 3,
+    "Citations": 171,
+    "Latest Paper": "Retraction notice to “Common risk factors in the cross-section of corporate bond returns” [Journal o",
+    "Latest Date": "2023-10-12"
+  },
+  {
+    "Author": "Matthew C. Ringgenberg",
+    "Papers": 3,
+    "Citations": 151,
+    "Latest Paper": "Does Floor Trading Matter?",
+    "Latest Date": "2024-10-27"
+  },
+  {
+    "Author": "Semyon Malamud",
+    "Papers": 3,
+    "Citations": 151,
+    "Latest Paper": "An Intermediation-Based Model of Exchange Rates",
+    "Latest Date": "2025-05-29"
+  },
+  {
+    "Author": "Asaf Manela",
+    "Papers": 3,
+    "Citations": 142,
+    "Latest Paper": "Does Finance Benefit Society? A Language Embedding Approach",
+    "Latest Date": "2025-02-27"
+  },
+  {
+    "Author": "Michelle Lowry",
+    "Papers": 3,
+    "Citations": 134,
+    "Latest Paper": "Are All ESG Funds Created Equal? Only Some Funds Are Committed",
+    "Latest Date": "2025-10-06"
+  },
+  {
+    "Author": "Ron Kaniel",
+    "Papers": 3,
+    "Citations": 115,
+    "Latest Paper": "Unmasking Mutual Fund Derivative Use",
+    "Latest Date": "2025-01-09"
+  },
+  {
+    "Author": "Markus Pelger",
+    "Papers": 3,
+    "Citations": 106,
+    "Latest Paper": "Forest through the Trees: Building Cross‐Sections of Stock Returns",
+    "Latest Date": "2025-09-02"
+  },
+  {
+    "Author": "Hui Chen",
+    "Papers": 3,
+    "Citations": 106,
+    "Latest Paper": "Measuring “Dark Matter” in Asset Pricing Models",
+    "Latest Date": "2024-03-03"
+  },
+  {
+    "Author": "Victor DeMiguel",
+    "Papers": 3,
+    "Citations": 102,
+    "Latest Paper": "A Multifactor Perspective on Volatility‐Managed Portfolios",
+    "Latest Date": "2024-10-27"
+  },
+  {
+    "Author": "Ting Xu",
+    "Papers": 3,
+    "Citations": 101,
+    "Latest Paper": "Regulatory costs of being public: Evidence from bunching estimation",
+    "Latest Date": "2024-01-12"
+  },
+  {
+    "Author": "Laura Veldkamp",
+    "Papers": 3,
+    "Citations": 100,
+    "Latest Paper": "Data sales and data dilution",
+    "Latest Date": "2025-04-08"
+  },
+  {
+    "Author": "José‐Luis Peydró",
+    "Papers": 3,
+    "Citations": 97,
+    "Latest Paper": "Systemic Risk and Monetary Policy: The Haircut Gap Channel of the Lender of Last Resort",
+    "Latest Date": "2023-12-23"
+  },
+  {
+    "Author": "Xing Huang",
+    "Papers": 3,
+    "Citations": 81,
+    "Latest Paper": "The “Actual Retail Price” of Equity Trades",
+    "Latest Date": "2025-07-25"
+  },
+  {
+    "Author": "Nadya Malenko",
+    "Papers": 3,
+    "Citations": 74,
+    "Latest Paper": "Creating Controversy in Proxy Voting Advice",
+    "Latest Date": "2025-03-16"
+  },
+  {
+    "Author": "Zhiguo He",
+    "Papers": 3,
+    "Citations": 73,
+    "Latest Paper": "Information-based pricing in specialized lending",
+    "Latest Date": "2025-07-23"
+  },
+  {
+    "Author": "Neng Wang",
+    "Papers": 3,
+    "Citations": 70,
+    "Latest Paper": "Dynamic Banking and the Value of Deposits",
+    "Latest Date": "2025-04-23"
+  },
+  {
+    "Author": "Stefano Giglio",
+    "Papers": 3,
+    "Citations": 69,
+    "Latest Paper": "Four facts about ESG beliefs and investor portfolios",
+    "Latest Date": "2024-12-21"
+  },
+  {
+    "Author": "Josef Zechner",
+    "Papers": 3,
+    "Citations": 65,
+    "Latest Paper": "Pricing and constructing international government bond portfolios",
+    "Latest Date": "2025-09-08"
+  },
+  {
+    "Author": "Joseph Engelberg",
+    "Papers": 3,
+    "Citations": 63,
+    "Latest Paper": "Political Sentiment and Innovation: Evidence from Patenters",
+    "Latest Date": "2025-04-28"
+  },
+  {
+    "Author": "Augustin Landier",
+    "Papers": 3,
+    "Citations": 60,
+    "Latest Paper": "ESG News, Future Cash Flows, and Firm Value",
+    "Latest Date": "2025-09-30"
+  },
+  {
+    "Author": "Yoshio Nozawa",
+    "Papers": 3,
+    "Citations": 58,
+    "Latest Paper": "Over‐the‐Counter Markets for Nonstandardized Assets",
+    "Latest Date": "2025-08-26"
+  },
+  {
+    "Author": "David Thesmar",
+    "Papers": 3,
+    "Citations": 57,
+    "Latest Paper": "The moral preferences of investors: Experimental evidence",
+    "Latest Date": "2024-11-01"
+  },
+  {
+    "Author": "Kairong Xiao",
+    "Papers": 3,
+    "Citations": 57,
+    "Latest Paper": "The Shadow Cost of Collateral",
+    "Latest Date": "2024-10-30"
+  },
+  {
+    "Author": "Dmitriy Muravyev",
+    "Papers": 3,
+    "Citations": 54,
+    "Latest Paper": "Anomalies and Their Short‐Sale Costs",
+    "Latest Date": "2025-09-30"
+  },
+  {
+    "Author": "Harrison Hong",
+    "Papers": 3,
+    "Citations": 53,
+    "Latest Paper": "Effects of Credit Expansions on Stock Market Booms and Busts",
+    "Latest Date": "2025-01-30"
+  },
+  {
+    "Author": "Tony Zhang",
+    "Papers": 3,
+    "Citations": 50,
+    "Latest Paper": "Understanding the strength of the dollar",
+    "Latest Date": "2025-04-04"
+  },
+  {
+    "Author": "Jack Liebersohn",
+    "Papers": 3,
+    "Citations": 47,
+    "Latest Paper": "Household mobility and mortgage rate lock",
+    "Latest Date": "2024-12-12"
+  },
+  {
+    "Author": "Yiming Ma",
+    "Papers": 3,
+    "Citations": 47,
+    "Latest Paper": "Steering a Ship in Illiquid Waters: Active Management of Passive Funds",
+    "Latest Date": "2025-05-15"
+  },
+  {
+    "Author": "Jianfeng Yu",
+    "Papers": 3,
+    "Citations": 45,
+    "Latest Paper": "Investor Sentiment and the Pricing of Characteristics-Based Factors",
+    "Latest Date": "2025-10-20"
+  },
+  {
+    "Author": "Lin William Cong",
+    "Papers": 3,
+    "Citations": 45,
+    "Latest Paper": "Strategic digitization in currency and payment competition",
+    "Latest Date": "2025-04-06"
+  },
+  {
+    "Author": "Igor Makarov",
+    "Papers": 3,
+    "Citations": 43,
+    "Latest Paper": "Are cryptos different? Evidence from retail trading",
+    "Latest Date": "2024-07-06"
+  },
+  {
+    "Author": "Cameron Peng",
+    "Papers": 3,
+    "Citations": 41,
+    "Latest Paper": "Reaching for yield: Evidence from households",
+    "Latest Date": "2025-04-04"
+  },
+  {
+    "Author": "Gordon M. Phillips",
+    "Papers": 3,
+    "Citations": 37,
+    "Latest Paper": "The Effects of Going Public on Firm Profitability and Strategy",
+    "Latest Date": "2025-04-24"
+  },
+  {
+    "Author": "Liyan Yang",
+    "Papers": 3,
+    "Citations": 36,
+    "Latest Paper": "Information sharing in financial markets",
+    "Latest Date": "2024-11-06"
+  },
+  {
+    "Author": "Michael Ewens",
+    "Papers": 3,
+    "Citations": 35,
+    "Latest Paper": "Venture Capital and Startup Agglomeration",
+    "Latest Date": "2025-04-01"
+  },
+  {
+    "Author": "Matteo Crosignani",
+    "Papers": 3,
+    "Citations": 35,
+    "Latest Paper": "Securing technological leadership? The cost of export controls on firms",
+    "Latest Date": "2025-11-08"
+  },
+  {
+    "Author": "Michael Weber",
+    "Papers": 3,
+    "Citations": 33,
+    "Latest Paper": "Inflation and Trading",
+    "Latest Date": "2025-09-11"
+  },
+  {
+    "Author": "Marco Sammon",
+    "Papers": 3,
+    "Citations": 32,
+    "Latest Paper": "The retail habitat",
+    "Latest Date": "2025-07-26"
+  },
+  {
+    "Author": "Huseyin Gulen",
+    "Papers": 3,
+    "Citations": 32,
+    "Latest Paper": "Extracting extrapolative beliefs from market prices: An augmented present-value approach",
+    "Latest Date": "2024-12-26"
+  },
+  {
+    "Author": "Yigitcan Karabulut",
+    "Papers": 3,
+    "Citations": 32,
+    "Latest Paper": "Shattered housing",
+    "Latest Date": "2024-04-09"
+  },
+  {
+    "Author": "Peter Feldhütter",
+    "Papers": 3,
+    "Citations": 31,
+    "Latest Paper": "Is Capital Structure Irrelevant with ESG Investors?",
+    "Latest Date": "2024-10-10"
+  },
+  {
+    "Author": "Christopher Polk",
+    "Papers": 3,
+    "Citations": 29,
+    "Latest Paper": "Corrigendum to “Ripples into waves: Trade networks, economic activity, and asset prices” [Journal of",
+    "Latest Date": "2025-11-01"
+  },
+  {
+    "Author": "Natasha Sarin",
+    "Papers": 3,
+    "Citations": 28,
+    "Latest Paper": "Price regulation in two-sided markets: Empirical evidence from debit cards",
+    "Latest Date": "2025-06-12"
+  },
+  {
+    "Author": "Erik J. Mayer",
+    "Papers": 3,
+    "Citations": 28,
+    "Latest Paper": "The Impact of Minority Representation at Mortgage Lenders",
+    "Latest Date": "2025-02-11"
+  },
+  {
+    "Author": "Brett Green",
+    "Papers": 3,
+    "Citations": 28,
+    "Latest Paper": "Due Diligence",
+    "Latest Date": "2024-03-04"
+  },
+  {
+    "Author": "Thilo Kind",
+    "Papers": 3,
+    "Citations": 27,
+    "Latest Paper": "ISSUE INFORMATION",
+    "Latest Date": "2023-11-01"
+  },
+  {
+    "Author": "Simon Mayer",
+    "Papers": 3,
+    "Citations": 26,
+    "Latest Paper": "Strategic digitization in currency and payment competition",
+    "Latest Date": "2025-04-06"
+  },
+  {
+    "Author": "Markus K. Brunnermeier",
+    "Papers": 3,
+    "Citations": 25,
+    "Latest Paper": "Presidential Address: Macrofinance and Resilience",
+    "Latest Date": "2024-11-11"
+  },
+  {
+    "Author": "Benjamin Golez",
+    "Papers": 3,
+    "Citations": 25,
+    "Latest Paper": "Equity duration and predictability",
+    "Latest Date": "2025-06-12"
+  },
+  {
+    "Author": "Chaojun Wang",
+    "Papers": 3,
+    "Citations": 22,
+    "Latest Paper": "Regulating Over‐the‐Counter Markets",
+    "Latest Date": "2025-05-30"
+  },
+  {
+    "Author": "Maureen O’Hara",
+    "Papers": 3,
+    "Citations": 22,
+    "Latest Paper": "Bond Market Resiliency: The Role of Insurers",
+    "Latest Date": "2025-11-08"
+  },
+  {
+    "Author": "Jules van Binsbergen",
+    "Papers": 3,
+    "Citations": 20,
+    "Latest Paper": "Is the United States a Lucky Survivor? A Hierarchical Bayesian Approach",
+    "Latest Date": "2025-04-16"
+  },
+  {
+    "Author": "Alexandre Corhay",
+    "Papers": 3,
+    "Citations": 20,
+    "Latest Paper": "Q: Risk, rents, or growth?",
+    "Latest Date": "2025-01-09"
+  },
+  {
+    "Author": "Alexandr Kopytov",
+    "Papers": 3,
+    "Citations": 20,
+    "Latest Paper": "The Pace of Change: Socially Responsible Investing in Private Markets",
+    "Latest Date": "2025-10-04"
+  },
+  {
+    "Author": "Andrea Vedolin",
+    "Papers": 3,
+    "Citations": 20,
+    "Latest Paper": "Robustness and dynamic sentiment",
+    "Latest Date": "2024-10-30"
+  },
+  {
+    "Author": "Samuel Antill",
+    "Papers": 3,
+    "Citations": 19,
+    "Latest Paper": "Crisis Interventions in Corporate Insolvency",
+    "Latest Date": "2025-01-30"
+  },
+  {
+    "Author": "Zhi Da",
+    "Papers": 3,
+    "Citations": 18,
+    "Latest Paper": "Pension fund flows, exchange rates, and covered interest rate parity",
+    "Latest Date": "2025-05-10"
+  },
+  {
+    "Author": "Vincent Glode",
+    "Papers": 3,
+    "Citations": 18,
+    "Latest Paper": "Technological Progress and Rent Seeking",
+    "Latest Date": "2024-07-15"
+  },
+  {
+    "Author": "Michał Zator",
+    "Papers": 3,
+    "Citations": 17,
+    "Latest Paper": "Robots and firm investment",
+    "Latest Date": "2025-10-11"
+  },
+  {
+    "Author": "Taylor Nadauld",
+    "Papers": 3,
+    "Citations": 17,
+    "Latest Paper": "What Problem Do Intermediaries Solve? Evidence From Real Estate Markets",
+    "Latest Date": "2025-10-14"
+  },
+  {
+    "Author": "David Scharfstein",
+    "Papers": 3,
+    "Citations": 15,
+    "Latest Paper": "Bank Risk-Taking and the Real Economy: Evidence from the Housing Boom and Its Aftermath",
+    "Latest Date": "2025-10-28"
+  },
+  {
+    "Author": "Andrey Malenko",
+    "Papers": 3,
+    "Citations": 14,
+    "Latest Paper": "Creating Controversy in Proxy Voting Advice",
+    "Latest Date": "2025-03-16"
+  },
+  {
+    "Author": "Mahyar Kargar",
+    "Papers": 3,
+    "Citations": 14,
+    "Latest Paper": "The marginal value of public pension wealth: Evidence from border house prices",
+    "Latest Date": "2025-07-28"
+  },
+  {
+    "Author": "Daniel Ferreira",
+    "Papers": 3,
+    "Citations": 13,
+    "Latest Paper": "Subtle Discrimination",
+    "Latest Date": "2025-10-06"
+  },
+  {
+    "Author": "Hitesh Doshi",
+    "Papers": 3,
+    "Citations": 12,
+    "Latest Paper": "Capital Investment, Equity Returns, and Aggregate Dynamics in Oligopolistic Production Economies",
+    "Latest Date": "2024-09-24"
+  },
+  {
+    "Author": "Neil D. Pearson",
+    "Papers": 3,
+    "Citations": 11,
+    "Latest Paper": "Anomalies and Their Short‐Sale Costs",
+    "Latest Date": "2025-09-30"
+  },
+  {
+    "Author": "George O. Aragon",
+    "Papers": 3,
+    "Citations": 10,
+    "Latest Paper": "Anticipatory Trading Against Distressed Mega Hedge Funds",
+    "Latest Date": "2025-10-03"
+  },
+  {
+    "Author": "Maxime Bonelli",
+    "Papers": 3,
+    "Citations": 10,
+    "Latest Paper": "Financial Advisors and Investors’ Bias",
+    "Latest Date": "2025-10-24"
+  },
+  {
+    "Author": "Filip Žikeš",
+    "Papers": 3,
+    "Citations": 8,
+    "Latest Paper": "Dealer balance sheets and bidding behavior in the Bank of England’s QE reverse auctions",
+    "Latest Date": "2025-10-17"
+  },
+  {
+    "Author": "Urban J. Jermann",
+    "Papers": 3,
+    "Citations": 7,
+    "Latest Paper": "Rules versus discretion in capital regulation",
+    "Latest Date": "2025-04-07"
+  },
+  {
+    "Author": "Chester S. Spatt",
+    "Papers": 3,
+    "Citations": 6,
+    "Latest Paper": "Would Order‐By‐Order Auctions Be Competitive?",
+    "Latest Date": "2025-05-13"
+  },
+  {
+    "Author": "Marianne Andries",
+    "Papers": 3,
+    "Citations": 3,
+    "Latest Paper": "Financial Advisors and Investors’ Bias",
+    "Latest Date": "2025-10-24"
+  },
+  {
+    "Author": "Antonio Falato",
+    "Papers": 3,
+    "Citations": 1,
+    "Latest Paper": "Bank Risk-Taking and the Real Economy: Evidence from the Housing Boom and Its Aftermath",
+    "Latest Date": "2025-10-28"
+  },
+  {
+    "Author": "Dong Lou",
+    "Papers": 3,
+    "Citations": 1,
+    "Latest Paper": "Corrigendum to “Ripples into waves: Trade networks, economic activity, and asset prices” [Journal of",
+    "Latest Date": "2025-11-01"
+  },
+  {
+    "Author": "James Hodson",
+    "Papers": 2,
+    "Citations": 685,
+    "Latest Paper": "Artificial intelligence, firm growth, and product innovation",
+    "Latest Date": "2023-11-23"
+  },
+  {
+    "Author": "Alex Xi He",
+    "Papers": 2,
+    "Citations": 653,
+    "Latest Paper": "Artificial intelligence, firm growth, and product innovation",
+    "Latest Date": "2023-11-23"
+  },
+  {
+    "Author": "Lasse Heje Pedersen",
+    "Papers": 2,
+    "Citations": 334,
+    "Latest Paper": "Is Capital Structure Irrelevant with ESG Investors?",
+    "Latest Date": "2024-10-10"
+  },
+  {
+    "Author": "Yuehua Tang",
+    "Papers": 2,
+    "Citations": 254,
+    "Latest Paper": "Surviving the fintech disruption",
+    "Latest Date": "2025-05-27"
+  },
+  {
+    "Author": "Vincent Yao",
+    "Papers": 2,
+    "Citations": 254,
+    "Latest Paper": "Surviving the fintech disruption",
+    "Latest Date": "2025-05-27"
+  },
+  {
+    "Author": "Bruno Biais",
+    "Papers": 2,
+    "Citations": 215,
+    "Latest Paper": "Committee-Based Blockchains as Games between Opportunistic Players and Adversaries",
+    "Latest Date": "2023-06-16"
+  },
+  {
+    "Author": "Sean Cao",
+    "Papers": 2,
+    "Citations": 207,
+    "Latest Paper": "From Man vs. Machine to Man + Machine: The art and AI of stock analyses",
+    "Latest Date": "2024-07-22"
+  },
+  {
+    "Author": "Baozhong Yang",
+    "Papers": 2,
+    "Citations": 207,
+    "Latest Paper": "From Man vs. Machine to Man + Machine: The art and AI of stock analyses",
+    "Latest Date": "2024-07-22"
+  },
+  {
+    "Author": "Tarek A. Hassan",
+    "Papers": 2,
+    "Citations": 204,
+    "Latest Paper": "The Global Impact of Brexit Uncertainty",
+    "Latest Date": "2023-11-02"
+  },
+  {
+    "Author": "Stephan Hollander",
+    "Papers": 2,
+    "Citations": 204,
+    "Latest Paper": "The Global Impact of Brexit Uncertainty",
+    "Latest Date": "2023-11-02"
+  },
+  {
+    "Author": "Ahmed Tahoun",
+    "Papers": 2,
+    "Citations": 204,
+    "Latest Paper": "The Global Impact of Brexit Uncertainty",
+    "Latest Date": "2023-11-02"
+  },
+  {
+    "Author": "Leland Bybee",
+    "Papers": 2,
+    "Citations": 187,
+    "Latest Paper": "Business News and Business Cycles",
+    "Latest Date": "2024-08-09"
+  },
+  {
+    "Author": "Florian Weigert",
+    "Papers": 2,
+    "Citations": 174,
+    "Latest Paper": "Unobserved Performance of Hedge Funds",
+    "Latest Date": "2024-07-10"
+  },
+  {
+    "Author": "Franklin Allen",
+    "Papers": 2,
+    "Citations": 172,
+    "Latest Paper": "Dissecting the Long‐Term Performance of the Chinese Stock Market",
+    "Latest Date": "2024-03-01"
+  },
+  {
+    "Author": "Jun Qian",
+    "Papers": 2,
+    "Citations": 172,
+    "Latest Paper": "Dissecting the Long‐Term Performance of the Chinese Stock Market",
+    "Latest Date": "2024-03-01"
+  },
+  {
+    "Author": "John M. Griffin",
+    "Papers": 2,
+    "Citations": 130,
+    "Latest Paper": "Did FinTech Lenders Facilitate PPP Fraud?",
+    "Latest Date": "2023-02-08"
+  },
+  {
+    "Author": "Samuel Kruger",
+    "Papers": 2,
+    "Citations": 130,
+    "Latest Paper": "Did FinTech Lenders Facilitate PPP Fraud?",
+    "Latest Date": "2023-02-08"
+  },
+  {
+    "Author": "Ingrid M. Werner",
+    "Papers": 2,
+    "Citations": 126,
+    "Latest Paper": "The retail execution quality landscape",
+    "Latest Date": "2025-04-04"
+  },
+  {
+    "Author": "David Laibson",
+    "Papers": 2,
+    "Citations": 122,
+    "Latest Paper": "Optimal illiquidity",
+    "Latest Date": "2025-01-18"
+  },
+  {
+    "Author": "Ryan Lewis",
+    "Papers": 2,
+    "Citations": 117,
+    "Latest Paper": "The marginal value of public pension wealth: Evidence from border house prices",
+    "Latest Date": "2025-07-28"
+  },
+  {
+    "Author": "Jessica Jeffers",
+    "Papers": 2,
+    "Citations": 116,
+    "Latest Paper": "The risk and return of impact investing funds",
+    "Latest Date": "2024-08-30"
+  },
+  {
+    "Author": "Shaojun Zhang",
+    "Papers": 2,
+    "Citations": 114,
+    "Latest Paper": "Carbon Returns across the Globe",
+    "Latest Date": "2024-10-21"
+  },
+  {
+    "Author": "Xuelin Li",
+    "Papers": 2,
+    "Citations": 112,
+    "Latest Paper": "Financial Effects of Remote Product Delivery: Evidence from Hospitals",
+    "Latest Date": "2024-06-06"
+  },
+  {
+    "Author": "Simona Abis",
+    "Papers": 2,
+    "Citations": 110,
+    "Latest Paper": "Broken promises, competition, and capital allocation in the mutual fund industry",
+    "Latest Date": "2024-09-28"
+  },
+  {
+    "Author": "Dirk Jenter",
+    "Papers": 2,
+    "Citations": 109,
+    "Latest Paper": "ISSUE INFORMATION",
+    "Latest Date": "2023-11-01"
+  },
+  {
+    "Author": "Niels Joachim Gormsen",
+    "Papers": 2,
+    "Citations": 105,
+    "Latest Paper": "Conditional risk",
+    "Latest Date": "2024-09-20"
+  },
+  {
+    "Author": "Daniel Andrei",
+    "Papers": 2,
+    "Citations": 104,
+    "Latest Paper": "Investor learning about monetary-policy transmission and the stock market",
+    "Latest Date": "2025-08-27"
+  },
+  {
+    "Author": "Philippe Mueller",
+    "Papers": 2,
+    "Citations": 102,
+    "Latest Paper": "Foreign Exchange Fixings and Returns around the Clock",
+    "Latest Date": "2023-12-19"
+  },
+  {
+    "Author": "Pengfei Ma",
+    "Papers": 2,
+    "Citations": 102,
+    "Latest Paper": "Partisanship in loan pricing",
+    "Latest Date": "2023-10-06"
+  },
+  {
+    "Author": "Jules H. van Binsbergen",
+    "Papers": 2,
+    "Citations": 101,
+    "Latest Paper": "The impact of impact investing",
+    "Latest Date": "2024-12-02"
+  },
+  {
+    "Author": "Hyunseob Kim",
+    "Papers": 2,
+    "Citations": 100,
+    "Latest Paper": "Delayed creative destruction: How uncertainty shapes corporate assets",
+    "Latest Date": "2024-01-21"
+  },
+  {
+    "Author": "Marina Niessner",
+    "Papers": 2,
+    "Citations": 100,
+    "Latest Paper": "Are cryptos different? Evidence from retail trading",
+    "Latest Date": "2024-07-06"
+  },
+  {
+    "Author": "Joseph Kalmenovitz",
+    "Papers": 2,
+    "Citations": 98,
+    "Latest Paper": "Regulatory Fragmentation",
+    "Latest Date": "2025-01-30"
+  },
+  {
+    "Author": "Lucian A. Taylor",
+    "Papers": 2,
+    "Citations": 98,
+    "Latest Paper": "Green tilts",
+    "Latest Date": "2025-10-08"
+  },
+  {
+    "Author": "Maximilian Rohrer",
+    "Papers": 2,
+    "Citations": 95,
+    "Latest Paper": "The effect of female leadership on contracting from Capitol Hill to Main Street",
+    "Latest Date": "2024-03-05"
+  },
+  {
+    "Author": "Anna Dreber",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Felix Holzmeister",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Jürgen Huber",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Magnus Johannesson",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Michael Kirchler",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Michael Razen",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Utz Weitzel",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Olivier Akmansoy",
+    "Papers": 2,
+    "Citations": 91,
+    "Latest Paper": "Computational Reproducibility in Finance: Evidence from 1,000 Tests",
+    "Latest Date": "2024-06-21"
+  },
+  {
+    "Author": "Anna Pavlova",
+    "Papers": 2,
+    "Citations": 89,
+    "Latest Paper": "Strategic arbitrage in segmented markets",
+    "Latest Date": "2025-01-30"
+  },
+  {
+    "Author": "Taisiya Sikorskaya",
+    "Papers": 2,
+    "Citations": 89,
+    "Latest Paper": "Strategic arbitrage in segmented markets",
+    "Latest Date": "2025-01-30"
+  },
+  {
+    "Author": "Johannes Stroebel",
+    "Papers": 2,
+    "Citations": 89,
+    "Latest Paper": "Four facts about ESG beliefs and investor portfolios",
+    "Latest Date": "2024-12-21"
+  },
+  {
+    "Author": "Nuri Ersahin",
+    "Papers": 2,
+    "Citations": 89,
+    "Latest Paper": "How Do Short-Term Incentives Affect Long-Term Productivity?",
+    "Latest Date": "2024-10-07"
+  },
+  {
+    "Author": "Kelly Shue",
+    "Papers": 2,
+    "Citations": 87,
+    "Latest Paper": "ISSUE INFORMATION",
+    "Latest Date": "2023-11-01"
+  },
+  {
+    "Author": "Filippo Mezzanotti",
+    "Papers": 2,
+    "Citations": 82,
+    "Latest Paper": "Investor Tax Credits and Entrepreneurship: Evidence from U.S. States",
+    "Latest Date": "2023-08-01"
+  },
+  {
+    "Author": "John R. Graham",
+    "Papers": 2,
+    "Citations": 81,
+    "Latest Paper": "The Persistence of Miscalibration",
+    "Latest Date": "2025-09-08"
+  },
+  {
+    "Author": "Doron Levit",
+    "Papers": 2,
+    "Citations": 81,
+    "Latest Paper": "ESG: A panacea for market power?",
+    "Latest Date": "2025-01-24"
+  },
+  {
+    "Author": "Vincent Bogousslavsky",
+    "Papers": 2,
+    "Citations": 80,
+    "Latest Paper": "Informed Trading Intensity",
+    "Latest Date": "2024-02-27"
+  },
+  {
+    "Author": "Jun Pan",
+    "Papers": 2,
+    "Citations": 76,
+    "Latest Paper": "The SOE Premium and Government Support in China's Credit Market",
+    "Latest Date": "2024-08-14"
+  },
+  {
+    "Author": "Anne Haubo Dyhrberg",
+    "Papers": 2,
+    "Citations": 76,
+    "Latest Paper": "The retail execution quality landscape",
+    "Latest Date": "2025-04-04"
+  },
+  {
+    "Author": "Mihail Velikov",
+    "Papers": 2,
+    "Citations": 76,
+    "Latest Paper": "Show me the receipts: B2B payment timeliness and expected returns",
+    "Latest Date": "2025-06-11"
+  },
+  {
+    "Author": "Izidin El Kalak",
+    "Papers": 2,
+    "Citations": 75,
+    "Latest Paper": "Nonstandard Errors",
+    "Latest Date": "2024-04-17"
+  },
+  {
+    "Author": "Carole Comerton‐Forde",
+    "Papers": 2,
+    "Citations": 71,
+    "Latest Paper": "Differential access to dark markets and execution outcomes",
+    "Latest Date": "2025-05-26"
+  },
+  {
+    "Author": "Kingsley Y. L. Fong",
+    "Papers": 2,
+    "Citations": 71,
+    "Latest Paper": "Regulating inattention in fee-based financial advice",
+    "Latest Date": "2024-12-24"
+  },
+  {
+    "Author": "Yacine Aı̈t-Sahalia",
+    "Papers": 2,
+    "Citations": 70,
+    "Latest Paper": "Continuous-Time Fama-MacBeth Regressions",
+    "Latest Date": "2025-09-11"
+  },
+  {
+    "Author": "Jean-Édouard Colliard",
+    "Papers": 2,
+    "Citations": 70,
+    "Latest Paper": "Measuring regulatory complexity",
+    "Latest Date": "2025-10-16"
+  },
+  {
+    "Author": "Li An",
+    "Papers": 2,
+    "Citations": 70,
+    "Latest Paper": "The Portfolio‐Driven Disposition Effect",
+    "Latest Date": "2024-08-21"
+  },
+  {
+    "Author": "Larissa Schäfer",
+    "Papers": 2,
+    "Citations": 68,
+    "Latest Paper": "Shattered housing",
+    "Latest Date": "2024-04-09"
+  },
+  {
+    "Author": "Calvin Zhang",
+    "Papers": 2,
+    "Citations": 66,
+    "Latest Paper": "Political Polarization Affects Households' Financial Decisions: Evidence from Home Sales",
+    "Latest Date": "2024-02-11"
+  },
+  {
+    "Author": "Marco Pagano",
+    "Papers": 2,
+    "Citations": 65,
+    "Latest Paper": "JAQ of all trades: Job mismatch, firm productivity and managerial quality",
+    "Latest Date": "2024-12-31"
+  },
+  {
+    "Author": "Runjing Lu",
+    "Papers": 2,
+    "Citations": 64,
+    "Latest Paper": "Political Sentiment and Innovation: Evidence from Patenters",
+    "Latest Date": "2025-04-28"
+  },
+  {
+    "Author": "William Mullins",
+    "Papers": 2,
+    "Citations": 64,
+    "Latest Paper": "Political Sentiment and Innovation: Evidence from Patenters",
+    "Latest Date": "2025-04-28"
+  },
+  {
+    "Author": "Matthew Henriksson",
+    "Papers": 2,
+    "Citations": 63,
+    "Latest Paper": "The Portfolio‐Driven Disposition Effect",
+    "Latest Date": "2024-08-21"
+  },
+  {
+    "Author": "Jared Williams",
+    "Papers": 2,
+    "Citations": 63,
+    "Latest Paper": "The Portfolio‐Driven Disposition Effect",
+    "Latest Date": "2024-08-21"
+  },
+  {
+    "Author": "Juhani T. Linnainmaa",
+    "Papers": 2,
+    "Citations": 63,
+    "Latest Paper": "Man versus Machine Learning Revisited",
+    "Latest Date": "2025-09-02"
+  },
+  {
+    "Author": "Ramona Dagostino",
+    "Papers": 2,
+    "Citations": 62,
+    "Latest Paper": "The impact of bank financing on municipalities’ bond issuance and the real economy",
+    "Latest Date": "2025-02-13"
+  },
+  {
+    "Author": "Tarun Ramadorai",
+    "Papers": 2,
+    "Citations": 59,
+    "Latest Paper": "Refinancing cross-subsidies in the mortgage market",
+    "Latest Date": "2024-06-05"
+  },
+  {
+    "Author": "Sascha Steffen",
+    "Papers": 2,
+    "Citations": 59,
+    "Latest Paper": "Corporate Loan Spreads and Economic Activity",
+    "Latest Date": "2024-12-06"
+  },
+  {
+    "Author": "Jinqiang Yang",
+    "Papers": 2,
+    "Citations": 58,
+    "Latest Paper": "Dynamic Banking and the Value of Deposits",
+    "Latest Date": "2025-04-23"
+  },
+  {
+    "Author": "Qiping Xu",
+    "Papers": 2,
+    "Citations": 58,
+    "Latest Paper": "Sustainability or Greenwashing: Evidence from the Asset Market for Industrial Pollution",
+    "Latest Date": "2024-12-30"
+  },
+  {
+    "Author": "Sasha Indarte",
+    "Papers": 2,
+    "Citations": 58,
+    "Latest Paper": "Moral Hazard versus Liquidity in Household Bankruptcy",
+    "Latest Date": "2023-07-14"
+  },
+  {
+    "Author": "Paolo Sodini",
+    "Papers": 2,
+    "Citations": 57,
+    "Latest Paper": "Countercyclical Income Risk and Portfolio Choices: Evidence from Sweden",
+    "Latest Date": "2024-04-08"
+  },
+  {
+    "Author": "Boris Vallée",
+    "Papers": 2,
+    "Citations": 57,
+    "Latest Paper": "The Labor Market Effects of Loan Guarantee Programs",
+    "Latest Date": "2024-03-30"
+  },
+  {
+    "Author": "Stephen P. Utkus",
+    "Papers": 2,
+    "Citations": 57,
+    "Latest Paper": "Four facts about ESG beliefs and investor portfolios",
+    "Latest Date": "2024-12-21"
+  },
+  {
+    "Author": "Paul Willen",
+    "Papers": 2,
+    "Citations": 56,
+    "Latest Paper": "The Time‐Varying Price of Financial Intermediation in the Mortgage Market",
+    "Latest Date": "2024-06-04"
+  },
+  {
+    "Author": "Kristopher Gerardi",
+    "Papers": 2,
+    "Citations": 56,
+    "Latest Paper": "Can everyone tap into the housing piggy bank? Racial disparities in access to home equity",
+    "Latest Date": "2025-03-15"
+  },
+  {
+    "Author": "Raghuram G. Rajan",
+    "Papers": 2,
+    "Citations": 54,
+    "Latest Paper": "Liquidity, Liquidity Everywhere, Not a Drop to Use: Why Flooding Banks with Central Bank Reserves Ma",
+    "Latest Date": "2024-07-05"
+  },
+  {
+    "Author": "Matthew Denes",
+    "Papers": 2,
+    "Citations": 54,
+    "Latest Paper": "Entrepreneurship and the gig economy: Evidence from U.S. tax returns",
+    "Latest Date": "2025-09-12"
+  },
+  {
+    "Author": "Pierre Collin‐Dufresne",
+    "Papers": 2,
+    "Citations": 54,
+    "Latest Paper": "How Integrated are Credit and Equity Markets? Evidence from Index Options",
+    "Latest Date": "2023-12-12"
+  },
+  {
+    "Author": "Christopher G. Schwarz",
+    "Papers": 2,
+    "Citations": 53,
+    "Latest Paper": "The “Actual Retail Price” of Equity Trades",
+    "Latest Date": "2025-07-25"
+  },
+  {
+    "Author": "Brad M. Barber",
+    "Papers": 2,
+    "Citations": 53,
+    "Latest Paper": "The “Actual Retail Price” of Equity Trades",
+    "Latest Date": "2025-07-25"
+  },
+  {
+    "Author": "Philippe Jorion",
+    "Papers": 2,
+    "Citations": 53,
+    "Latest Paper": "The “Actual Retail Price” of Equity Trades",
+    "Latest Date": "2025-07-25"
+  },
+  {
+    "Author": "Terrance Odean",
+    "Papers": 2,
+    "Citations": 53,
+    "Latest Paper": "The “Actual Retail Price” of Equity Trades",
+    "Latest Date": "2025-07-25"
+  },
+  {
+    "Author": "Ben Charoenwong",
+    "Papers": 2,
+    "Citations": 53,
+    "Latest Paper": "RegTech: Technology-driven compliance and its effects on profitability, operations, and market struc",
+    "Latest Date": "2024-02-13"
+  },
+  {
+    "Author": "Alan Kwan",
+    "Papers": 2,
+    "Citations": 53,
+    "Latest Paper": "RegTech: Technology-driven compliance and its effects on profitability, operations, and market struc",
+    "Latest Date": "2024-02-13"
+  },
+  {
+    "Author": "Daniel Carvalho",
+    "Papers": 2,
+    "Citations": 52,
+    "Latest Paper": "The Working Capital Credit Multiplier",
+    "Latest Date": "2024-08-27"
+  },
+  {
+    "Author": "Magnus Dahlquist",
+    "Papers": 2,
+    "Citations": 51,
+    "Latest Paper": "Institutions’ return expectations across assets and time",
+    "Latest Date": "2025-11-01"
+  },
+  {
+    "Author": "Markus Ibert",
+    "Papers": 2,
+    "Citations": 51,
+    "Latest Paper": "Institutions’ return expectations across assets and time",
+    "Latest Date": "2025-11-01"
+  },
+  {
+    "Author": "Martin C. Schmalz",
+    "Papers": 2,
+    "Citations": 50,
+    "Latest Paper": "Horizon-Dependent Risk Aversion and the Timing and Pricing of Uncertainty",
+    "Latest Date": "2024-09-05"
+  },
+  {
+    "Author": "Christopher S. Jones",
+    "Papers": 2,
+    "Citations": 48,
+    "Latest Paper": "Very Noisy Option Prices and Inference Regarding the Volatility Risk Premium",
+    "Latest Date": "2024-07-17"
+  },
+  {
+    "Author": "Claire Célérier",
+    "Papers": 2,
+    "Citations": 48,
+    "Latest Paper": "Finance, Advertising, and Race",
+    "Latest Date": "2025-06-09"
+  },
+  {
+    "Author": "Manuel Adelino",
+    "Papers": 2,
+    "Citations": 48,
+    "Latest Paper": "Credit supply and house prices: Evidence from mortgage market segmentation",
+    "Latest Date": "2024-10-28"
+  },
+  {
+    "Author": "Laurent E. Calvet",
+    "Papers": 2,
+    "Citations": 47,
+    "Latest Paper": "Investor Factors",
+    "Latest Date": "2025-08-07"
+  },
+  {
+    "Author": "Dongho Song",
+    "Papers": 2,
+    "Citations": 46,
+    "Latest Paper": "The Term Structure of Covered Interest Rate Parity Violations",
+    "Latest Date": "2024-03-31"
+  },
+  {
+    "Author": "Andrzej Skrzypacz",
+    "Papers": 2,
+    "Citations": 46,
+    "Latest Paper": "Disclosing a Random Walk",
+    "Latest Date": "2023-11-13"
+  },
+  {
+    "Author": "Cláudia Custódio",
+    "Papers": 2,
+    "Citations": 45,
+    "Latest Paper": "The Impact of the Financial Education of Executives on the Financial Practices of Medium and Large E",
+    "Latest Date": "2025-08-18"
+  },
+  {
+    "Author": "Antonio Gargano",
+    "Papers": 2,
+    "Citations": 45,
+    "Latest Paper": "Goal Setting and Saving in the FinTech Era",
+    "Latest Date": "2024-04-11"
+  },
+  {
+    "Author": "Lawrence Schmidt",
+    "Papers": 2,
+    "Citations": 45,
+    "Latest Paper": "Climbing and falling off the ladder: Asset pricing implications of labor market event risk",
+    "Latest Date": "2025-07-22"
+  },
+  {
+    "Author": "Stefan Nagel",
+    "Papers": 2,
+    "Citations": 45,
+    "Latest Paper": "Risk-Adjusted Returns of Private Equity Funds: A New Approach",
+    "Latest Date": "2024-10-11"
+  },
+  {
+    "Author": "Ryan D. Israelsen",
+    "Papers": 2,
+    "Citations": 43,
+    "Latest Paper": "Uncovering the Hidden Effort Problem",
+    "Latest Date": "2025-02-17"
+  },
+  {
+    "Author": "Alon Brav",
+    "Papers": 2,
+    "Citations": 43,
+    "Latest Paper": "ISSUE INFORMATION",
+    "Latest Date": "2023-11-01"
+  },
+  {
+    "Author": "Yang Sun",
+    "Papers": 2,
+    "Citations": 42,
+    "Latest Paper": "Self-Declared benchmarks and fund manager intent: “Cheating” or competing?",
+    "Latest Date": "2025-01-06"
+  },
+  {
+    "Author": "Yang Liu",
+    "Papers": 2,
+    "Citations": 42,
+    "Latest Paper": "Getting to the Core: Inflation Risks Within and Across Asset Classes",
+    "Latest Date": "2025-07-16"
+  },
+  {
+    "Author": "Adrien d’Avernas",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "Bonds versus Equities: Information for Investment",
+    "Latest Date": "2024-10-20"
+  },
+  {
+    "Author": "Jesse Davis",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "Choosing to Disagree: Endogenous Dismissiveness and Overconfidence in Financial Markets",
+    "Latest Date": "2024-02-18"
+  },
+  {
+    "Author": "Naveen Gondhi",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "Choosing to Disagree: Endogenous Dismissiveness and Overconfidence in Financial Markets",
+    "Latest Date": "2024-02-18"
+  },
+  {
+    "Author": "Jungsuk Han",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "The short-termism trap: Catering to informed investors with limited horizons",
+    "Latest Date": "2024-06-14"
+  },
+  {
+    "Author": "Nitish Kumar",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "ESG lending",
+    "Latest Date": "2025-09-04"
+  },
+  {
+    "Author": "Fabio Braggion",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "The value of financial intermediation: Evidence from online debt crowdfunding",
+    "Latest Date": "2025-07-15"
+  },
+  {
+    "Author": "Hongjun Yan",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "Disclosing and cooling-off: An analysis of insider trading rules",
+    "Latest Date": "2024-08-01"
+  },
+  {
+    "Author": "Mariano Massimiliano Croce",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "Concealed carry",
+    "Latest Date": "2024-06-08"
+  },
+  {
+    "Author": "Felix von Meyerinck",
+    "Papers": 2,
+    "Citations": 41,
+    "Latest Paper": "CEO turnover and director reputation",
+    "Latest Date": "2024-11-23"
+  },
+  {
+    "Author": "Ulrike Malmendier",
+    "Papers": 2,
+    "Citations": 40,
+    "Latest Paper": "CEO Stress, Aging, and Death",
+    "Latest Date": "2025-10-07"
+  },
+  {
+    "Author": "Zhengwei Wang",
+    "Papers": 2,
+    "Citations": 40,
+    "Latest Paper": "Investor Sentiment and the Pricing of Characteristics-Based Factors",
+    "Latest Date": "2025-10-20"
+  },
+  {
+    "Author": "Efraim Benmelech",
+    "Papers": 2,
+    "Citations": 39,
+    "Latest Paper": "Robots and firm investment",
+    "Latest Date": "2025-10-11"
+  },
+  {
+    "Author": "Hyun Song Shin",
+    "Papers": 2,
+    "Citations": 38,
+    "Latest Paper": "Distributed ledgers and the governance of money",
+    "Latest Date": "2025-02-22"
+  },
+  {
+    "Author": "Andrew Sutherland",
+    "Papers": 2,
+    "Citations": 38,
+    "Latest Paper": "Investment when new capital is hard to find",
+    "Latest Date": "2024-02-16"
+  },
+  {
+    "Author": "Harold H. Zhang",
+    "Papers": 2,
+    "Citations": 37,
+    "Latest Paper": "Operating Hedge and Gross Profitability Premium",
+    "Latest Date": "2023-09-13"
+  },
+  {
+    "Author": "Lucio Sarno",
+    "Papers": 2,
+    "Citations": 37,
+    "Latest Paper": "The trade imbalance network and currency returns",
+    "Latest Date": "2025-06-24"
+  },
+  {
+    "Author": "Gerard Hoberg",
+    "Papers": 2,
+    "Citations": 36,
+    "Latest Paper": "Leaky Director Networks and Innovation Herding",
+    "Latest Date": "2025-07-15"
+  },
+  {
+    "Author": "Quentin Vandeweyer",
+    "Papers": 2,
+    "Citations": 36,
+    "Latest Paper": "Discount factors and monetary policy: Evidence from dual-listed stocks",
+    "Latest Date": "2025-11-08"
+  },
+  {
+    "Author": "Christophe Spaenjers",
+    "Papers": 2,
+    "Citations": 36,
+    "Latest Paper": "Specialization and performance in private equity: Evidence from the hotel industry",
+    "Latest Date": "2024-09-07"
+  },
+  {
+    "Author": "Tim Eisert",
+    "Papers": 2,
+    "Citations": 35,
+    "Latest Paper": "Exorbitant privilege? Quantitative easing and the bond market subsidy of prospective fallen angels",
+    "Latest Date": "2025-05-15"
+  },
+  {
+    "Author": "Michael Reher",
+    "Papers": 2,
+    "Citations": 35,
+    "Latest Paper": "The Mortgage‐Cash Premium Puzzle",
+    "Latest Date": "2024-07-23"
+  },
+  {
+    "Author": "Thomas Geelen",
+    "Papers": 2,
+    "Citations": 33,
+    "Latest Paper": "Due Diligence",
+    "Latest Date": "2024-03-04"
   }
 ]
