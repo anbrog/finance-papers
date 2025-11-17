@@ -30,6 +30,21 @@ def run_command(cmd, description):
     
     return result.returncode
 
+def run_git_command(cmd, description):
+    """Run a git command from project root"""
+    print(f"\n{'='*80}")
+    print(f"{description}")
+    print(f"{'='*80}")
+    print(f"Running: {' '.join(cmd)}\n")
+    
+    result = subprocess.run(cmd, cwd=project_root)
+    
+    if result.returncode != 0:
+        print(f"\n❌ Error: Command failed with exit code {result.returncode}")
+        return result.returncode
+    
+    return result.returncode
+
 def get_current_year():
     """Get current year"""
     return datetime.now().year
@@ -479,7 +494,7 @@ Next steps:
             ]
             
             for cmd, desc in git_commands:
-                result = run_command(cmd, desc)
+                result = run_git_command(cmd, desc)
                 if result != 0:
                     print(f"⚠️  Git command failed: {desc}")
                     break
