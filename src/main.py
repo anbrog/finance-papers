@@ -26,9 +26,9 @@ def run_command(cmd, description):
     
     if result.returncode != 0:
         print(f"\n❌ Error: Command failed with exit code {result.returncode}")
-        sys.exit(1)
+        return result.returncode
     
-    return result
+    return result.returncode
 
 def get_current_year():
     """Get current year"""
