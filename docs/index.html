@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Finance Papers Database</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>Finance Papers Database Explorer</h1>
+    <p>Loading database viewer...</p>
+    
+    <script type="module">
+        import { Datasette } from 'https://cdn.jsdelivr.net/npm/@datasette/datasette-lite@0.2.1/dist/datasette.js';
+        
+        new Datasette({
+            files: [
+                // Add your database files here
+                './data/openalex_aer_2024.db',
+                './data/working_papers_2024.db'
+            ]
+        });
+    </script>
+</body>
+</html>
