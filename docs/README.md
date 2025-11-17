@@ -47,5 +47,6 @@ This directory contains static HTML files for viewing the finance papers databas
 ## Alternative: Keep Streamlit + Export Snapshots
 
 Best of both worlds:
-1. Use Streamlit Cloud for live updates: https://anbrog-finance-papers.streamlit.app
+**Use both approaches:**
+1. Use Streamlit Cloud for live updates: https://finance-papers.streamlit.app
 2. Export snapshots to GitHub Pages for archival/sharing
