@@ -288,7 +288,8 @@ def main():
                     st.dataframe(
                         df,
                         use_container_width=True,
-                        height=600
+                        height=600,
+                        hide_index=True
                     )
                     
                     # Download button
