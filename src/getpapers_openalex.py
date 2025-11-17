@@ -90,8 +90,11 @@ def fetch_articles(filters):
 
 def save_to_db(articles, db_filename='openalex_articles.db', force_update=False):
     """Save OpenAlex articles to SQLite database"""
-    # Create output directory
-    output_dir = '../out/data'
+    # Create output directory - use path relative to project root
+    # Get the directory containing this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    output_dir = os.path.join(project_root, 'out', 'data')
     os.makedirs(output_dir, exist_ok=True)
     db_filepath = os.path.join(output_dir, db_filename)
     

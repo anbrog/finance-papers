@@ -10,7 +10,10 @@ import sqlite3
 from datetime import datetime
 import glob
 
-DB_DIR = '../out/data'
+# Get DB_DIR relative to project root
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+DB_DIR = os.path.join(project_root, 'out', 'data')
 
 def run_command(cmd, description):
     """Run a shell command and handle errors"""
