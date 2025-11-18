@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Papers Database</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">📊 Finance Papers</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="rankings.html">Author Rankings</a></li>
+                <li><a href="papers.html">Working Papers</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Finance Research Paper Analysis</h1>
+            <p class="subtitle">Track publications, citations, and working papers from top finance journals</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <h3>Author Rankings</h3>
+                <p>View top authors ranked by publications and citations in leading finance journals (AER, JF, JFE, QJE, RFS)</p>
+                <a href="rankings.html" class="btn">View Rankings →</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📄</div>
+                <h3>Working Papers</h3>
+                <p>Browse recent working papers from top authors before they're published in journals</p>
+                <a href="papers.html" class="btn">Browse Papers →</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>Database Stats</h3>
+                <p>Statistics and insights about the collected publication and citation data</p>
+                <a href="about.html" class="btn">Learn More →</a>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>About the Database</h2>
+            <p>This database tracks publications and citations from five top finance and economics journals:</p>
+            <ul class="journal-list">
+                <li><strong>AER</strong> - American Economic Review</li>
+                <li><strong>JF</strong> - Journal of Finance</li>
+                <li><strong>JFE</strong> - Journal of Financial Economics</li>
+                <li><strong>QJE</strong> - Quarterly Journal of Economics</li>
+                <li><strong>RFS</strong> - Review of Financial Studies</li>
+            </ul>
+            <p>Data is sourced from <a href="https://openalex.org" target="_blank">OpenAlex</a>, an open catalog of scholarly papers.</p>
+        </div>
+
+        <div class="features">
+            <h2>Features</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <h4>📈 Real-time Rankings</h4>
+                    <p>Sort authors by paper count or total citations</p>
+                </div>
+                <div class="feature">
+                    <h4>🔍 Advanced Search</h4>
+                    <p>Filter by author name, publication year, or journal</p>
+                </div>
+                <div class="feature">
+                    <h4>📥 Export Data</h4>
+                    <p>Download rankings and papers as CSV files</p>
+                </div>
+                <div class="feature">
+                    <h4>🔄 Regular Updates</h4>
+                    <p>Database updated with latest publications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Finance Papers Database | Data from <a href="https://openalex.org" target="_blank">OpenAlex</a></p>
+        <p><a href="https://github.com/anbrog/finance-papers" target="_blank">View on GitHub</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

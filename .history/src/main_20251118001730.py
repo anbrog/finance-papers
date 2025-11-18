@@ -400,7 +400,7 @@ def main():
     wp_count = 0
     
     if update_wp == 'y':
-    # Find the latest author list CSV
+        # Find the latest author list CSV
         pattern = os.path.join(DB_DIR, 'author_list_top3_*.csv')
         csv_files = glob.glob(pattern)
         

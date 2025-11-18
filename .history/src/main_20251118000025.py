@@ -26,24 +26,9 @@ def run_command(cmd, description):
     
     if result.returncode != 0:
         print(f"\n❌ Error: Command failed with exit code {result.returncode}")
-        return result.returncode
+        sys.exit(1)
     
-    return result.returncode
-
-def run_git_command(cmd, description):
-    """Run a git command from project root"""
-    print(f"\n{'='*80}")
-    print(f"{description}")
-    print(f"{'='*80}")
-    print(f"Running: {' '.join(cmd)}\n")
-    
-    result = subprocess.run(cmd, cwd=project_root)
-    
-    if result.returncode != 0:
-        print(f"\n❌ Error: Command failed with exit code {result.returncode}")
-        return result.returncode
-    
-    return result.returncode
+    return result
 
 def get_current_year():
     """Get current year"""
@@ -400,7 +385,7 @@ def main():
     wp_count = 0
     
     if update_wp == 'y':
-    # Find the latest author list CSV
+        # Find the latest author list CSV
         pattern = os.path.join(DB_DIR, 'author_list_top3_*.csv')
         csv_files = glob.glob(pattern)
         
@@ -479,35 +464,27 @@ Next steps:
         print("Updating static website data...")
         print("="*80 + "\n")
         
-        # Export rankings to JSON (use absolute path from project root)
-        export_script = os.path.join(project_root, 'src', 'export_rankings.py')
-        export_cmd = [sys.executable, export_script]
+        # Export rankings to JSON
+        export_cmd = [sys.executable, 'src/export_rankings.py']
         result = run_command(export_cmd, "Exporting rankings to JSON")
         
         if result == 0:
-            # Check if there are any changes to commit
-            print("\nChecking for changes...")
-            check_result = run_git_command(['git', 'diff', '--quiet', 'docs/data/rankings.json'], "Checking for changes")
+            # Git commands
+            print("\nCommitting and pushing to GitHub...")
+            git_commands = [
+                (['git', 'add', 'docs/data/rankings.json'], "Staging changes"),
+                (['git', 'commit', '-m', 'Update rankings data'], "Committing changes"),
+                (['git', 'push'], "Pushing to GitHub")
+            ]
             
-            if check_result != 0:  # Non-zero means there are changes
-                # Git commands
-                print("\nCommitting and pushing to GitHub...")
-                git_commands = [
-                    (['git', 'add', 'docs/data/rankings.json'], "Staging changes"),
-                    (['git', 'commit', '-m', 'Update rankings data'], "Committing changes"),
-                    (['git', 'push'], "Pushing to GitHub")
-                ]
-                
-                for cmd, desc in git_commands:
-                    result = run_git_command(cmd, desc)
-                    if result != 0:
-                        print(f"⚠️  Git command failed: {desc}")
-                        break
-                else:
-                    print("\n✅ Static website data updated successfully!")
-                    print("   View at: https://anbrog.github.io/finance-papers/")
+            for cmd, desc in git_commands:
+                result = run_command(cmd, desc)
+                if result != 0:
+                    print(f"⚠️  Git command failed: {desc}")
+                    break
             else:
-                print("ℹ️  No changes detected in rankings data - skipping commit")
+                print("\n✅ Static website data updated successfully!")
+                print("   View at: https://anbrog.github.io/finance-papers/")
         else:
             print("⚠️  Export failed, skipping git push")
 

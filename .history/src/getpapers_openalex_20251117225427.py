@@ -90,8 +90,11 @@ def fetch_articles(filters):
 
 def save_to_db(articles, db_filename='openalex_articles.db', force_update=False):
     """Save OpenAlex articles to SQLite database"""
-    # Create output directory
-    output_dir = '../out/data'
+    # Create output directory - use path relative to project root
+    # Get the directory containing this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    output_dir = os.path.join(project_root, 'out', 'data')
     os.makedirs(output_dir, exist_ok=True)
     db_filepath = os.path.join(output_dir, db_filename)
     
@@ -175,13 +178,15 @@ def save_to_db(articles, db_filename='openalex_articles.db', force_update=False)
     
     return new_count, duplicate_count, updated_count
 
-if __name__ == "__main__":
+
+def main():
+    """Main entry point for console script"""
     # Parse command line arguments
     if len(sys.argv) < 2:
-        print("Usage: python3 getpapers-openalex.py <journal> [year] [--force]")
+        print("Usage: get-papers <journal> [year] [--force]")
         print(f"Available journals: {', '.join(JOURNALS.keys())}, top3")
-        print("Example: python3 getpapers-openalex.py jf 2024")
-        print("Example: python3 getpapers-openalex.py top3 2024 --force")
+        print("Example: get-papers jf 2024")
+        print("Example: get-papers top3 2024 --force")
         print("\nOptions:")
         print("  --force    Update existing articles with new citation counts")
         sys.exit(1)
@@ -230,3 +235,7 @@ if __name__ == "__main__":
             # Use journal-specific database filename
             db_filename = f'openalex_{jkey}_{year}.db'
             save_to_db(articles, db_filename, force_update=force_update)
+
+
+if __name__ == "__main__":
+    main()

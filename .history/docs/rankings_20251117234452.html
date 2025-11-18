@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Author Rankings - Finance Papers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">📊 Finance Papers</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rankings.html" class="active">Author Rankings</a></li>
+                <li><a href="papers.html">Working Papers</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>👥 Author Rankings</h1>
+            <p class="subtitle">Top authors by publications and citations in finance journals</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="filter-box">
+            <div class="filter-group">
+                <label>Search Author: <input type="text" id="searchInput" placeholder="Type to filter..."></label>
+                <label>Min Papers: <input type="number" id="minPapers" value="0" min="0"></label>
+                <button class="btn" onclick="filterData()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+        
+        <div class="metrics" id="metrics"></div>
+        
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Rank ↕</th>
+                    <th onclick="sortTable(1)">Author ↕</th>
+                    <th onclick="sortTable(2)">Papers ↕</th>
+                    <th onclick="sortTable(3)">Citations ↕</th>
+                    <th>Latest Paper</th>
+                    <th onclick="sortTable(5)">Date ↕</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="6" class="loading">Loading data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="container">
+        <h3>💡 How to Update Data</h3>
+        <ol>
+            <li>Export rankings from the <a href="https://anbrog-finance-papers.streamlit.app" target="_blank">Streamlit app</a> as CSV</li>
+            <li>Convert to JSON: <code>python3 -c "import pandas as pd; pd.read_csv('rankings.csv').to_json('data/rankings.json', orient='records', indent=2)"</code></li>
+            <li>Commit and push to GitHub</li>
+            <li>Site updates automatically!</li>
+        </ol>
+    </div>
+
+    <footer>
+        <p>Finance Papers Database | Data from <a href="https://openalex.org" target="_blank">OpenAlex</a></p>
+        <p><a href="https://github.com/anbrog/finance-papers" target="_blank">View on GitHub</a> | <a href="https://anbrog-finance-papers.streamlit.app" target="_blank">Live App</a></p>
+    </footer>
+
+    <script>
+        let allData = [];
+        let displayData = [];
+        
+        async function loadData() {
+            try {
+                const response = await fetch('./data/rankings.json');
+                allData = await response.json();
+                displayData = [...allData];
+                renderTable();
+                updateMetrics();
+            } catch (error) {
+                document.getElementById('tableBody').innerHTML = 
+                    '<tr><td colspan="6" class="loading">⚠️ No data available. Please export data from the Streamlit app.</td></tr>';
+            }
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            if (displayData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">No results found</td></tr>';
+                return;
+            }
+            
+            displayData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${row.Author || ''}</strong></td>
+                    <td>${row.Papers || 0}</td>
+                    <td>${row.Citations || 0}</td>
+                    <td>${(row['Latest Paper'] || '').substring(0, 80)}</td>
+                    <td>${row['Latest Date'] || ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function updateMetrics() {
+            const totalPapers = displayData.reduce((sum, row) => sum + (row.Papers || 0), 0);
+            const totalCitations = displayData.reduce((sum, row) => sum + (row.Citations || 0), 0);
+            
+            document.getElementById('metrics').innerHTML = `
+                <div class="metric">
+                    <span class="metric-value">${displayData.length}</span>
+                    <span class="metric-label">Authors</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value">${totalPapers}</span>
+                    <span class="metric-label">Papers</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value">${totalCitations.toLocaleString()}</span>
+                    <span class="metric-label">Citations</span>
+                </div>
+            `;
+        }
+        
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const minPapers = parseInt(document.getElementById('minPapers').value) || 0;
+            
+            displayData = allData.filter(row => {
+                const matchesSearch = !searchTerm || 
+                    (row.Author || '').toLowerCase().includes(searchTerm);
+                const matchesPapers = (row.Papers || 0) >= minPapers;
+                return matchesSearch && matchesPapers;
+            });
+            
+            renderTable();
+            updateMetrics();
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('minPapers').value = '0';
+            displayData = [...allData];
+            renderTable();
+            updateMetrics();
+        }
+        
+        function sortTable(columnIndex) {
+            const columns = ['Rank', 'Author', 'Papers', 'Citations', 'Latest Paper', 'Latest Date'];
+            const key = columns[columnIndex];
+            
+            displayData.sort((a, b) => {
+                let aVal = a[key] || 0;
+                let bVal = b[key] || 0;
+                
+                if (typeof aVal === 'string') {
+                    return bVal.localeCompare(aVal);
+                }
+                return bVal - aVal;
+            });
+            
+            renderTable();
+        }
+        
+        document.getElementById('searchInput').addEventListener('input', filterData);
+        document.getElementById('minPapers').addEventListener('input', filterData);
+        
+        loadData();
+    </script>
+</body>
+</html>

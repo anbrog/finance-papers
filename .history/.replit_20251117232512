@@ -1,0 +1,7 @@
+run = "pip install -e . && finance-papers"
+
+[nix]
+channel = "stable-23_11"
+
+[deployment]
+run = ["sh", "-c", "pip install -e . && finance-papers"]

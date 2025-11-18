@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Papers - Finance Papers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">📊 Finance Papers</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rankings.html">Author Rankings</a></li>
+                <li><a href="papers.html" class="active">Working Papers</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>📄 Working Papers</h1>
+            <p class="subtitle">Latest research from top finance authors</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="filter-box">
+            <div class="filter-group">
+                <label>Search: <input type="text" id="searchInput" placeholder="Author or title..."></label>
+                <label>Year: <input type="number" id="yearFilter" placeholder="e.g., 2024" min="2020" max="2025"></label>
+                <button class="btn" onclick="filterPapers()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+        
+        <div class="metrics" id="metrics"></div>
+        
+        <div id="papersList" class="loading">Loading working papers...</div>
+    </div>
+
+    <div class="container">
+        <h3>💡 About Working Papers</h3>
+        <p>Working papers are preliminary versions of research articles before they are formally published in academic journals. This database tracks working papers from authors who have published in top finance journals.</p>
+        <p><strong>How to update:</strong> Export working papers data from the Streamlit app and convert to JSON format.</p>
+    </div>
+
+    <footer>
+        <p>Finance Papers Database | Data from <a href="https://openalex.org" target="_blank">OpenAlex</a></p>
+        <p><a href="https://github.com/anbrog/finance-papers" target="_blank">View on GitHub</a> | <a href="https://anbrog-finance-papers.streamlit.app" target="_blank">Live App</a></p>
+    </footer>
+
+    <script>
+        let allPapers = [];
+        let displayPapers = [];
+        
+        async function loadPapers() {
+            try {
+                const response = await fetch('./data/papers.json');
+                allPapers = await response.json();
+                displayPapers = [...allPapers];
+                renderPapers();
+                updateMetrics();
+            } catch (error) {
+                document.getElementById('papersList').innerHTML = 
+                    '<p class="loading">⚠️ No working papers data available. Please export from the Streamlit app.</p>';
+            }
+        }
+        
+        function renderPapers() {
+            const container = document.getElementById('papersList');
+            container.innerHTML = '';
+            
+            if (displayPapers.length === 0) {
+                container.innerHTML = '<p class="loading">No papers found matching your criteria.</p>';
+                return;
+            }
+            
+            displayPapers.forEach(paper => {
+                const paperCard = document.createElement('div');
+                paperCard.className = 'card';
+                paperCard.style.marginBottom = '1rem';
+                paperCard.innerHTML = `
+                    <h3 style="color: #667eea; margin-bottom: 0.5rem;">${paper.title || 'Untitled'}</h3>
+                    <p><strong>Author:</strong> ${paper.author || 'Unknown'}</p>
+                    <p><strong>Date:</strong> ${paper.date || 'N/A'}</p>
+                    <p><strong>Affiliation:</strong> ${paper.affiliation || 'N/A'}</p>
+                    ${paper.url ? `<a href="${paper.url}" target="_blank" class="btn">View Paper →</a>` : ''}
+                `;
+                container.appendChild(paperCard);
+            });
+        }
+        
+        function updateMetrics() {
+            document.getElementById('metrics').innerHTML = `
+                <div class="metric">
+                    <span class="metric-value">${displayPapers.length}</span>
+                    <span class="metric-label">Working Papers</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value">${new Set(displayPapers.map(p => p.author)).size}</span>
+                    <span class="metric-label">Authors</span>
+                </div>
+            `;
+        }
+        
+        function filterPapers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            
+            displayPapers = allPapers.filter(paper => {
+                const matchesSearch = !searchTerm || 
+                    (paper.title || '').toLowerCase().includes(searchTerm) ||
+                    (paper.author || '').toLowerCase().includes(searchTerm);
+                const matchesYear = !year || (paper.date || '').includes(year);
+                return matchesSearch && matchesYear;
+            });
+            
+            renderPapers();
+            updateMetrics();
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('yearFilter').value = '';
+            displayPapers = [...allPapers];
+            renderPapers();
+            updateMetrics();
+        }
+        
+        loadPapers();
+    </script>
+</body>
+</html>

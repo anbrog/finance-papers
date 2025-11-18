@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Papers - Author Rankings</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #1f1f1f;
+            border-bottom: 3px solid #ff4b4b;
+            padding-bottom: 10px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: #ff4b4b;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        .filter-box {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .metric {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Finance Papers - Author Rankings</h1>
+    
+    <div class="container">
+        <div class="filter-box">
+            <label>Search Author: <input type="text" id="searchInput" placeholder="Type to filter..."></label>
+            <label>Min Papers: <input type="number" id="minPapers" value="0" min="0"></label>
+        </div>
+        
+        <div id="metrics"></div>
+        
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Rank ↕</th>
+                    <th onclick="sortTable(1)">Author ↕</th>
+                    <th onclick="sortTable(2)">Papers ↕</th>
+                    <th onclick="sortTable(3)">Citations ↕</th>
+                    <th>Latest Paper</th>
+                    <th onclick="sortTable(5)">Date ↕</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="container">
+        <p><strong>Instructions to update data:</strong></p>
+        <ol>
+            <li>Export author rankings from Streamlit app as CSV</li>
+            <li>Convert CSV to JSON: <code>python -c "import pandas as pd; pd.read_csv('rankings.csv').to_json('data.json', orient='records')"</code></li>
+            <li>Replace data.json in this directory</li>
+            <li>Commit and push to GitHub</li>
+        </ol>
+    </div>
+
+    <script>
+        let allData = [];
+        
+        // Load data from JSON file
+        async function loadData() {
+            try {
+                const response = await fetch('./data/rankings.json');
+                allData = await response.json();
+                displayData(allData);
+                updateMetrics(allData);
+            } catch (error) {
+                document.getElementById('tableBody').innerHTML = 
+                    '<tr><td colspan="6">No data available. Please export data from Streamlit app.</td></tr>';
+            }
+        }
+        
+        function displayData(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${row.Author || ''}</td>
+                    <td>${row.Papers || 0}</td>
+                    <td>${row.Citations || 0}</td>
+                    <td>${(row['Latest Paper'] || '').substring(0, 80)}</td>
+                    <td>${row['Latest Date'] || ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function updateMetrics(data) {
+            const totalPapers = data.reduce((sum, row) => sum + (row.Papers || 0), 0);
+            const totalCitations = data.reduce((sum, row) => sum + (row.Citations || 0), 0);
+            
+            document.getElementById('metrics').innerHTML = `
+                <div class="metric">Total Authors: ${data.length}</div>
+                <div class="metric">Total Papers: ${totalPapers}</div>
+                <div class="metric">Total Citations: ${totalCitations}</div>
+            `;
+        }
+        
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const minPapers = parseInt(document.getElementById('minPapers').value) || 0;
+            
+            const filtered = allData.filter(row => {
+                const matchesSearch = !searchTerm || 
+                    (row.Author || '').toLowerCase().includes(searchTerm);
+                const matchesPapers = (row.Papers || 0) >= minPapers;
+                return matchesSearch && matchesPapers;
+            });
+            
+            displayData(filtered);
+            updateMetrics(filtered);
+        }
+        
+        function sortTable(columnIndex) {
+            const columns = ['Rank', 'Author', 'Papers', 'Citations', 'Latest Paper', 'Latest Date'];
+            const key = columns[columnIndex];
+            
+            allData.sort((a, b) => {
+                let aVal = a[key] || 0;
+                let bVal = b[key] || 0;
+                
+                if (typeof aVal === 'string') {
+                    return bVal.localeCompare(aVal);
+                }
+                return bVal - aVal;
+            });
+            
+            displayData(allData);
+        }
+        
+        document.getElementById('searchInput').addEventListener('input', filterData);
+        document.getElementById('minPapers').addEventListener('input', filterData);
+        
+        loadData();
+    </script>
+</body>
+</html>

@@ -400,7 +400,7 @@ def main():
     wp_count = 0
     
     if update_wp == 'y':
-    # Find the latest author list CSV
+        # Find the latest author list CSV
         pattern = os.path.join(DB_DIR, 'author_list_top3_*.csv')
         csv_files = glob.glob(pattern)
         
@@ -485,29 +485,22 @@ Next steps:
         result = run_command(export_cmd, "Exporting rankings to JSON")
         
         if result == 0:
-            # Check if there are any changes to commit
-            print("\nChecking for changes...")
-            check_result = run_git_command(['git', 'diff', '--quiet', 'docs/data/rankings.json'], "Checking for changes")
+            # Git commands
+            print("\nCommitting and pushing to GitHub...")
+            git_commands = [
+                (['git', 'add', 'docs/data/rankings.json'], "Staging changes"),
+                (['git', 'commit', '-m', 'Update rankings data'], "Committing changes"),
+                (['git', 'push'], "Pushing to GitHub")
+            ]
             
-            if check_result != 0:  # Non-zero means there are changes
-                # Git commands
-                print("\nCommitting and pushing to GitHub...")
-                git_commands = [
-                    (['git', 'add', 'docs/data/rankings.json'], "Staging changes"),
-                    (['git', 'commit', '-m', 'Update rankings data'], "Committing changes"),
-                    (['git', 'push'], "Pushing to GitHub")
-                ]
-                
-                for cmd, desc in git_commands:
-                    result = run_git_command(cmd, desc)
-                    if result != 0:
-                        print(f"⚠️  Git command failed: {desc}")
-                        break
-                else:
-                    print("\n✅ Static website data updated successfully!")
-                    print("   View at: https://anbrog.github.io/finance-papers/")
+            for cmd, desc in git_commands:
+                result = run_git_command(cmd, desc)
+                if result != 0:
+                    print(f"⚠️  Git command failed: {desc}")
+                    break
             else:
-                print("ℹ️  No changes detected in rankings data - skipping commit")
+                print("\n✅ Static website data updated successfully!")
+                print("   View at: https://anbrog.github.io/finance-papers/")
         else:
             print("⚠️  Export failed, skipping git push")
 

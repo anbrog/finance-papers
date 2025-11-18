@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Finance Papers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">📊 Finance Papers</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rankings.html">Author Rankings</a></li>
+                <li><a href="papers.html">Working Papers</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>About Finance Papers Database</h1>
+            <p class="subtitle">Open source tool for tracking finance research</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="info-section">
+            <h2>📚 What is this?</h2>
+            <p>The Finance Papers Database is an open-source tool for tracking publications, citations, and working papers from leading finance and economics journals. It provides researchers, students, and practitioners with easy access to publication data and author rankings.</p>
+        </div>
+
+        <div class="info-section">
+            <h2>📊 Journals Covered</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <h4>AER</h4>
+                    <p>American Economic Review - Top general economics journal</p>
+                </div>
+                <div class="feature">
+                    <h4>JF</h4>
+                    <p>Journal of Finance - Premier finance journal</p>
+                </div>
+                <div class="feature">
+                    <h4>JFE</h4>
+                    <p>Journal of Financial Economics - Leading finance research</p>
+                </div>
+                <div class="feature">
+                    <h4>QJE</h4>
+                    <p>Quarterly Journal of Economics - Top theory journal</p>
+                </div>
+                <div class="feature">
+                    <h4>RFS</h4>
+                    <p>Review of Financial Studies - Major finance publication</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>🔧 How It Works</h2>
+            <ol>
+                <li><strong>Data Collection:</strong> Fetches publication data from <a href="https://openalex.org" target="_blank">OpenAlex API</a></li>
+                <li><strong>Storage:</strong> Saves data in SQLite databases for efficient querying</li>
+                <li><strong>Analysis:</strong> Ranks authors by publication count and citation metrics</li>
+                <li><strong>Working Papers:</strong> Tracks unpublished work from top authors</li>
+                <li><strong>Web Interface:</strong> Provides both dynamic (Streamlit) and static (GitHub Pages) access</li>
+            </ol>
+        </div>
+
+        <div class="info-section">
+            <h2>💻 Technology Stack</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <h4>Python</h4>
+                    <p>Core language for data processing and CLI tools</p>
+                </div>
+                <div class="feature">
+                    <h4>SQLite</h4>
+                    <p>Lightweight database for storing publications</p>
+                </div>
+                <div class="feature">
+                    <h4>Streamlit</h4>
+                    <p>Interactive web app for live updates and queries</p>
+                </div>
+                <div class="feature">
+                    <h4>GitHub Pages</h4>
+                    <p>Static site hosting for archived data snapshots</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>🚀 Available Interfaces</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Command Line (CLI)</h3>
+                    <p>Install via pip and run locally:</p>
+                    <code>pip install -e .<br>finance-papers</code>
+                    <p style="margin-top: 1rem;"><a href="https://github.com/anbrog/finance-papers" target="_blank" class="btn">GitHub Repo →</a></p>
+                </div>
+                <div class="card">
+                    <h3>Web App (Streamlit)</h3>
+                    <p>Interactive interface with live updates and database queries</p>
+                    <p style="margin-top: 1rem;"><a href="https://anbrog-finance-papers.streamlit.app" target="_blank" class="btn">Launch App →</a></p>
+                </div>
+                <div class="card">
+                    <h3>Static Site (This Site)</h3>
+                    <p>Browse archived data snapshots without running any code</p>
+                    <p style="margin-top: 1rem;"><a href="rankings.html" class="btn">View Rankings →</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📝 How to Contribute</h2>
+            <p>This is an open-source project! Contributions are welcome:</p>
+            <ul>
+                <li>Report bugs or request features via <a href="https://github.com/anbrog/finance-papers/issues" target="_blank">GitHub Issues</a></li>
+                <li>Submit pull requests to improve the code</li>
+                <li>Share your analysis or use cases</li>
+                <li>Suggest additional journals to track</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h2>📄 License & Attribution</h2>
+            <p><strong>Code:</strong> Open source (see GitHub repository for license)</p>
+            <p><strong>Data:</strong> Sourced from <a href="https://openalex.org" target="_blank">OpenAlex</a>, which is free and open</p>
+            <p><strong>Citation:</strong> If you use this tool in your research, please cite the GitHub repository and OpenAlex</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Finance Papers Database | Data from <a href="https://openalex.org" target="_blank">OpenAlex</a></p>
+        <p><a href="https://github.com/anbrog/finance-papers" target="_blank">View on GitHub</a> | <a href="https://anbrog-finance-papers.streamlit.app" target="_blank">Live App</a></p>
+    </footer>
+</body>
+</html>
