@@ -183,6 +183,31 @@
             border-color: #0066cc;
         }
 
+        .year-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .year-filter label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .year-filter input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -430,15 +455,14 @@
             <div class="table-container">
                 <div class="table-controls">
                     <input type="text" id="searchInput" placeholder="Search by author name...">
-                    <select id="yearFilter">
-                        <option value="all">All Years</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                    </select>
+                    <div class="year-filter">
+                        <label><input type="checkbox" class="year-checkbox" value="2025" checked> 2025</label>
+                        <label><input type="checkbox" class="year-checkbox" value="2024" checked> 2024</label>
+                        <label><input type="checkbox" class="year-checkbox" value="2023" checked> 2023</label>
+                        <label><input type="checkbox" class="year-checkbox" value="2022" checked> 2022</label>
+                        <label><input type="checkbox" class="year-checkbox" value="2021" checked> 2021</label>
+                        <label><input type="checkbox" class="year-checkbox" value="2020" checked> 2020</label>
+                    </div>
                     <select id="sortBy">
                         <option value="papers">Sort by Papers</option>
                         <option value="citations">Sort by Citations</option>
@@ -684,35 +708,36 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const minPapers = parseInt(document.getElementById('minPapers').value) || 0;
             const sortBy = document.getElementById('sortBy').value;
-            const yearFilter = document.getElementById('yearFilter').value;
+            
+            // Get selected years
+            const selectedYears = Array.from(document.querySelectorAll('.year-checkbox:checked')).map(cb => parseInt(cb.value));
+            const allYearsSelected = selectedYears.length === document.querySelectorAll('.year-checkbox').length;
             
             let filtered = allDataWP.filter(row => {
                 const matchesSearch = !searchTerm || (row.Author || '').toLowerCase().includes(searchTerm);
                 
-                // Filter by year if specified
+                // Filter by selected years
                 let matchesYear = true;
-                if (yearFilter !== 'all' && row.Years) {
-                    const year = parseInt(yearFilter);
-                    matchesYear = row.Years[year] > 0;
-                }
+                let papersCount = 0;
                 
-                // Calculate papers count for the filtered year
-                let papersCount = row.Papers || 0;
-                if (yearFilter !== 'all' && row.Years) {
-                    const year = parseInt(yearFilter);
-                    papersCount = row.Years[year] || 0;
+                if (!allYearsSelected && selectedYears.length > 0 && row.Years) {
+                    // Check if author has papers in any selected year
+                    matchesYear = selectedYears.some(year => row.Years[year] > 0);
+                    // Sum papers from selected years
+                    papersCount = selectedYears.reduce((sum, year) => sum + (row.Years[year] || 0), 0);
+                } else {
+                    papersCount = row.Papers || 0;
                 }
                 
                 const matchesPapers = papersCount >= minPapers;
                 return matchesSearch && matchesYear && matchesPapers;
             });
             
-            // Adjust paper counts for display if year filter is active
-            if (yearFilter !== 'all') {
-                const year = parseInt(yearFilter);
+            // Adjust paper counts for display if specific years are selected
+            if (!allYearsSelected && selectedYears.length > 0) {
                 filtered = filtered.map(row => ({
                     ...row,
-                    Papers: row.Years && row.Years[year] ? row.Years[year] : 0
+                    Papers: row.Years ? selectedYears.reduce((sum, year) => sum + (row.Years[year] || 0), 0) : 0
                 }));
             }
             
@@ -736,35 +761,36 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const minPapers = parseInt(document.getElementById('minPapers').value) || 0;
             const sortBy = document.getElementById('sortBy').value;
-            const yearFilter = document.getElementById('yearFilter').value;
+            
+            // Get selected years
+            const selectedYears = Array.from(document.querySelectorAll('.year-checkbox:checked')).map(cb => parseInt(cb.value));
+            const allYearsSelected = selectedYears.length === document.querySelectorAll('.year-checkbox').length;
             
             let filtered = allData.filter(row => {
                 const matchesSearch = !searchTerm || (row.Author || '').toLowerCase().includes(searchTerm);
                 
-                // Filter by year if specified
+                // Filter by selected years
                 let matchesYear = true;
-                if (yearFilter !== 'all' && row.Years) {
-                    const year = parseInt(yearFilter);
-                    matchesYear = row.Years[year] > 0;
-                }
+                let papersCount = 0;
                 
-                // Calculate papers count for the filtered year
-                let papersCount = row.Papers || 0;
-                if (yearFilter !== 'all' && row.Years) {
-                    const year = parseInt(yearFilter);
-                    papersCount = row.Years[year] || 0;
+                if (!allYearsSelected && selectedYears.length > 0 && row.Years) {
+                    // Check if author has papers in any selected year
+                    matchesYear = selectedYears.some(year => row.Years[year] > 0);
+                    // Sum papers from selected years
+                    papersCount = selectedYears.reduce((sum, year) => sum + (row.Years[year] || 0), 0);
+                } else {
+                    papersCount = row.Papers || 0;
                 }
                 
                 const matchesPapers = papersCount >= minPapers;
                 return matchesSearch && matchesYear && matchesPapers;
             });
             
-            // Adjust paper counts for display if year filter is active
-            if (yearFilter !== 'all') {
-                const year = parseInt(yearFilter);
+            // Adjust paper counts for display if specific years are selected
+            if (!allYearsSelected && selectedYears.length > 0) {
                 filtered = filtered.map(row => ({
                     ...row,
-                    Papers: row.Years && row.Years[year] ? row.Years[year] : 0
+                    Papers: row.Years ? selectedYears.reduce((sum, year) => sum + (row.Years[year] || 0), 0) : 0
                 }));
             }
             
@@ -848,12 +874,16 @@
                 filterData();
             }
         });
-        document.getElementById('yearFilter').addEventListener('change', () => {
-            if (window.currentTab === 'working-papers-tab') {
-                filterDataWP();
-            } else {
-                filterData();
-            }
+        
+        // Add event listeners to all year checkboxes
+        document.querySelectorAll('.year-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                if (window.currentTab === 'working-papers-tab') {
+                    filterDataWP();
+                } else {
+                    filterData();
+                }
+            });
         });
         
         // Initialize current tab
