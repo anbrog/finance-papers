@@ -25,54 +25,67 @@ def read_author_list(csv_file):
             authors.append({
                 'rank': int(row['Rank']),
                 'name': row['Author Name'],
+                'author_id': row.get('Author ID', '').strip() if 'Author ID' in row else None,
                 'paper_count': int(row['Paper Count'])
             })
     return authors
 
-def fetch_working_papers_for_author(author_name, year=None):
-    """Fetch working papers (preprints) from OpenAlex for a specific author"""
-    # Check if author_name contains an OpenAlex ID (format: "Name|A12345678")
+def fetch_working_papers_for_author(author_name, author_id=None, year=None):
+    """Fetch working papers (preprints) from OpenAlex for a specific author
+    
+    Args:
+        author_name: Author's display name
+        author_id: OpenAlex author ID (e.g., 'https://openalex.org/A1234567890')
+        year: Optional year filter
+    """
     author_affiliation = None
     
-    if '|' in author_name:
-        author_display_name, author_id = author_name.split('|', 1)
-        author_name = author_display_name.strip()
-        author_id = author_id.strip()
+    # If author_id is provided, use it directly
+    if author_id:
+        # Extract just the ID part if full URL is provided
+        if author_id.startswith('https://openalex.org/'):
+            author_id = author_id.split('/')[-1]
     else:
-        # Search for the author and get their OpenAlex ID first
-        author_search_url = "https://api.openalex.org/authors"
-        
-        # Build filter
-        filters = f"display_name.search:{author_name}"
-        
-        params = {
-            "filter": filters,
-            "per-page": 1
-        }
-        
-        mailto = os.getenv("OPENALEX_MAILTO")
-        if mailto:
-            params["mailto"] = mailto
-        
-        try:
-            resp = requests.get(author_search_url, params=params, timeout=30)
-            resp.raise_for_status()
-            data = resp.json()
+        # Check if author_name contains an OpenAlex ID (format: "Name|A12345678")
+        if '|' in author_name:
+            author_display_name, author_id = author_name.split('|', 1)
+            author_name = author_display_name.strip()
+            author_id = author_id.strip()
+        else:
+            # Search for the author and get their OpenAlex ID first
+            author_search_url = "https://api.openalex.org/authors"
             
-            if not data.get("results"):
-                return []
+            # Build filter
+            filters = f"display_name.search:{author_name}"
             
-            author_result = data["results"][0]
-            author_id = author_result["id"].split('/')[-1]  # Extract author ID
+            params = {
+                "filter": filters,
+                "per-page": 1
+            }
             
-            # Get last known institution from author profile
-            last_institution = author_result.get("last_known_institution")
-            if last_institution:
-                author_affiliation = last_institution.get("display_name")
+            mailto = os.getenv("OPENALEX_MAILTO")
+            if mailto:
+                params["mailto"] = mailto
+            
+            try:
+                resp = requests.get(author_search_url, params=params, timeout=30)
+                resp.raise_for_status()
+                data = resp.json()
                 
-        except requests.RequestException as e:
-            print(f"Error fetching author ID for {author_name}: {e}")
-            return []
+                if not data.get("results"):
+                    return []
+                
+                author_result = data["results"][0]
+                author_id = author_result["id"].split('/')[-1]  # Extract author ID
+                
+                # Get last known institution from author profile
+                last_institution = author_result.get("last_known_institution")
+                if last_institution:
+                    author_affiliation = last_institution.get("display_name")
+                    
+            except requests.RequestException as e:
+                print(f"Error fetching author ID for {author_name}: {e}")
+                return []
     
     # Now search for working papers by this author
     # Working papers are type:report, or exclude journal articles to get preprints/dissertations
@@ -259,8 +272,11 @@ def main():
     total_authors = len(authors)
     
     for idx, author in enumerate(authors, 1):
-        print(f"[{idx}/{total_authors}] {author['name']}...", end=' ', flush=True)
-        papers = fetch_working_papers_for_author(author['name'], year)
+        author_name = author['name']
+        author_id = author.get('author_id')
+        
+        print(f"[{idx}/{total_authors}] {author_name}...", end=' ', flush=True)
+        papers = fetch_working_papers_for_author(author_name, author_id, year)
         all_papers.extend(papers)
         print(f"{len(papers)} working papers")
         

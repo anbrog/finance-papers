@@ -580,15 +580,22 @@ def make_author_list(journals=None, year=None, top_n=250):
             authors = json.loads(authors_json)
             for author in authors:
                 name = author.get('name')
+                author_id = author.get('author_id')
                 if name:
-                    if name not in author_counts:
-                        author_counts[name] = 0
-                    author_counts[name] += 1
+                    # Use author_id as key if available, otherwise fall back to name
+                    key = author_id if author_id else name
+                    if key not in author_counts:
+                        author_counts[key] = {
+                            'name': name,
+                            'author_id': author_id,
+                            'count': 0
+                        }
+                    author_counts[key]['count'] += 1
         
         conn.close()
     
     # Sort by count (descending)
-    ranked = sorted(author_counts.items(), key=lambda x: x[1], reverse=True)
+    ranked = sorted(author_counts.items(), key=lambda x: x[1]['count'], reverse=True)
     
     # Take top N
     top_authors = ranked[:top_n]
@@ -603,18 +610,18 @@ def make_author_list(journals=None, year=None, top_n=250):
     # Write to CSV
     with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['Rank', 'Author Name', 'Paper Count'])
+        writer.writerow(['Rank', 'Author Name', 'Author ID', 'Paper Count'])
         
-        for rank, (author_name, count) in enumerate(top_authors, 1):
-            writer.writerow([rank, author_name, count])
+        for rank, (key, data) in enumerate(top_authors, 1):
+            writer.writerow([rank, data['name'], data['author_id'] or '', data['count']])
     
     print(f"\n✅ Author list saved to: {filepath}")
     print(f"   Total authors in list: {len(top_authors)}")
     print(f"   Total unique authors: {len(ranked)}")
     print(f"   Total articles: {total_articles}")
     print(f"\nTop 10 authors:")
-    for rank, (author_name, count) in enumerate(top_authors[:10], 1):
-        print(f"   {rank}. {author_name} ({count} papers)")
+    for rank, (key, data) in enumerate(top_authors[:10], 1):
+        print(f"   {rank}. {data['name']} ({data['count']} papers)")
 
 def view_wp_new(year=None):
     """

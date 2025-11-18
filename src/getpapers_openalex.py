@@ -79,6 +79,7 @@ def fetch_articles(filters):
                     {
                         "name": auth.get("author", {}).get("display_name"),
                         "orcid": auth.get("author", {}).get("orcid"),
+                        "author_id": auth.get("author", {}).get("id"),
                         "institutions": [
                             inst.get("display_name") for inst in auth.get("institutions", [])
                         ],
