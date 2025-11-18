@@ -944,9 +944,24 @@ def main():
         year = sys.argv[4] if len(sys.argv) > 4 else None
         papers_by_author(author_name, journals, year)
     elif command == 'make-author-list':
-        journals = sys.argv[2] if len(sys.argv) > 2 else None
-        year = sys.argv[3] if len(sys.argv) > 3 else None
-        make_author_list(journals, year)
+        # Parse arguments and --N flag
+        journals = None
+        year = None
+        top_n = 250
+        
+        for arg in sys.argv[2:]:
+            if arg.startswith('--'):
+                try:
+                    top_n = int(arg[2:])
+                except ValueError:
+                    print(f"Invalid --N flag: {arg}")
+                    sys.exit(1)
+            elif journals is None:
+                journals = arg
+            elif year is None:
+                year = arg
+        
+        make_author_list(journals, year, top_n)
     elif command == 'view-wp-new':
         year = sys.argv[2] if len(sys.argv) > 2 else None
         view_wp_new(year)
