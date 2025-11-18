@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Papers Database - Andreas Brøgger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #ffffff;
+        }
+
+        /* Navigation - matching andreasbrogger.com */
+        nav {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        nav .nav-links a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav .nav-links a:hover {
+            color: #000;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 100px auto 60px;
+            padding: 0 40px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 300;
+            margin-bottom: 30px;
+            color: #000;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 400;
+            margin: 50px 0 25px;
+            color: #000;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 30px 0 15px;
+            color: #000;
+        }
+
+        p, li {
+            font-size: 17px;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        a {
+            color: #0066cc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #004499;
+            text-decoration: underline;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-bottom: 60px;
+        }
+
+        .hero p {
+            font-size: 19px;
+            line-height: 1.8;
+            max-width: 800px;
+        }
+
+        /* Stats Cards */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 4px;
+            border-left: 3px solid #0066cc;
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: 300;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 15px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Data Table */
+        .table-container {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+
+        .table-controls {
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .table-controls input,
+        .table-controls select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .table-controls input:focus,
+        .table-controls select:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #fafafa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: #f0f0f0;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0066cc;
+            color: white !important;
+            border: none;
+            border-radius: 3px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none !important;
+        }
+
+        .btn:hover {
+            background: #0052a3;
+        }
+
+        .btn-secondary {
+            background: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #555;
+        }
+
+        /* Footer */
+        footer {
+            max-width: 1200px;
+            margin: 80px auto 40px;
+            padding: 30px 40px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #666;
+        }
+
+        /* Sections */
+        .section {
+            margin: 60px 0;
+        }
+
+        .about-box {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 4px;
+            border-left: 3px solid #0066cc;
+            margin: 30px 0;
+        }
+
+        .about-box h3 {
+            margin-top: 0;
+        }
+
+        .about-box ul {
+            margin-left: 20px;
+            margin-top: 15px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 17px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s ease;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #0066cc;
+        }
+
+        .tab-btn.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav .container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            main {
+                padding: 0 20px;
+                margin-top: 140px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="https://andreasbrogger.com" class="logo">Andreas Brøgger</a>
+            <ul class="nav-links">
+                <li><a href="https://andreasbrogger.com">Main Site</a></li>
+                <li><a href="#rankings">Rankings</a></li>
+                <li><a href="#working-papers">Working Papers</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Finance Papers Database</h1>
+            <p>
+                A comprehensive database of academic publications in top finance journals 
+                (JF, JFE, RFS) with author rankings and working papers tracking. 
+                Data sourced from <a href="https://openalex.org" target="_blank">OpenAlex</a>.
+            </p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <div class="number" id="totalAuthors">-</div>
+                <div class="label">Authors Tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalPapers">-</div>
+                <div class="label">Journal Articles</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalCitations">-</div>
+                <div class="label">Total Citations</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalWorkingPapers">-</div>
+                <div class="label">Working Papers</div>
+            </div>
+        </div>
+
+        <!-- Rankings Section -->
+        <section class="section" id="rankings">
+            <h2>Author Rankings</h2>
+            <p>Top authors by publications in leading finance journals (JF, JFE, RFS) and working papers.</p>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('journals')">Journal Articles</button>
+                <button class="tab-btn" onclick="switchTab('working-papers-tab')">Working Papers</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <input type="text" id="searchInput" placeholder="Search by author name...">
+                    <select id="yearFilter">
+                        <option value="all">All Years</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                    </select>
+                    <select id="sortBy">
+                        <option value="papers">Sort by Papers</option>
+                        <option value="citations">Sort by Citations</option>
+                    </select>
+                    <input type="number" id="minPapers" placeholder="Min papers" min="0" value="1">
+                    <button class="btn" onclick="filterData()">Apply Filters</button>
+                    <button class="btn btn-secondary" onclick="exportCSV()">Download CSV</button>
+                </div>
+                
+                <div id="tableWrapper">
+                    <div class="loading">Loading data...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Working Papers Section -->
+        <section class="section" id="working-papers">
+            <h2>Working Papers by Top Authors</h2>
+            <p>Working papers from leading finance researchers. View rankings in the <a href="#rankings" onclick="switchTab('working-papers-tab')">rankings section</a>.</p>
+            <div class="about-box">
+                <h3>Working Papers Database</h3>
+                <p>
+                    The working papers database tracks recent working papers from the top 250 authors 
+                    ranked by journal publications. This provides early insight into emerging research 
+                    from leading scholars in finance.
+                </p>
+                <p style="margin-top: 1rem;">
+                    <strong>Data includes:</strong> Author names, publication dates, venues (SSRN, arXiv, etc.), 
+                    and citation counts for working papers.
+                </p>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section" id="about">
+            <h2>About This Database</h2>
+            <div class="about-box">
+                <h3>Data Sources</h3>
+                <p>
+                    This database aggregates publication data from five leading finance journals:
+                </p>
+                <ul>
+                    <li><strong>JF</strong> - Journal of Finance</li>
+                    <li><strong>JFE</strong> - Journal of Financial Economics</li>
+                    <li><strong>RFS</strong> - Review of Financial Studies</li>
+                </ul>
+                <p style="margin-top: 20px;">
+                    Data is sourced from <a href="https://openalex.org" target="_blank">OpenAlex</a>, 
+                    an open catalog of scholarly papers, authors, and institutions.
+                </p>
+            </div>
+
+            <div class="about-box">
+                <h3>Live Dashboard</h3>
+                <p>
+                    For real-time updates and interactive data exploration, visit the 
+                    <a href="https://finance-papers.streamlit.app" target="_blank">Streamlit dashboard</a>.
+                    The dashboard allows you to update data, filter by year, and explore working papers.
+                </p>
+            </div>
+
+            <div class="about-box">
+                <h3>Source Code</h3>
+                <p>
+                    This project is open source. View the code and contribute on 
+                    <a href="https://github.com/anbrog/finance-papers" target="_blank">GitHub</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2025 <a href="https://andreasbrogger.com">Andreas Brøgger</a> | 
+            <a href="https://github.com/anbrog/finance-papers" target="_blank">GitHub</a> | 
+            <a href="https://finance-papers.streamlit.app" target="_blank">Live Dashboard</a>
+        </p>
+        <p style="margin-top: 10px; font-size: 13px;">
+            Last updated: <span id="lastUpdate">-</span>
+        </p>
+    </footer>
+
+    <script>
+        let allData = [];
+        let allDataWP = [];
+        
+        async function loadData() {
+            try {
+                const response = await fetch('./data/rankings.json');
+                const data = await response.json();
+                
+                // Handle both old and new data formats
+                if (Array.isArray(data)) {
+                    // Old format: array of rankings
+                    allData = data;
+                    allDataWP = [];
+                } else {
+                    // New format: object with journals and working_papers
+                    allData = data.journals || [];
+                    allDataWP = data.working_papers || [];
+                    if (data.last_updated) {
+                        document.getElementById('lastUpdate').textContent = new Date(data.last_updated).toLocaleDateString();
+                    }
+                }
+                
+                if (allData.length > 0) {
+                    displayData(allData);
+                    updateStats(allData);
+                }
+                
+                if (allDataWP.length > 0) {
+                    displayDataWP(allDataWP);
+                    updateStatsWP(allDataWP);
+                }
+                
+                if (allData.length === 0 && allDataWP.length === 0) {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showEmptyState();
+            }
+        }
+        
+        function displayData(data) {
+            const wrapper = document.getElementById('tableWrapper');
+            
+            if (data.length === 0) {
+                wrapper.innerHTML = '<div class="empty-state"><h3>No results found</h3><p>Try adjusting your filters</p></div>';
+                return;
+            }
+            
+            let html = '<table><thead><tr>';
+            html += '<th onclick="sortTable(\'rank\')">Rank</th>';
+            html += '<th onclick="sortTable(\'author\')">Author</th>';
+            html += '<th onclick="sortTable(\'papers\')">Papers</th>';
+            html += '<th onclick="sortTable(\'citations\')">Citations</th>';
+            html += '<th>Latest Paper</th>';
+            html += '<th onclick="sortTable(\'date\')">Date</th>';
+            html += '</tr></thead><tbody>';
+            
+            data.forEach((row, index) => {
+                html += '<tr>';
+                html += `<td>${index + 1}</td>`;
+                html += `<td><strong>${row.Author || ''}</strong></td>`;
+                html += `<td>${row.Papers || 0}</td>`;
+                html += `<td>${row.Citations || 0}</td>`;
+                html += `<td>${(row['Latest Paper'] || '').substring(0, 60)}${row['Latest Paper']?.length > 60 ? '...' : ''}</td>`;
+                html += `<td>${row['Latest Date'] || ''}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
+        }
+        
+        function updateStats(data) {
+            const totalAuthors = data.length;
+            const totalPapers = data.reduce((sum, row) => sum + (row.Papers || 0), 0);
+            const totalCitations = data.reduce((sum, row) => sum + (row.Citations || 0), 0);
+            
+            document.getElementById('totalAuthors').textContent = totalAuthors.toLocaleString();
+            document.getElementById('totalPapers').textContent = totalPapers.toLocaleString();
+            document.getElementById('totalCitations').textContent = totalCitations.toLocaleString();
+            
+            // Update working papers count if available
+            if (typeof allDataWP !== 'undefined' && allDataWP.length > 0) {
+                const wpCount = allDataWP.reduce((sum, row) => sum + (row.Papers || 0), 0);
+                document.getElementById('totalWorkingPapers').textContent = wpCount.toLocaleString();
+            } else {
+                document.getElementById('totalWorkingPapers').textContent = '-';
+            }
+        }
+        
+        function displayDataWP(data) {
+            const wrapper = document.getElementById('tableWrapper');
+            
+            if (data.length === 0) {
+                wrapper.innerHTML = '<div class="empty-state"><h3>No working papers data yet</h3><p>Check back after running the update workflow</p></div>';
+                return;
+            }
+            
+            let html = '<table><thead><tr>';
+            html += '<th onclick="sortTableWP(\'rank\')">Rank</th>';
+            html += '<th onclick="sortTableWP(\'author\')">Author</th>';
+            html += '<th onclick="sortTableWP(\'papers\')">Papers</th>';
+            html += '<th onclick="sortTableWP(\'citations\')">Citations</th>';
+            html += '<th>Latest Paper</th>';
+            html += '<th onclick="sortTableWP(\'date\')">Date</th>';
+            html += '<th>Location</th>';
+            html += '</tr></thead><tbody>';
+            
+            data.forEach((row, index) => {
+                html += '<tr>';
+                html += `<td>${index + 1}</td>`;
+                html += `<td><strong>${row.Author || ''}</strong></td>`;
+                html += `<td>${row.Papers || 0}</td>`;
+                html += `<td>${row.Citations || 0}</td>`;
+                html += `<td>${(row['Latest Paper'] || '').substring(0, 50)}${row['Latest Paper']?.length > 50 ? '...' : ''}</td>`;
+                html += `<td>${row['Latest Date'] || ''}</td>`;
+                html += `<td>${(row.Location || '').substring(0, 30)}${row.Location?.length > 30 ? '...' : ''}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
+        }
+        
+        function updateStatsWP(data) {
+            const totalAuthors = data.length;
+            const totalPapers = data.reduce((sum, row) => sum + (row.Papers || 0), 0);
+            const totalCitations = data.reduce((sum, row) => sum + (row.Citations || 0), 0);
+            
+            document.getElementById('totalWorkingPapers').textContent = totalPapers.toLocaleString();
+        }
+        
+        function switchTab(tabName) {
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Determine which tab to show
+            if (tabName === 'journals') {
+                // Show journals, which is the existing tableWrapper
+                document.querySelector('.tab-btn[onclick*=\"journals\"]').classList.add('active');
+                filterData(); // Refresh journal data
+            } else if (tabName === 'working-papers-tab') {
+                // For working papers, we need to switch the display
+                document.querySelector('.tab-btn[onclick*=\"working-papers-tab\"]').classList.add('active');
+                if (typeof allDataWP !== 'undefined' && allDataWP.length > 0) {
+                    displayDataWP(allDataWP);
+                } else {
+                    document.getElementById('tableWrapper').innerHTML = '<div class=\"empty-state\"><h3>No working papers data yet</h3><p>Run the finance-papers CLI and choose to update working papers</p></div>';
+                }
+            }
+        }
+        
+        function sortTableWP(column) {
+            // Implement sorting for working papers if needed
+            // For now, just re-display
+            displayDataWP(allDataWP);
+        }
+        
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const minPapers = parseInt(document.getElementById('minPapers').value) || 0;
+            const sortBy = document.getElementById('sortBy').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            
+            let filtered = allData.filter(row => {
+                const matchesSearch = !searchTerm || (row.Author || '').toLowerCase().includes(searchTerm);
+                
+                // Filter by year if specified
+                let matchesYear = true;
+                if (yearFilter !== 'all' && row.Years) {
+                    const year = parseInt(yearFilter);
+                    matchesYear = row.Years[year] > 0;
+                }
+                
+                // Calculate papers count for the filtered year
+                let papersCount = row.Papers || 0;
+                if (yearFilter !== 'all' && row.Years) {
+                    const year = parseInt(yearFilter);
+                    papersCount = row.Years[year] || 0;
+                }
+                
+                const matchesPapers = papersCount >= minPapers;
+                return matchesSearch && matchesYear && matchesPapers;
+            });
+            
+            // Adjust paper counts for display if year filter is active
+            if (yearFilter !== 'all') {
+                const year = parseInt(yearFilter);
+                filtered = filtered.map(row => ({
+                    ...row,
+                    Papers: row.Years && row.Years[year] ? row.Years[year] : 0
+                }));
+            }
+            
+            filtered.sort((a, b) => {
+                if (sortBy === 'citations') {
+                    return (b.Citations || 0) - (a.Citations || 0);
+                }
+                return (b.Papers || 0) - (a.Papers || 0);
+            });
+            
+            displayData(filtered);
+            updateStats(filtered);
+        }
+        
+        function sortTable(column) {
+            const sortBy = column === 'citations' ? 'citations' : 'papers';
+            document.getElementById('sortBy').value = sortBy;
+            filterData();
+        }
+        
+        function exportCSV() {
+            const csv = convertToCSV(allData);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `finance_papers_rankings_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+        
+        function convertToCSV(data) {
+            const headers = ['Rank', 'Author', 'Papers', 'Citations', 'Latest Paper', 'Latest Date'];
+            const rows = data.map((row, index) => [
+                index + 1,
+                row.Author || '',
+                row.Papers || 0,
+                row.Citations || 0,
+                (row['Latest Paper'] || '').replace(/"/g, '""'),
+                row['Latest Date'] || ''
+            ]);
+            
+            return [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+            ].join('\n');
+        }
+        
+        function showEmptyState() {
+            document.getElementById('tableWrapper').innerHTML = `
+                <div class="empty-state">
+                    <h3>No data available yet</h3>
+                    <p>Export rankings from the <a href="https://finance-papers.streamlit.app" target="_blank">Streamlit dashboard</a> to populate this page.</p>
+                    <p style="margin-top: 20px;">
+                        <a href="https://finance-papers.streamlit.app" target="_blank" class="btn">Go to Dashboard</a>
+                    </p>
+                </div>
+            `;
+            document.getElementById('totalAuthors').textContent = '0';
+            document.getElementById('totalPapers').textContent = '0';
+            document.getElementById('totalCitations').textContent = '0';
+        }
+        
+        document.getElementById('searchInput').addEventListener('input', filterData);
+        document.getElementById('minPapers').addEventListener('input', filterData);
+        document.getElementById('sortBy').addEventListener('change', filterData);
+        document.getElementById('yearFilter').addEventListener('change', filterData);
+        
+        loadData();
+    </script>
+</body>
+</html>
