@@ -90,32 +90,129 @@ def get_author_rankings(journals=['aer', 'jf', 'jfe', 'qje', 'rfs'], year=None, 
     
     return data
 
+def get_working_papers_rankings(top_n=250):
+    """Get author rankings from working papers database"""
+    authors_data = {}
+    
+    # Check for working papers database
+    pattern = os.path.join(DB_DIR, 'working_papers*.db')
+    db_files = glob.glob(pattern)
+    
+    if not db_files:
+        print("No working papers database found")
+        return []
+    
+    for db_file in db_files:
+        print(f"Processing: {os.path.basename(db_file)}")
+        
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute('''
+                SELECT author_name, title, publication_date, cited_by_count, primary_location
+                FROM working_papers
+            ''')
+            
+            for row in cursor.fetchall():
+                author_name, title, pub_date, citations, location = row
+                
+                if not author_name:
+                    continue
+                
+                if author_name not in authors_data:
+                    authors_data[author_name] = {
+                        'papers': 0,
+                        'citations': 0,
+                        'latest_date': '',
+                        'latest_title': '',
+                        'latest_location': ''
+                    }
+                
+                authors_data[author_name]['papers'] += 1
+                authors_data[author_name]['citations'] += citations or 0
+                
+                if pub_date and (not authors_data[author_name]['latest_date'] or pub_date > authors_data[author_name]['latest_date']):
+                    authors_data[author_name]['latest_date'] = pub_date
+                    authors_data[author_name]['latest_title'] = title
+                    authors_data[author_name]['latest_location'] = location
+        
+        except Exception as e:
+            print(f"Error processing {db_file}: {e}")
+        finally:
+            conn.close()
+    
+    # Convert to list
+    data = []
+    for author, stats in authors_data.items():
+        data.append({
+            'Author': author,
+            'Papers': stats['papers'],
+            'Citations': stats['citations'],
+            'Latest Paper': stats['latest_title'][:100] if stats['latest_title'] else '',
+            'Latest Date': stats['latest_date'],
+            'Location': stats['latest_location'][:50] if stats['latest_location'] else ''
+        })
+    
+    # Sort by papers then citations
+    data.sort(key=lambda x: (x['Papers'], x['Citations']), reverse=True)
+    
+    # Limit to top N
+    data = data[:top_n]
+    
+    return data
+
 def main():
     print("Generating author rankings from databases...")
     print(f"Database directory: {DB_DIR}")
     
-    # Get rankings
-    rankings = get_author_rankings(top_n=250)
+    # Get journal rankings
+    print("\n📚 Processing journal articles...")
+    journal_rankings = get_author_rankings(top_n=250)
     
-    if not rankings:
-        print("No data found in databases!")
-        sys.exit(1)
+    if not journal_rankings:
+        print("No journal data found in databases!")
+    else:
+        print(f"Found {len(journal_rankings)} authors")
+        print(f"Total papers: {sum(r['Papers'] for r in journal_rankings)}")
+        print(f"Total citations: {sum(r['Citations'] for r in journal_rankings)}")
     
-    print(f"\nFound {len(rankings)} authors")
-    print(f"Total papers: {sum(r['Papers'] for r in rankings)}")
-    print(f"Total citations: {sum(r['Citations'] for r in rankings)}")
+    # Get working papers rankings
+    print("\n📄 Processing working papers...")
+    wp_rankings = get_working_papers_rankings(top_n=250)
+    
+    if not wp_rankings:
+        print("No working papers data found")
+    else:
+        print(f"Found {len(wp_rankings)} authors")
+        print(f"Total working papers: {sum(r['Papers'] for r in wp_rankings)}")
+        print(f"Total citations: {sum(r['Citations'] for r in wp_rankings)}")
+    
+    # Combine data
+    export_data = {
+        'journals': journal_rankings,
+        'working_papers': wp_rankings,
+        'last_updated': os.popen('date -u +"%Y-%m-%d %H:%M:%S UTC"').read().strip()
+    }
     
     # Export to JSON
     output_file = os.path.join(project_root, 'docs', 'data', 'rankings.json')
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(rankings, f, indent=2, ensure_ascii=False)
+        json.dump(export_data, f, indent=2, ensure_ascii=False)
     
     print(f"\n✅ Exported to: {output_file}")
-    print(f"\nTop 10 authors:")
-    for i, author in enumerate(rankings[:10], 1):
-        print(f"{i}. {author['Author']} - {author['Papers']} papers, {author['Citations']} citations")
+    
+    if journal_rankings:
+        print(f"\nTop 10 authors (journals):")
+        for i, author in enumerate(journal_rankings[:10], 1):
+            print(f"{i}. {author['Author']} - {author['Papers']} papers, {author['Citations']} citations")
+    
+    if wp_rankings:
+        print(f"\nTop 10 authors (working papers):")
+        for i, author in enumerate(wp_rankings[:10], 1):
+            print(f"{i}. {author['Author']} - {author['Papers']} papers, {author['Citations']} citations")
     
     sys.exit(0)
 

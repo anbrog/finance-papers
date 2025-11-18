@@ -294,7 +294,45 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #999;
+            color: #666;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s ease;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #0066cc;
+        }
+
+        .tab-btn.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .empty-state h3 {
@@ -353,7 +391,7 @@
             <h1>Finance Papers Database</h1>
             <p>
                 A comprehensive database of academic publications in top finance journals 
-                (AER, JF, JFE, QJE, RFS) with author rankings and working papers tracking. 
+                (JF, JFE, RFS) with author rankings and working papers tracking. 
                 Data sourced from <a href="https://openalex.org" target="_blank">OpenAlex</a>.
             </p>
         </div>
@@ -378,10 +416,16 @@
             </div>
         </div>
 
-        <!-- Author Rankings Section -->
+        <!-- Rankings Section -->
         <section class="section" id="rankings">
             <h2>Author Rankings</h2>
-            <p>Top authors ranked by number of publications in leading finance journals.</p>
+            <p>Top authors by publications in leading finance journals (JF, JFE, RFS) and working papers.</p>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('journals')">Journal Articles</button>
+                <button class="tab-btn" onclick="switchTab('working-papers-tab')">Working Papers</button>
+            </div>
             
             <div class="table-container">
                 <div class="table-controls">
@@ -403,11 +447,19 @@
 
         <!-- Working Papers Section -->
         <section class="section" id="working-papers">
-            <h2>Recent Working Papers</h2>
-            <p>Latest working papers from top finance researchers.</p>
+            <h2>Working Papers by Top Authors</h2>
+            <p>Working papers from leading finance researchers. View rankings in the <a href="#rankings" onclick="switchTab('working-papers-tab')">rankings section</a>.</p>
             <div class="about-box">
-                <h3>Coming Soon</h3>
-                <p>Working papers data will be available in the next update. Check back soon!</p>
+                <h3>Working Papers Database</h3>
+                <p>
+                    The working papers database tracks recent working papers from the top 250 authors 
+                    ranked by journal publications. This provides early insight into emerging research 
+                    from leading scholars in finance.
+                </p>
+                <p style="margin-top: 1rem;">
+                    <strong>Data includes:</strong> Author names, publication dates, venues (SSRN, arXiv, etc.), 
+                    and citation counts for working papers.
+                </p>
             </div>
         </section>
 
@@ -420,10 +472,8 @@
                     This database aggregates publication data from five leading finance journals:
                 </p>
                 <ul>
-                    <li><strong>AER</strong> - American Economic Review</li>
                     <li><strong>JF</strong> - Journal of Finance</li>
                     <li><strong>JFE</strong> - Journal of Financial Economics</li>
-                    <li><strong>QJE</strong> - Quarterly Journal of Economics</li>
                     <li><strong>RFS</strong> - Review of Financial Studies</li>
                 </ul>
                 <p style="margin-top: 20px;">
@@ -465,20 +515,42 @@
 
     <script>
         let allData = [];
+        let allDataWP = [];
         
         async function loadData() {
             try {
                 const response = await fetch('./data/rankings.json');
-                allData = await response.json();
+                const data = await response.json();
+                
+                // Handle both old and new data formats
+                if (Array.isArray(data)) {
+                    // Old format: array of rankings
+                    allData = data;
+                    allDataWP = [];
+                } else {
+                    // New format: object with journals and working_papers
+                    allData = data.journals || [];
+                    allDataWP = data.working_papers || [];
+                    if (data.last_updated) {
+                        document.getElementById('lastUpdate').textContent = new Date(data.last_updated).toLocaleDateString();
+                    }
+                }
                 
                 if (allData.length > 0) {
                     displayData(allData);
                     updateStats(allData);
-                    document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString();
-                } else {
+                }
+                
+                if (allDataWP.length > 0) {
+                    displayDataWP(allDataWP);
+                    updateStatsWP(allDataWP);
+                }
+                
+                if (allData.length === 0 && allDataWP.length === 0) {
                     showEmptyState();
                 }
             } catch (error) {
+                console.error('Error loading data:', error);
                 showEmptyState();
             }
         }
@@ -523,7 +595,83 @@
             document.getElementById('totalAuthors').textContent = totalAuthors.toLocaleString();
             document.getElementById('totalPapers').textContent = totalPapers.toLocaleString();
             document.getElementById('totalCitations').textContent = totalCitations.toLocaleString();
-            document.getElementById('totalWorkingPapers').textContent = '-';
+            
+            // Update working papers count if available
+            if (typeof allDataWP !== 'undefined' && allDataWP.length > 0) {
+                const wpCount = allDataWP.reduce((sum, row) => sum + (row.Papers || 0), 0);
+                document.getElementById('totalWorkingPapers').textContent = wpCount.toLocaleString();
+            } else {
+                document.getElementById('totalWorkingPapers').textContent = '-';
+            }
+        }
+        
+        function displayDataWP(data) {
+            const wrapper = document.getElementById('tableWrapper');
+            
+            if (data.length === 0) {
+                wrapper.innerHTML = '<div class="empty-state"><h3>No working papers data yet</h3><p>Check back after running the update workflow</p></div>';
+                return;
+            }
+            
+            let html = '<table><thead><tr>';
+            html += '<th onclick="sortTableWP(\'rank\')">Rank</th>';
+            html += '<th onclick="sortTableWP(\'author\')">Author</th>';
+            html += '<th onclick="sortTableWP(\'papers\')">Papers</th>';
+            html += '<th onclick="sortTableWP(\'citations\')">Citations</th>';
+            html += '<th>Latest Paper</th>';
+            html += '<th onclick="sortTableWP(\'date\')">Date</th>';
+            html += '<th>Location</th>';
+            html += '</tr></thead><tbody>';
+            
+            data.forEach((row, index) => {
+                html += '<tr>';
+                html += `<td>${index + 1}</td>`;
+                html += `<td><strong>${row.Author || ''}</strong></td>`;
+                html += `<td>${row.Papers || 0}</td>`;
+                html += `<td>${row.Citations || 0}</td>`;
+                html += `<td>${(row['Latest Paper'] || '').substring(0, 50)}${row['Latest Paper']?.length > 50 ? '...' : ''}</td>`;
+                html += `<td>${row['Latest Date'] || ''}</td>`;
+                html += `<td>${(row.Location || '').substring(0, 30)}${row.Location?.length > 30 ? '...' : ''}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
+        }
+        
+        function updateStatsWP(data) {
+            const totalAuthors = data.length;
+            const totalPapers = data.reduce((sum, row) => sum + (row.Papers || 0), 0);
+            const totalCitations = data.reduce((sum, row) => sum + (row.Citations || 0), 0);
+            
+            document.getElementById('totalWorkingPapers').textContent = totalPapers.toLocaleString();
+        }
+        
+        function switchTab(tabName) {
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Determine which tab to show
+            if (tabName === 'journals') {
+                // Show journals, which is the existing tableWrapper
+                document.querySelector('.tab-btn[onclick*=\"journals\"]').classList.add('active');
+                filterData(); // Refresh journal data
+            } else if (tabName === 'working-papers-tab') {
+                // For working papers, we need to switch the display
+                document.querySelector('.tab-btn[onclick*=\"working-papers-tab\"]').classList.add('active');
+                if (typeof allDataWP !== 'undefined' && allDataWP.length > 0) {
+                    displayDataWP(allDataWP);
+                } else {
+                    document.getElementById('tableWrapper').innerHTML = '<div class=\"empty-state\"><h3>No working papers data yet</h3><p>Run the finance-papers CLI and choose to update working papers</p></div>';
+                }
+            }
+        }
+        
+        function sortTableWP(column) {
+            // Implement sorting for working papers if needed
+            // For now, just re-display
+            displayDataWP(allDataWP);
         }
         
         function filterData() {
