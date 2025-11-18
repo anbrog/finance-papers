@@ -132,12 +132,23 @@ def fetch_working_papers_for_author(author_name, author_id=None, year=None):
         print(f"Error fetching data for {author_name}: {e}")
         return []
 
-def save_working_papers_to_db(papers, db_filename='working_papers.db'):
-    """Save working papers to SQLite database"""
+def save_working_papers_to_db(papers, db_filename='working_papers.db', clean=False):
+    """Save working papers to SQLite database
+    
+    Args:
+        papers: List of paper dictionaries
+        db_filename: Database filename
+        clean: If True, drop and recreate the table (removes all old data)
+    """
     db_filepath = os.path.join(DB_DIR, db_filename)
     
     conn = sqlite3.connect(db_filepath)
     cursor = conn.cursor()
+    
+    # Drop table if clean flag is set
+    if clean:
+        print("🗑️  Cleaning database - removing all old working papers...")
+        cursor.execute('DROP TABLE IF EXISTS working_papers')
     
     # Create table
     cursor.execute('''
@@ -207,11 +218,14 @@ def main():
     csv_file = None
     year = None
     max_authors = None
+    clean = False
     
     i = 1
     while i < len(sys.argv):
         arg = sys.argv[i]
-        if arg.startswith('--'):
+        if arg == '--clean':
+            clean = True
+        elif arg.startswith('--'):
             try:
                 max_authors = int(arg[2:])
             except ValueError:
@@ -230,10 +244,14 @@ def main():
         csv_files = glob.glob(pattern)
         
         if not csv_files:
-            print("Usage: python3 get_wp.py <author_list_csv> [year] [--N]")
+            print("Usage: python3 get_wp.py <author_list_csv> [year] [--N] [--clean]")
             print("Example: python3 get_wp.py author_list_top3_2024_top250_*.csv")
             print("Example: python3 get_wp.py author_list_top3_2024_top250_*.csv 2024")
             print("Example: python3 get_wp.py author_list_top3_2024_top250_*.csv 2024 --50")
+            print("Example: python3 get_wp.py author_list_top3_2024_top250_*.csv 2024 --clean")
+            print("\nFlags:")
+            print("  --N      Limit to first N authors")
+            print("  --clean  Remove all old working papers before adding new ones")
             print("\nError: No author_list CSV files found in ../out/data/")
             sys.exit(1)
         
@@ -288,12 +306,15 @@ def main():
     
     if all_papers:
         db_filename = f"working_papers{f'_{year}' if year else ''}.db"
-        new_count, dup_count = save_working_papers_to_db(all_papers, db_filename)
+        new_count, dup_count = save_working_papers_to_db(all_papers, db_filename, clean)
         
         db_path = os.path.join(DB_DIR, db_filename)
-        print(f"\n💾 Saved {new_count} new working papers to {db_path}")
-        if dup_count > 0:
-            print(f"🔄 Skipped {dup_count} duplicate working papers")
+        if clean:
+            print(f"\n💾 Saved {new_count} working papers to {db_path} (database cleaned)")
+        else:
+            print(f"\n💾 Saved {new_count} new working papers to {db_path}")
+            if dup_count > 0:
+                print(f"🔄 Skipped {dup_count} duplicate working papers")
     else:
         print("\nNo working papers found.")
 

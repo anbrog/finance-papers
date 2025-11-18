@@ -394,15 +394,15 @@ def main():
     # Ask if user wants to update working papers
     print("\n" + "="*80)
     while True:
-        update_wp = input("📝 Update working papers? (y/n): ").strip().lower()
-        if update_wp in ['y', 'n']:
+        update_wp = input("📝 Update working papers? (y/n/clean): ").strip().lower()
+        if update_wp in ['y', 'n', 'clean']:
             break
-        print("⚠️  Please enter 'y' or 'n'")
+        print("⚠️  Please enter 'y' (update), 'n' (skip), or 'clean' (replace all)")
     
     wp_count = 0
     
-    if update_wp == 'y':
-    # Find the latest author list CSV
+    if update_wp in ['y', 'clean']:
+        # Find the latest author list CSV
         pattern = os.path.join(DB_DIR, 'author_list_top3_*.csv')
         csv_files = glob.glob(pattern)
         
@@ -419,6 +419,10 @@ def main():
         # Fetch working papers (without year filter - get all years)
         script_path = os.path.join(script_dir, 'get_wp.py')
         cmd = [sys.executable, script_path, csv_abs_path]
+        
+        # Add --clean flag if user chose 'clean'
+        if update_wp == 'clean':
+            cmd.append('--clean')
         
         run_command(cmd, "Fetching Working Papers for Top 250 Authors")
         
