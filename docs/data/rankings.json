@@ -2879,44 +2879,67 @@
       }
     },
     {
-      "Author": "Magnus Johannesson",
-      "Papers": 139,
-      "Citations": 8804,
-      "Latest Paper": "Pre-Registration and Pre-Analysis Plans in Experimental Economics",
-      "Latest Date": "2025-04-01",
-      "Location": "",
+      "Author": "Feng Guo",
+      "Papers": 153,
+      "Citations": 3755,
+      "Latest Paper": "Common marmoset: An emerging non-human primate model for translational applications in brain disorde",
+      "Latest Date": "2025-03-15",
+      "Location": "Current Opinion in Neurobiology",
       "Years": {
+        "2017": 8,
+        "2015": 8,
+        "2014": 5,
+        "2016": 3,
+        "2008": 4,
+        "2022": 17,
+        "2011": 5,
+        "2019": 8,
+        "2021": 3,
+        "2020": 5,
         "2018": 7,
-        "2019": 10,
-        "2008": 3,
-        "2017": 9,
-        "1993": 5,
-        "2014": 3,
-        "2013": 6,
-        "2015": 4,
-        "1991": 3,
-        "1996": 16,
-        "1998": 2,
-        "2003": 2,
-        "2020": 2,
-        "2021": 4,
-        "2024": 6,
-        "2025": 6,
-        "1999": 4,
-        "1992": 3,
-        "2016": 4,
-        "1995": 4,
-        "2023": 1,
-        "2022": 3,
-        "1994": 2,
-        "1997": 8,
-        "2009": 5,
         "2012": 4,
-        "2007": 4,
-        "2011": 1,
-        "2002": 1,
-        "2006": 1,
-        "2010": 1
+        "2025": 2,
+        "2013": 1,
+        "2023": 6,
+        "1998": 1,
+        "2024": 15,
+        "2004": 5,
+        "2010": 4,
+        "1999": 1,
+        "2002": 13,
+        "2003": 10,
+        "2005": 3,
+        "2009": 2,
+        "2007": 6,
+        "2001": 3,
+        "2006": 4
+      }
+    },
+    {
+      "Author": "Wei Jiang",
+      "Papers": 150,
+      "Citations": 3889,
+      "Latest Paper": "Towards Comprehensive Interactive Change Understanding in Remote Sensing: A Large-scale Dataset and ",
+      "Latest Date": "2025-09-27",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2017": 6,
+        "2009": 1,
+        "2019": 5,
+        "2021": 8,
+        "2018": 13,
+        "2022": 32,
+        "2023": 36,
+        "2024": 10,
+        "2020": 4,
+        "2025": 15,
+        "2014": 2,
+        "2016": 7,
+        "2010": 1,
+        "2007": 5,
+        "2013": 1,
+        "2011": 3,
+        "2006": 1
       }
     },
     {
@@ -2977,6 +3000,29 @@
       }
     },
     {
+      "Author": "Daniel Carvalho",
+      "Papers": 133,
+      "Citations": 2696,
+      "Latest Paper": "O Princípio da Proporcionalidade no Direito Brasileiro: Uma Análise Crítica da Teoria e Prática",
+      "Latest Date": "2025-06-30",
+      "Location": "AYA Editora eBooks",
+      "Years": {
+        "2010": 3,
+        "2019": 15,
+        "2012": 3,
+        "2021": 11,
+        "2018": 4,
+        "2022": 3,
+        "2017": 3,
+        "2020": 12,
+        "2016": 1,
+        "2023": 62,
+        "2025": 14,
+        "2007": 1,
+        "2009": 1
+      }
+    },
+    {
       "Author": "Florian Hoffmann",
       "Papers": 133,
       "Citations": 844,
@@ -3004,6 +3050,51 @@
         "1984": 1,
         "2025": 4,
         "2000": 1
+      }
+    },
+    {
+      "Author": "Raghuram G. Rajan",
+      "Papers": 123,
+      "Citations": 7476,
+      "Latest Paper": "Designing a Survey to Explore Omani SMEs’ Capital Budgeting Practices and Its Determinants",
+      "Latest Date": "2025-11-01",
+      "Location": "Lecture notes in networks and systems",
+      "Years": {
+        "2004": 7,
+        "2009": 7,
+        "2011": 9,
+        "2019": 5,
+        "2000": 6,
+        "1997": 2,
+        "2023": 4,
+        "2024": 2,
+        "2005": 6,
+        "2007": 2,
+        "2012": 3,
+        "2016": 12,
+        "1988": 1,
+        "1998": 3,
+        "2010": 1,
+        "2013": 1,
+        "2003": 5,
+        "1994": 3,
+        "2002": 2,
+        "1996": 2,
+        "2001": 2,
+        "1999": 3,
+        "2020": 5,
+        "2018": 2,
+        "2006": 1,
+        "2017": 3,
+        "2008": 4,
+        "1995": 3,
+        "2015": 3,
+        "1991": 1,
+        "2014": 3,
+        "1993": 2,
+        "1992": 1,
+        "2021": 1,
+        "2025": 6
       }
     },
     {
@@ -3072,41 +3163,70 @@
       }
     },
     {
-      "Author": "Michael Weber",
-      "Papers": 107,
-      "Citations": 1376,
-      "Latest Paper": "Clinical Deep Phenotyping of Treatment Response in Schizophrenia (CDP-STAR): design and methodology ",
-      "Latest Date": "2025-06-22",
-      "Location": "bioRxiv (Cold Spring Harbor Laboratory)",
+      "Author": "Magnus Johannesson",
+      "Papers": 110,
+      "Citations": 8059,
+      "Latest Paper": "Confusion remains an important issue in public goods game experiments",
+      "Latest Date": "2024-07-25",
+      "Location": "Proceedings of the National Academy of Sciences",
       "Years": {
-        "2018": 17,
-        "2017": 11,
-        "2015": 2,
-        "2002": 2,
-        "2023": 26,
-        "1999": 2,
-        "2016": 8,
-        "2013": 4,
-        "2007": 2,
-        "2014": 2,
-        "2019": 3,
+        "2018": 3,
+        "2019": 6,
+        "2008": 3,
+        "2017": 7,
+        "1993": 5,
+        "2014": 3,
+        "2013": 6,
+        "1991": 3,
+        "1996": 16,
+        "1998": 2,
+        "2003": 2,
         "2024": 4,
-        "2005": 1,
-        "2009": 2,
-        "2003": 3,
-        "2021": 3,
-        "1987": 1,
+        "1999": 4,
+        "1992": 3,
+        "2015": 3,
+        "2016": 3,
+        "1995": 4,
+        "2021": 1,
+        "2022": 1,
+        "1994": 2,
+        "1997": 8,
+        "2009": 5,
+        "2012": 4,
+        "2007": 4,
+        "2011": 1,
+        "2002": 1,
+        "2006": 1,
         "2010": 1,
-        "1997": 1,
-        "2004": 1,
-        "1988": 1,
-        "2011": 2,
-        "2008": 1,
-        "2000": 1,
-        "2022": 2,
-        "2020": 1,
-        "2025": 2,
-        "1986": 1
+        "2020": 1
+      }
+    },
+    {
+      "Author": "Hao Xing",
+      "Papers": 107,
+      "Citations": 1575,
+      "Latest Paper": "Aeroacoustics in owl flight: biomechanisms and biomimetics",
+      "Latest Date": "2025-06-06",
+      "Location": "Bioinspiration & Biomimetics",
+      "Years": {
+        "2007": 4,
+        "2013": 6,
+        "2016": 8,
+        "2024": 13,
+        "2020": 4,
+        "2023": 8,
+        "2004": 2,
+        "2019": 5,
+        "2025": 10,
+        "2011": 1,
+        "2000": 5,
+        "2021": 5,
+        "2022": 20,
+        "2018": 5,
+        "2010": 2,
+        "2012": 1,
+        "2017": 6,
+        "2009": 2
       }
     },
     {
@@ -3143,6 +3263,68 @@
         "2012": 1,
         "1989": 1,
         "2025": 1
+      }
+    },
+    {
+      "Author": "Jesse Davis",
+      "Papers": 99,
+      "Citations": 848,
+      "Latest Paper": "Policy Safety Testing in Non-Deterministic Planning: Fuzzing, Test Oracles, Fault Analysis",
+      "Latest Date": "2025-10-21",
+      "Location": "Frontiers in artificial intelligence and applicati",
+      "Years": {
+        "2019": 9,
+        "2005": 2,
+        "2020": 14,
+        "2018": 6,
+        "2015": 5,
+        "2021": 8,
+        "2024": 13,
+        "2022": 7,
+        "2023": 12,
+        "2016": 7,
+        "2014": 1,
+        "2013": 2,
+        "2017": 2,
+        "2025": 5,
+        "2006": 1,
+        "2012": 3,
+        "2003": 1,
+        "2004": 1
+      }
+    },
+    {
+      "Author": "Pascal Paul",
+      "Papers": 94,
+      "Citations": 5223,
+      "Latest Paper": "BCMA signaling from the Golgi apparatus in B cells",
+      "Latest Date": "2025-09-10",
+      "Location": "bioRxiv (Cold Spring Harbor Laboratory)",
+      "Years": {
+        "2003": 2,
+        "2002": 1,
+        "2009": 4,
+        "2006": 1,
+        "2014": 5,
+        "2005": 1,
+        "2017": 2,
+        "2008": 3,
+        "2019": 5,
+        "2000": 2,
+        "2013": 2,
+        "2021": 5,
+        "1994": 1,
+        "2020": 5,
+        "2018": 8,
+        "1992": 1,
+        "2010": 1,
+        "2007": 1,
+        "1988": 1,
+        "2016": 1,
+        "2022": 5,
+        "2023": 28,
+        "2024": 6,
+        "2025": 3
       }
     },
     {
@@ -3197,6 +3379,35 @@
         "2016": 1,
         "2018": 5,
         "2013": 1
+      }
+    },
+    {
+      "Author": "Anna Dreber",
+      "Papers": 88,
+      "Citations": 1191,
+      "Latest Paper": "Open Science, Closed Peer Review?",
+      "Latest Date": "2025-07-21",
+      "Location": "",
+      "Years": {
+        "2017": 2,
+        "2015": 6,
+        "2021": 5,
+        "2018": 5,
+        "2008": 5,
+        "2012": 6,
+        "2020": 3,
+        "2019": 7,
+        "2013": 5,
+        "2024": 5,
+        "2025": 23,
+        "2011": 4,
+        "2016": 1,
+        "2010": 1,
+        "2022": 2,
+        "2014": 2,
+        "2004": 1,
+        "2009": 1,
+        "2023": 1
       }
     },
     {
@@ -3263,32 +3474,6 @@
       }
     },
     {
-      "Author": "Wei Jiang",
-      "Papers": 85,
-      "Citations": 977,
-      "Latest Paper": "Multipartite entanglement in the XY spin-1/2 chain",
-      "Latest Date": "2025-11-05",
-      "Location": "",
-      "Years": {
-        "2022": 13,
-        "2020": 8,
-        "2008": 1,
-        "2023": 12,
-        "2024": 14,
-        "2025": 15,
-        "2016": 2,
-        "2005": 1,
-        "2012": 1,
-        "2017": 2,
-        "2021": 7,
-        "2015": 1,
-        "2018": 3,
-        "2006": 1,
-        "2007": 1,
-        "2019": 3
-      }
-    },
-    {
       "Author": "Lukas Schmid",
       "Papers": 85,
       "Citations": 90,
@@ -3309,6 +3494,30 @@
         "2012": 1,
         "2021": 1,
         "2025": 3
+      }
+    },
+    {
+      "Author": "Xing Huang",
+      "Papers": 82,
+      "Citations": 4997,
+      "Latest Paper": "Proto-Former: Unified Facial Landmark Detection by Prototype Transformer",
+      "Latest Date": "2025-10-17",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2013": 1,
+        "2023": 9,
+        "2024": 17,
+        "2015": 1,
+        "2014": 2,
+        "2021": 7,
+        "2020": 20,
+        "2022": 14,
+        "2016": 1,
+        "2012": 1,
+        "2017": 1,
+        "2018": 1,
+        "2019": 2,
+        "2025": 5
       }
     },
     {
@@ -3459,6 +3668,30 @@
       }
     },
     {
+      "Author": "Tony Zhang",
+      "Papers": 69,
+      "Citations": 1024,
+      "Latest Paper": "Noise May Contain Transferable Knowledge: Understanding Semi-supervised Heterogeneous Domain Adaptat",
+      "Latest Date": "2025-02-19",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2022": 9,
+        "2023": 7,
+        "2025": 4,
+        "2015": 1,
+        "2020": 18,
+        "2024": 5,
+        "2011": 2,
+        "2021": 11,
+        "2013": 2,
+        "2007": 1,
+        "2012": 1,
+        "2006": 1,
+        "2019": 6,
+        "2018": 1
+      }
+    },
+    {
       "Author": "Hanno Lustig",
       "Papers": 69,
       "Citations": 724,
@@ -3564,6 +3797,42 @@
       }
     },
     {
+      "Author": "Bruno Biais",
+      "Papers": 67,
+      "Citations": 472,
+      "Latest Paper": "Taxing Financial Transactions : A Mirrleesian Approach",
+      "Latest Date": "2023-02-01",
+      "Location": "Toulouse 1 Capitole Publications (Université Toulo",
+      "Years": {
+        "1999": 3,
+        "2013": 3,
+        "2020": 3,
+        "1997": 5,
+        "2021": 2,
+        "2010": 3,
+        "2018": 1,
+        "2002": 8,
+        "2000": 4,
+        "2015": 1,
+        "2023": 1,
+        "2014": 2,
+        "2009": 7,
+        "2008": 1,
+        "2017": 2,
+        "2004": 3,
+        "2003": 2,
+        "2007": 5,
+        "2019": 2,
+        "1998": 1,
+        "1993": 1,
+        "2006": 1,
+        "1991": 1,
+        "1994": 1,
+        "1989": 1,
+        "2001": 1
+      }
+    },
+    {
       "Author": "Patrick Bolton",
       "Papers": 65,
       "Citations": 3618,
@@ -3595,30 +3864,6 @@
         "2023": 1,
         "2010": 1,
         "2024": 4
-      }
-    },
-    {
-      "Author": "Xing Huang",
-      "Papers": 65,
-      "Citations": 2522,
-      "Latest Paper": "Expression and Mechanism of TRPV1 Channel in Prefrontal Cortex after Acute Hypoxic Exercise",
-      "Latest Date": "2025-06-05",
-      "Location": "",
-      "Years": {
-        "2014": 1,
-        "2021": 4,
-        "2020": 9,
-        "2023": 28,
-        "2022": 10,
-        "2015": 1,
-        "2011": 2,
-        "2016": 1,
-        "2019": 2,
-        "2012": 1,
-        "2018": 1,
-        "2024": 3,
-        "2013": 1,
-        "2025": 1
       }
     },
     {
@@ -3737,6 +3982,41 @@
       }
     },
     {
+      "Author": "Yacine Aı̈t-Sahalia",
+      "Papers": 59,
+      "Citations": 3373,
+      "Latest Paper": "Testing Whether Volatility is Local or Stochastic",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2014": 5,
+        "2006": 2,
+        "2010": 8,
+        "2009": 2,
+        "2008": 3,
+        "2001": 5,
+        "2016": 2,
+        "2003": 2,
+        "1995": 2,
+        "2000": 2,
+        "2004": 4,
+        "2005": 3,
+        "2013": 2,
+        "2018": 1,
+        "1994": 1,
+        "2002": 3,
+        "1998": 1,
+        "2021": 1,
+        "2022": 1,
+        "2011": 2,
+        "1993": 1,
+        "2012": 1,
+        "1996": 2,
+        "2024": 2,
+        "2025": 1
+      }
+    },
+    {
       "Author": "Utz Weitzel",
       "Papers": 58,
       "Citations": 85,
@@ -3818,33 +4098,37 @@
       }
     },
     {
-      "Author": "Michael Kirchler",
-      "Papers": 56,
-      "Citations": 179,
+      "Author": "Jürgen Huber",
+      "Papers": 55,
+      "Citations": 128,
       "Latest Paper": "From Individual Choices to the 4-Eyes-Principle: The Big Robber Game Revisited Among Financial Profe",
       "Latest Date": "2025-01-01",
       "Location": "SSRN Electronic Journal",
       "Years": {
-        "2022": 4,
+        "2004": 6,
         "2020": 5,
-        "2024": 3,
-        "2018": 5,
-        "2009": 2,
-        "2007": 3,
-        "2015": 2,
-        "2014": 4,
-        "2023": 6,
+        "2007": 6,
+        "2009": 3,
+        "2016": 3,
+        "2015": 3,
+        "2022": 1,
         "2005": 1,
-        "2010": 2,
-        "2011": 1,
+        "2019": 4,
+        "2014": 2,
+        "2011": 5,
         "2008": 3,
         "2021": 1,
-        "2016": 3,
-        "2019": 6,
+        "1989": 1,
+        "1995": 1,
+        "2010": 1,
         "2013": 1,
-        "2004": 1,
+        "2018": 1,
         "2006": 1,
-        "2025": 2
+        "2023": 1,
+        "1992": 1,
+        "2024": 1,
+        "2025": 2,
+        "2000": 1
       }
     },
     {
@@ -3897,6 +4181,34 @@
       }
     },
     {
+      "Author": "Tarek A. Hassan",
+      "Papers": 53,
+      "Citations": 767,
+      "Latest Paper": "Trade War and the Dollar Anchor",
+      "Latest Date": "2025-10-01",
+      "Location": "",
+      "Years": {
+        "2016": 3,
+        "2020": 4,
+        "2017": 1,
+        "2018": 2,
+        "2021": 5,
+        "2025": 6,
+        "2013": 3,
+        "2012": 2,
+        "2015": 3,
+        "2024": 3,
+        "2014": 4,
+        "2011": 2,
+        "2010": 1,
+        "1985": 1,
+        "2022": 9,
+        "2019": 1,
+        "1999": 1,
+        "2023": 1
+      }
+    },
+    {
       "Author": "Laura Veldkamp",
       "Papers": 52,
       "Citations": 1123,
@@ -3923,6 +4235,37 @@
         "2010": 2,
         "2004": 1,
         "2025": 2
+      }
+    },
+    {
+      "Author": "Manju Puri",
+      "Papers": 52,
+      "Citations": 858,
+      "Latest Paper": "Breaking Barriers to Financial Access: Cross-Platform Digital Payments and Credit Markets",
+      "Latest Date": "2024-12-01",
+      "Location": "",
+      "Years": {
+        "2022": 4,
+        "2007": 2,
+        "2023": 2,
+        "2010": 4,
+        "2013": 5,
+        "2018": 3,
+        "2008": 3,
+        "2002": 3,
+        "2004": 4,
+        "2011": 3,
+        "2021": 2,
+        "2014": 1,
+        "2005": 2,
+        "2020": 2,
+        "2024": 4,
+        "2000": 1,
+        "2015": 1,
+        "2009": 1,
+        "2012": 2,
+        "2016": 2,
+        "1994": 1
       }
     },
     {
@@ -3963,6 +4306,34 @@
       }
     },
     {
+      "Author": "Thomas Philippon",
+      "Papers": 49,
+      "Citations": 2438,
+      "Latest Paper": "Olivier Blanchard (1948–)",
+      "Latest Date": "2025-01-01",
+      "Location": "",
+      "Years": {
+        "2012": 2,
+        "2006": 5,
+        "2019": 5,
+        "2015": 2,
+        "2007": 7,
+        "2020": 3,
+        "2017": 2,
+        "2016": 3,
+        "2005": 2,
+        "2018": 1,
+        "2010": 3,
+        "2001": 1,
+        "2009": 2,
+        "2011": 6,
+        "2013": 1,
+        "2021": 1,
+        "2014": 2,
+        "2025": 1
+      }
+    },
+    {
       "Author": "Constantine Yannelis",
       "Papers": 49,
       "Citations": 959,
@@ -3982,39 +4353,6 @@
         "2013": 2,
         "2019": 1,
         "2018": 1
-      }
-    },
-    {
-      "Author": "Dan Green",
-      "Papers": 49,
-      "Citations": 255,
-      "Latest Paper": "One Hundred Physics Visualizations Using MATLAB",
-      "Latest Date": "2024-05-30",
-      "Location": "WORLD SCIENTIFIC eBooks",
-      "Years": {
-        "2019": 4,
-        "2010": 2,
-        "1994": 2,
-        "2024": 1,
-        "2003": 5,
-        "2014": 6,
-        "1996": 4,
-        "2006": 1,
-        "2005": 3,
-        "1980": 2,
-        "1997": 1,
-        "2004": 3,
-        "1981": 1,
-        "2015": 1,
-        "2013": 1,
-        "2016": 2,
-        "2018": 3,
-        "2020": 2,
-        "2000": 1,
-        "2021": 1,
-        "2009": 1,
-        "2023": 1,
-        "1990": 1
       }
     },
     {
@@ -4049,6 +4387,68 @@
       }
     },
     {
+      "Author": "Michael Weber",
+      "Papers": 47,
+      "Citations": 1112,
+      "Latest Paper": "Quantum Dot Based Chromatic Calorimetry: A proposal",
+      "Latest Date": "2025-01-22",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2011": 5,
+        "2008": 1,
+        "2021": 2,
+        "2003": 1,
+        "2018": 6,
+        "2024": 3,
+        "2012": 3,
+        "2007": 1,
+        "2020": 1,
+        "2013": 2,
+        "1999": 1,
+        "2016": 2,
+        "1994": 1,
+        "2019": 2,
+        "1989": 1,
+        "2005": 1,
+        "2017": 2,
+        "2025": 2,
+        "2014": 1,
+        "2015": 1,
+        "1990": 1,
+        "2002": 1,
+        "2000": 1,
+        "2004": 1,
+        "1997": 1,
+        "2022": 1,
+        "2023": 2
+      }
+    },
+    {
+      "Author": "Neng Wang",
+      "Papers": 46,
+      "Citations": 1053,
+      "Latest Paper": "Small molecule inhibitors of the NorA multidrug efflux pump potentiate antibiotic activity by bindin",
+      "Latest Date": "2025-08-22",
+      "Location": "bioRxiv (Cold Spring Harbor Laboratory)",
+      "Years": {
+        "2008": 2,
+        "2004": 2,
+        "2010": 2,
+        "2022": 3,
+        "1988": 1,
+        "1994": 1,
+        "2013": 2,
+        "2003": 1,
+        "2018": 3,
+        "2019": 5,
+        "2020": 7,
+        "2021": 11,
+        "2016": 2,
+        "2017": 3,
+        "2025": 1
+      }
+    },
+    {
       "Author": "Shaojun Zhang",
       "Papers": 46,
       "Citations": 746,
@@ -4072,25 +4472,26 @@
       }
     },
     {
-      "Author": "Neng Wang",
-      "Papers": 44,
-      "Citations": 1296,
-      "Latest Paper": "[Causal relationship between insomnia and erectile dysfunction based on heart-kidney intersection th",
-      "Latest Date": "2025-07-01",
-      "Location": "PubMed",
+      "Author": "Li An",
+      "Papers": 46,
+      "Citations": 304,
+      "Latest Paper": "Columnar to equiaxed transition in additively manufactured titanium alloys: A comprehensive review o",
+      "Latest Date": "2025-05-24",
+      "Location": "Journal of Alloys and Compounds",
       "Years": {
-        "2020": 2,
-        "2015": 3,
-        "2021": 3,
-        "2016": 2,
-        "2017": 3,
-        "2023": 8,
-        "2024": 4,
-        "2022": 9,
-        "2025": 6,
-        "2018": 2,
-        "2019": 1,
-        "2012": 1
+        "2013": 1,
+        "2024": 11,
+        "2017": 1,
+        "2023": 4,
+        "2025": 7,
+        "2022": 7,
+        "2018": 3,
+        "2021": 7,
+        "2015": 1,
+        "2016": 1,
+        "2014": 1,
+        "2020": 1,
+        "2007": 1
       }
     },
     {
@@ -4114,6 +4515,34 @@
         "2011": 2,
         "2021": 1,
         "2024": 1
+      }
+    },
+    {
+      "Author": "Robert Richmond",
+      "Papers": 44,
+      "Citations": 542,
+      "Latest Paper": "Ocean Health and Human Health are Inextricably Linked",
+      "Latest Date": "2025-03-25",
+      "Location": "",
+      "Years": {
+        "1997": 1,
+        "2021": 1,
+        "1990": 1,
+        "2016": 5,
+        "2023": 5,
+        "1993": 4,
+        "2010": 1,
+        "2019": 8,
+        "2008": 3,
+        "2011": 1,
+        "2018": 5,
+        "1924": 1,
+        "2005": 1,
+        "1998": 1,
+        "2020": 1,
+        "2022": 3,
+        "2025": 1,
+        "2014": 1
       }
     },
     {
@@ -4165,34 +4594,6 @@
         "2003": 1,
         "2006": 1,
         "2018": 2
-      }
-    },
-    {
-      "Author": "Tarek A. Hassan",
-      "Papers": 42,
-      "Citations": 737,
-      "Latest Paper": "The Canary and the Bone: A Darwinian Lecture on Erectile Dysfunction",
-      "Latest Date": "2025-09-30",
-      "Location": "Trends in andrology and sexual medicine",
-      "Years": {
-        "2016": 2,
-        "2020": 3,
-        "2017": 1,
-        "2018": 2,
-        "2021": 5,
-        "2025": 4,
-        "2013": 3,
-        "2012": 2,
-        "2015": 2,
-        "2024": 3,
-        "2014": 4,
-        "2011": 2,
-        "2010": 1,
-        "1985": 1,
-        "2022": 3,
-        "2019": 1,
-        "1999": 1,
-        "2023": 1
       }
     },
     {
@@ -4305,34 +4706,26 @@
       }
     },
     {
-      "Author": "John R. Graham",
-      "Papers": 37,
-      "Citations": 3379,
-      "Latest Paper": "Replication Data and Code for Corporate Culture: Evidence from the Field",
-      "Latest Date": "2022-07-27",
-      "Location": "Harvard Dataverse",
+      "Author": "Jason Allen",
+      "Papers": 38,
+      "Citations": 706,
+      "Latest Paper": "Bayesian Nonparametrics for Causal Inference and Missing Data",
+      "Latest Date": "2023-07-10",
+      "Location": "",
       "Years": {
-        "2003": 3,
-        "2011": 6,
-        "2012": 1,
-        "2008": 1,
-        "2005": 2,
-        "2013": 1,
-        "2006": 1,
         "2004": 1,
-        "2001": 1,
-        "2017": 2,
-        "2009": 1,
-        "2014": 2,
-        "2010": 3,
-        "2002": 1,
-        "1996": 1,
-        "2019": 1,
-        "2022": 2,
-        "1990": 3,
+        "2016": 3,
+        "2013": 2,
+        "2017": 6,
+        "2023": 16,
+        "2011": 1,
+        "2019": 2,
+        "2010": 1,
         "2018": 2,
-        "2016": 1,
-        "2007": 1
+        "2012": 1,
+        "2009": 1,
+        "2015": 1,
+        "2022": 1
       }
     },
     {
@@ -4473,6 +4866,36 @@
       }
     },
     {
+      "Author": "John R. Graham",
+      "Papers": 34,
+      "Citations": 3283,
+      "Latest Paper": "Replication Data and Code for Corporate Culture: Evidence from the Field",
+      "Latest Date": "2022-07-27",
+      "Location": "Harvard Dataverse",
+      "Years": {
+        "2003": 3,
+        "2011": 5,
+        "2012": 1,
+        "2008": 1,
+        "2005": 2,
+        "2013": 1,
+        "2006": 1,
+        "2004": 1,
+        "2001": 1,
+        "2017": 2,
+        "2009": 1,
+        "2014": 2,
+        "2010": 2,
+        "2002": 1,
+        "1996": 1,
+        "2019": 1,
+        "2022": 2,
+        "1990": 3,
+        "2018": 2,
+        "2007": 1
+      }
+    },
+    {
       "Author": "Philippe Jorion",
       "Papers": 33,
       "Citations": 2597,
@@ -4581,6 +5004,30 @@
       }
     },
     {
+      "Author": "Kris Jacobs",
+      "Papers": 32,
+      "Citations": 241,
+      "Latest Paper": "A Framework for Real-Time Modeling and Forecasting of Large Unbalanced Option Implied Volatility Sur",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2013": 2,
+        "2014": 3,
+        "2007": 2,
+        "2025": 3,
+        "2017": 2,
+        "2012": 4,
+        "2024": 1,
+        "2003": 3,
+        "2001": 3,
+        "2002": 3,
+        "2010": 2,
+        "2009": 1,
+        "2011": 2,
+        "2005": 1
+      }
+    },
+    {
       "Author": "Francisco Gomes",
       "Papers": 31,
       "Citations": 537,
@@ -4604,6 +5051,32 @@
         "2004": 2,
         "2009": 2,
         "2013": 1
+      }
+    },
+    {
+      "Author": "Clemens Sialm",
+      "Papers": 31,
+      "Citations": 485,
+      "Latest Paper": "Information Acquisition By Mutual Fund Investors: Evidence from Stock Trading Suspensions",
+      "Latest Date": "2024-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2024": 1,
+        "2005": 2,
+        "2006": 3,
+        "2013": 2,
+        "1999": 1,
+        "2000": 4,
+        "2011": 2,
+        "2009": 2,
+        "2015": 1,
+        "2004": 2,
+        "2022": 1,
+        "2017": 1,
+        "2021": 3,
+        "2020": 3,
+        "2019": 1,
+        "2002": 2
       }
     },
     {
@@ -4632,6 +5105,28 @@
         "2015": 1,
         "2007": 1,
         "2023": 1
+      }
+    },
+    {
+      "Author": "Anna Pavlova",
+      "Papers": 31,
+      "Citations": 231,
+      "Latest Paper": "Correctional rhythmics in the educational space",
+      "Latest Date": "2025-08-21",
+      "Location": "",
+      "Years": {
+        "2013": 3,
+        "2011": 3,
+        "2022": 4,
+        "2014": 2,
+        "2020": 4,
+        "2019": 3,
+        "2025": 4,
+        "2021": 3,
+        "2007": 2,
+        "2006": 1,
+        "2024": 1,
+        "2008": 1
       }
     },
     {
@@ -4664,18 +5159,71 @@
       }
     },
     {
-      "Author": "Christopher Clayton",
-      "Papers": 31,
-      "Citations": 16,
-      "Latest Paper": "Geoeconomic Pressure",
-      "Latest Date": "2025-07-01",
+      "Author": "Avanidhar Subrahmanyam",
+      "Papers": 30,
+      "Citations": 425,
+      "Latest Paper": "The Capital Market Implications of Climate Risk Disclosure",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2007": 1,
+        "2004": 5,
+        "2001": 2,
+        "2024": 3,
+        "2025": 2,
+        "2006": 1,
+        "2019": 1,
+        "2011": 1,
+        "2013": 2,
+        "1989": 1,
+        "2002": 1,
+        "2000": 1,
+        "2021": 1,
+        "1992": 1,
+        "1998": 3,
+        "1985": 1,
+        "1984": 1,
+        "2015": 1,
+        "1990": 1
+      }
+    },
+    {
+      "Author": "Felix Holzmeister",
+      "Papers": 30,
+      "Citations": 29,
+      "Latest Paper": "The Sources of Researcher Variation in Economics",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2019": 14,
+        "2023": 3,
+        "2022": 4,
+        "2020": 5,
+        "2021": 2,
+        "2025": 2
+      }
+    },
+    {
+      "Author": "Robin Greenwood",
+      "Papers": 29,
+      "Citations": 612,
+      "Latest Paper": "Supply and Demand and the Term Structure of Interest Rates",
+      "Latest Date": "2023-11-01",
       "Location": "",
       "Years": {
-        "2025": 9,
-        "2017": 1,
-        "2020": 18,
+        "2018": 1,
+        "2015": 4,
+        "2010": 4,
         "2019": 2,
-        "2024": 1
+        "2012": 1,
+        "2008": 5,
+        "2020": 1,
+        "2017": 3,
+        "2016": 1,
+        "2022": 1,
+        "2013": 3,
+        "2011": 1,
+        "2023": 2
       }
     },
     {
@@ -4748,41 +5296,6 @@
       }
     },
     {
-      "Author": "Liyan Yang",
-      "Papers": 27,
-      "Citations": 777,
-      "Latest Paper": "Overcoming resistance in RET-altered cancers through rational inhibitor design and combination thera",
-      "Latest Date": "2025-09-01",
-      "Location": "Bioorganic Chemistry",
-      "Years": {
-        "2021": 6,
-        "2020": 2,
-        "2023": 6,
-        "2022": 10,
-        "2024": 1,
-        "2025": 2
-      }
-    },
-    {
-      "Author": "Tony Zhang",
-      "Papers": 26,
-      "Citations": 79,
-      "Latest Paper": "Trade War and the Dollar Anchor",
-      "Latest Date": "2025-10-01",
-      "Location": "",
-      "Years": {
-        "2018": 1,
-        "2021": 4,
-        "2023": 6,
-        "2016": 1,
-        "2015": 3,
-        "2020": 1,
-        "2024": 2,
-        "2022": 6,
-        "2025": 2
-      }
-    },
-    {
       "Author": "Jules van Binsbergen",
       "Papers": 25,
       "Citations": 816,
@@ -4803,29 +5316,6 @@
         "2008": 1,
         "2016": 1,
         "2022": 2
-      }
-    },
-    {
-      "Author": "Li An",
-      "Papers": 25,
-      "Citations": 194,
-      "Latest Paper": "Contrastive Learning-Based Finger-Vein Recognition Using Frequency-Mixup Augmentation and Time-Frequ",
-      "Latest Date": "2025-08-09",
-      "Location": "Lecture notes of the Institute for Computer Scienc",
-      "Years": {
-        "2022": 1,
-        "2009": 1,
-        "2012": 1,
-        "2013": 10,
-        "2017": 1,
-        "2023": 1,
-        "2020": 1,
-        "2005": 1,
-        "2007": 1,
-        "2014": 1,
-        "2018": 1,
-        "2019": 2,
-        "2025": 2
       }
     },
     {
@@ -4900,6 +5390,53 @@
         "1991": 1,
         "2001": 1,
         "2023": 1
+      }
+    },
+    {
+      "Author": "Ingrid M. Werner",
+      "Papers": 24,
+      "Citations": 366,
+      "Latest Paper": "Beyond Reverse Splits: How Do Low-Price Firms Restructure?",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2010": 2,
+        "1997": 1,
+        "1994": 2,
+        "1993": 2,
+        "1992": 2,
+        "2013": 3,
+        "2023": 2,
+        "1990": 2,
+        "2009": 1,
+        "2017": 1,
+        "2004": 1,
+        "2015": 1,
+        "2007": 1,
+        "2014": 1,
+        "2021": 1,
+        "2025": 1
+      }
+    },
+    {
+      "Author": "Michael Kirchler",
+      "Papers": 24,
+      "Citations": 122,
+      "Latest Paper": "Speculating in Zero-Value Assets: The Greater Fool Game Experiment",
+      "Latest Date": "2024-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2022": 1,
+        "2018": 5,
+        "2014": 2,
+        "2023": 5,
+        "2007": 1,
+        "2010": 2,
+        "2008": 2,
+        "2019": 3,
+        "2013": 1,
+        "2016": 1,
+        "2024": 1
       }
     },
     {
@@ -4979,6 +5516,30 @@
       }
     },
     {
+      "Author": "Laura T. Starks",
+      "Papers": 22,
+      "Citations": 2804,
+      "Latest Paper": "Considerations on ESG Investment Implementation",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2021": 2,
+        "2003": 2,
+        "2009": 2,
+        "2024": 1,
+        "2025": 1,
+        "2022": 4,
+        "2016": 2,
+        "2020": 1,
+        "2015": 2,
+        "2013": 1,
+        "2014": 1,
+        "2005": 1,
+        "2002": 1,
+        "2023": 1
+      }
+    },
+    {
       "Author": "Jun Pan",
       "Papers": 22,
       "Citations": 614,
@@ -4999,29 +5560,6 @@
         "2015": 1,
         "2008": 1,
         "2003": 1
-      }
-    },
-    {
-      "Author": "Laura T. Starks",
-      "Papers": 21,
-      "Citations": 2804,
-      "Latest Paper": "Considerations on ESG Investment Implementation",
-      "Latest Date": "2025-01-01",
-      "Location": "SSRN Electronic Journal",
-      "Years": {
-        "2021": 2,
-        "2003": 2,
-        "2009": 2,
-        "2024": 1,
-        "2025": 1,
-        "2022": 4,
-        "2016": 2,
-        "2020": 1,
-        "2015": 2,
-        "2013": 1,
-        "2014": 1,
-        "2005": 1,
-        "2002": 1
       }
     },
     {
@@ -5066,46 +5604,6 @@
       }
     },
     {
-      "Author": "Michelle Lowry",
-      "Papers": 21,
-      "Citations": 96,
-      "Latest Paper": "Achieving Strategic Alignment between Business and Information Technology with Information Technolog",
-      "Latest Date": "2025-01-01",
-      "Location": "SSRN Electronic Journal",
-      "Years": {
-        "2024": 4,
-        "2000": 1,
-        "2001": 2,
-        "2006": 1,
-        "2019": 1,
-        "1998": 1,
-        "2023": 4,
-        "2021": 2,
-        "2020": 1,
-        "2022": 1,
-        "2025": 3
-      }
-    },
-    {
-      "Author": "Pascal Paul",
-      "Papers": 21,
-      "Citations": 60,
-      "Latest Paper": "A Macroeconomic Model of Central Bank Digital Currency",
-      "Latest Date": "2025-06-01",
-      "Location": "",
-      "Years": {
-        "1939": 1,
-        "1931": 1,
-        "2021": 1,
-        "1934": 1,
-        "2025": 1,
-        "1989": 1,
-        "2019": 13,
-        "1924": 1,
-        "1950": 1
-      }
-    },
-    {
       "Author": "Chester S. Spatt",
       "Papers": 20,
       "Citations": 164,
@@ -5129,6 +5627,29 @@
       }
     },
     {
+      "Author": "Heitor Almeida",
+      "Papers": 19,
+      "Citations": 430,
+      "Latest Paper": "Information Asymmetry Index: The View of Market Analysts",
+      "Latest Date": "2024-09-10",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2024": 3,
+        "2014": 1,
+        "2006": 2,
+        "2009": 2,
+        "2005": 1,
+        "2002": 2,
+        "1994": 1,
+        "2013": 1,
+        "2010": 2,
+        "2011": 1,
+        "2017": 1,
+        "1996": 1,
+        "1995": 1
+      }
+    },
+    {
       "Author": "Taylor Nadauld",
       "Papers": 19,
       "Citations": 289,
@@ -5146,6 +5667,25 @@
         "2006": 1,
         "2022": 1,
         "2025": 1
+      }
+    },
+    {
+      "Author": "Ludovic Phalippou",
+      "Papers": 19,
+      "Citations": 104,
+      "Latest Paper": "Venture Capitalists and Employee Satisfaction",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2010": 2,
+        "2024": 4,
+        "2014": 1,
+        "2012": 2,
+        "2007": 1,
+        "2008": 3,
+        "2004": 1,
+        "2023": 1,
+        "2025": 4
       }
     },
     {
@@ -5168,6 +5708,25 @@
         "2014": 2,
         "2016": 2,
         "2017": 1
+      }
+    },
+    {
+      "Author": "John M. Griffin",
+      "Papers": 18,
+      "Citations": 142,
+      "Latest Paper": "Are Crypto Anti-Money Laundering Policies Effective?",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2015": 1,
+        "2002": 1,
+        "2023": 2,
+        "2006": 1,
+        "1997": 1,
+        "2022": 9,
+        "2019": 1,
+        "2024": 1,
+        "2025": 1
       }
     },
     {
@@ -5233,6 +5792,45 @@
       }
     },
     {
+      "Author": "Calvin Zhang",
+      "Papers": 17,
+      "Citations": 33,
+      "Latest Paper": "SWE-Bench Pro: Can AI Agents Solve Long-Horizon Software Engineering Tasks?",
+      "Latest Date": "2025-09-21",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2022": 1,
+        "2021": 1,
+        "2020": 1,
+        "2016": 2,
+        "2024": 3,
+        "2019": 1,
+        "2015": 1,
+        "2023": 5,
+        "2025": 2
+      }
+    },
+    {
+      "Author": "Florian Weigert",
+      "Papers": 17,
+      "Citations": 27,
+      "Latest Paper": "Forecasting Mutual Fund Performance – Combining&amp;nbsp;&lt;span&gt;Return-Based with Portfolio Hol",
+      "Latest Date": "2024-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2018": 3,
+        "2017": 1,
+        "2007": 1,
+        "2015": 4,
+        "2013": 1,
+        "2016": 1,
+        "2020": 2,
+        "2014": 1,
+        "2021": 1,
+        "2024": 2
+      }
+    },
+    {
       "Author": "Ting Xu",
       "Papers": 16,
       "Citations": 1393,
@@ -5282,6 +5880,23 @@
         "2019": 6,
         "2016": 1,
         "2023": 1
+      }
+    },
+    {
+      "Author": "Kelly Shue",
+      "Papers": 16,
+      "Citations": 226,
+      "Latest Paper": "Noisy Experts? Discretion in Regulation",
+      "Latest Date": "2024-04-01",
+      "Location": "",
+      "Years": {
+        "2024": 2,
+        "2016": 3,
+        "2009": 3,
+        "2019": 3,
+        "2017": 2,
+        "2006": 2,
+        "2021": 1
       }
     },
     {
@@ -5422,6 +6037,24 @@
       }
     },
     {
+      "Author": "Christine Laudenbach",
+      "Papers": 15,
+      "Citations": 23,
+      "Latest Paper": "Unintended discrimination in financial advice",
+      "Latest Date": "2025-04-17",
+      "Location": "AEA Randomized Controlled Trials",
+      "Years": {
+        "2021": 1,
+        "2023": 1,
+        "2019": 1,
+        "2017": 1,
+        "2018": 1,
+        "2022": 3,
+        "2024": 3,
+        "2025": 4
+      }
+    },
+    {
       "Author": "Song Ma",
       "Papers": 15,
       "Citations": 14,
@@ -5473,6 +6106,43 @@
       }
     },
     {
+      "Author": "Liyan Yang",
+      "Papers": 14,
+      "Citations": 150,
+      "Latest Paper": "Progress of 2D Perovskite Solar Cells: Structure and Performance",
+      "Latest Date": "2025-01-02",
+      "Location": "Small",
+      "Years": {
+        "2021": 2,
+        "2020": 1,
+        "2025": 1,
+        "2024": 2,
+        "2014": 1,
+        "2015": 1,
+        "2011": 1,
+        "2017": 1,
+        "2010": 1,
+        "2012": 2,
+        "2023": 1
+      }
+    },
+    {
+      "Author": "Stephan Luck",
+      "Papers": 14,
+      "Citations": 97,
+      "Latest Paper": "A Historical Perspective on Stablecoins",
+      "Latest Date": "2025-10-01",
+      "Location": "",
+      "Years": {
+        "2023": 2,
+        "2022": 2,
+        "2025": 4,
+        "2020": 1,
+        "2014": 2,
+        "2024": 3
+      }
+    },
+    {
       "Author": "Peter Koudijs",
       "Papers": 14,
       "Citations": 66,
@@ -5488,6 +6158,62 @@
         "2011": 1,
         "2016": 2,
         "2023": 1
+      }
+    },
+    {
+      "Author": "Dan Green",
+      "Papers": 14,
+      "Citations": 15,
+      "Latest Paper": "Contributors",
+      "Latest Date": "2024-11-15",
+      "Location": "Elsevier eBooks",
+      "Years": {
+        "2006": 1,
+        "2018": 2,
+        "1992": 4,
+        "1968": 1,
+        "1999": 1,
+        "1980": 1,
+        "2022": 1,
+        "2014": 1,
+        "2021": 1,
+        "2024": 1
+      }
+    },
+    {
+      "Author": "Daniel Ferreira",
+      "Papers": 14,
+      "Citations": 14,
+      "Latest Paper": "Find-DLB - A naturalistic cohort of patients presenting with clinical features of Dementia with Lewy",
+      "Latest Date": "2025-10-17",
+      "Location": "",
+      "Years": {
+        "2016": 1,
+        "2022": 3,
+        "2009": 1,
+        "2012": 1,
+        "2020": 3,
+        "2019": 1,
+        "2021": 2,
+        "2015": 1,
+        "2025": 1
+      }
+    },
+    {
+      "Author": "Rossen Valkanov",
+      "Papers": 13,
+      "Citations": 925,
+      "Latest Paper": "Forecasting Stock Returns under Economic Constraints",
+      "Latest Date": "2013-03-01",
+      "Location": "RePEc: Research Papers in Economics",
+      "Years": {
+        "2013": 3,
+        "2004": 5,
+        "2012": 1,
+        "2001": 1,
+        "2008": 1,
+        "1999": 1,
+        "2000": 1
       }
     },
     {
@@ -5542,6 +6268,22 @@
         "2012": 1,
         "2018": 1,
         "2015": 1
+      }
+    },
+    {
+      "Author": "Joshua Matthew Pollet",
+      "Papers": 12,
+      "Citations": 164,
+      "Latest Paper": "The Role of Assets In Place: Loss of Market Exclusivity and Investment",
+      "Latest Date": "2020-07-01",
+      "Location": "",
+      "Years": {
+        "2005": 4,
+        "2009": 2,
+        "2015": 1,
+        "2020": 1,
+        "2018": 2,
+        "2007": 1
       }
     },
     {
@@ -5618,25 +6360,6 @@
       }
     },
     {
-      "Author": "Brett Green",
-      "Papers": 12,
-      "Citations": 32,
-      "Latest Paper": "The Welfare Benefits of Pay-As-You-Go Financing",
-      "Latest Date": "2025-02-01",
-      "Location": "",
-      "Years": {
-        "2021": 1,
-        "2016": 1,
-        "2019": 3,
-        "2014": 1,
-        "2018": 2,
-        "2017": 1,
-        "2024": 1,
-        "2025": 1,
-        "2022": 1
-      }
-    },
-    {
       "Author": "Marianne Andries",
       "Papers": 12,
       "Citations": 15,
@@ -5654,6 +6377,42 @@
       }
     },
     {
+      "Author": "Hyunseob Kim",
+      "Papers": 11,
+      "Citations": 547,
+      "Latest Paper": "The Selection Effects of Part-Time Work: Experimental Evidence from a Large-Scale Recruitment Drive",
+      "Latest Date": "2022-01-01",
+      "Location": "",
+      "Years": {
+        "2009": 2,
+        "2016": 1,
+        "2012": 2,
+        "2018": 1,
+        "2011": 2,
+        "2019": 1,
+        "2021": 1,
+        "2022": 1
+      }
+    },
+    {
+      "Author": "Dongho Song",
+      "Papers": 11,
+      "Citations": 275,
+      "Latest Paper": "News-Driven Uncertainty Fluctuations*",
+      "Latest Date": "2022-01-01",
+      "Location": "",
+      "Years": {
+        "2012": 2,
+        "2018": 1,
+        "2014": 1,
+        "2020": 2,
+        "2019": 1,
+        "2011": 2,
+        "2013": 1,
+        "2022": 1
+      }
+    },
+    {
       "Author": "Nadya Malenko",
       "Papers": 11,
       "Citations": 48,
@@ -5667,22 +6426,6 @@
         "2011": 1,
         "2020": 1,
         "2021": 1
-      }
-    },
-    {
-      "Author": "Daniel Carvalho",
-      "Papers": 11,
-      "Citations": 14,
-      "Latest Paper": "Insights on nanomaterials-fungi interactions: probing engineering principles for developing antifung",
-      "Latest Date": "2025-07-16",
-      "Location": "International Journal of Pharmaceutics",
-      "Years": {
-        "2021": 3,
-        "2025": 1,
-        "2019": 3,
-        "2023": 2,
-        "2010": 1,
-        "2024": 1
       }
     },
     {
@@ -5717,6 +6460,24 @@
         "2017": 2,
         "2018": 1,
         "2016": 1
+      }
+    },
+    {
+      "Author": "Naveen Gondhi",
+      "Papers": 10,
+      "Citations": 87,
+      "Latest Paper": "Design and Development of Intelligent Systems for Skin Cancer Detection",
+      "Latest Date": "2025-07-10",
+      "Location": "",
+      "Years": {
+        "2022": 2,
+        "2020": 1,
+        "2024": 1,
+        "2016": 1,
+        "2019": 2,
+        "2021": 1,
+        "2023": 1,
+        "2025": 1
       }
     },
     {
@@ -5766,6 +6527,21 @@
         "2015": 2,
         "2024": 1,
         "2017": 3,
+        "2025": 1
+      }
+    },
+    {
+      "Author": "Niels Joachim Gormsen",
+      "Papers": 9,
+      "Citations": 256,
+      "Latest Paper": "Code for: Corporate Discount Rates",
+      "Latest Date": "2025-04-30",
+      "Location": "ICPSR Data Holdings",
+      "Years": {
+        "2020": 2,
+        "2023": 2,
+        "2024": 3,
+        "2022": 1,
         "2025": 1
       }
     },
@@ -5847,6 +6623,23 @@
         "2017": 1,
         "2024": 2,
         "2023": 1
+      }
+    },
+    {
+      "Author": "Christopher Clayton",
+      "Papers": 9,
+      "Citations": 14,
+      "Latest Paper": "Two-Screen Method for Determining Electron Beam Energy and Deflection from Laser Wakefield Accelerat",
+      "Latest Date": "2009-04-24",
+      "Location": "OSTI OAI (U.S. Department of Energy Office of Scie",
+      "Years": {
+        "2009": 2,
+        "1984": 2,
+        "2002": 1,
+        "2001": 1,
+        "2008": 1,
+        "1995": 1,
+        "1986": 1
       }
     },
     {
@@ -5995,6 +6788,20 @@
       }
     },
     {
+      "Author": "Deeksha Gupta",
+      "Papers": 8,
+      "Citations": 22,
+      "Latest Paper": "Femtosecond charge and spin dynamics in CoPt alloys",
+      "Latest Date": "2025-02-04",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2021": 2,
+        "2024": 4,
+        "2013": 1,
+        "2025": 1
+      }
+    },
+    {
       "Author": "Terrance Odean",
       "Papers": 7,
       "Citations": 56,
@@ -6054,6 +6861,23 @@
         "2017": 1,
         "2013": 1,
         "2022": 1
+      }
+    },
+    {
+      "Author": "Brendan Daley",
+      "Papers": 7,
+      "Citations": 10,
+      "Latest Paper": "Choosing between Growth and Glory",
+      "Latest Date": "2018-08-01",
+      "Location": "",
+      "Years": {
+        "2007": 1,
+        "2018": 1,
+        "2012": 1,
+        "2017": 1,
+        "2013": 1,
+        "2015": 1,
+        "2014": 1
       }
     },
     {
@@ -6203,6 +7027,20 @@
       }
     },
     {
+      "Author": "Baolian Wang",
+      "Papers": 6,
+      "Citations": 16,
+      "Latest Paper": "Multi-day Return Properties of Leveraged Index ETFs",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2025": 3,
+        "2020": 1,
+        "2015": 1,
+        "2014": 1
+      }
+    },
+    {
       "Author": "Benjamin Golez",
       "Papers": 6,
       "Citations": 8,
@@ -6215,6 +7053,20 @@
         "2011": 1,
         "2017": 1,
         "2022": 1
+      }
+    },
+    {
+      "Author": "Michelle Lowry",
+      "Papers": 5,
+      "Citations": 144,
+      "Latest Paper": "Mechanically activated bone cells drive vessel formation via an extracellular vesicle mediated mecha",
+      "Latest Date": "2023-02-11",
+      "Location": "bioRxiv (Cold Spring Harbor Laboratory)",
+      "Years": {
+        "2015": 1,
+        "2018": 1,
+        "2019": 2,
+        "2023": 1
       }
     },
     {
@@ -6231,6 +7083,46 @@
       }
     },
     {
+      "Author": "Shaoteng Li",
+      "Papers": 5,
+      "Citations": 14,
+      "Latest Paper": "The Role of Intermediaries in Selection Markets: Evidence form Mortgage Lending",
+      "Latest Date": "2023-12-01",
+      "Location": "",
+      "Years": {
+        "2020": 3,
+        "2022": 1,
+        "2023": 1
+      }
+    },
+    {
+      "Author": "Jonathan Brogaard",
+      "Papers": 5,
+      "Citations": 6,
+      "Latest Paper": "Have Financial Markets Become More Liquid?",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2021": 1,
+        "2018": 1,
+        "2019": 1,
+        "2024": 1,
+        "2025": 1
+      }
+    },
+    {
+      "Author": "Indira Puri",
+      "Papers": 5,
+      "Citations": 1,
+      "Latest Paper": "Understanding Traders' Preferences, Knowledge, and Investment Behavior",
+      "Latest Date": "2022-04-29",
+      "Location": "AEA Randomized Controlled Trials",
+      "Years": {
+        "2021": 2,
+        "2022": 3
+      }
+    },
+    {
       "Author": "Maxime Bonelli",
       "Papers": 5,
       "Citations": 0,
@@ -6244,17 +7136,30 @@
       }
     },
     {
-      "Author": "Daniel Ferreira",
+      "Author": "Brett Green",
       "Papers": 4,
-      "Citations": 143,
-      "Latest Paper": "Meios privados de acesso ao público: análise da relação de forças no processo do Quinto Constitucion",
-      "Latest Date": "2021-01-01",
-      "Location": "Fórum Justiça eBooks",
+      "Citations": 230,
+      "Latest Paper": "The Effects of Medicinal Cannabis Use on Seizures in Adults With Medically Refractory Epilepsy",
+      "Latest Date": "2021-07-21",
+      "Location": "",
       "Years": {
+        "2007": 1,
+        "2004": 1,
         "2021": 1,
-        "2010": 1,
-        "2011": 1,
-        "2020": 1
+        "2013": 1
+      }
+    },
+    {
+      "Author": "Jared Williams",
+      "Papers": 4,
+      "Citations": 116,
+      "Latest Paper": "Contraceptive needs of the perimenopausal woman",
+      "Latest Date": "2002-09-01",
+      "Location": "Obstetrics and Gynecology Clinics of North America",
+      "Years": {
+        "2001": 2,
+        "2002": 1,
+        "2000": 1
       }
     },
     {
@@ -6281,6 +7186,19 @@
         "2018": 1,
         "2019": 1,
         "2022": 1
+      }
+    },
+    {
+      "Author": "Jungsuk Han",
+      "Papers": 4,
+      "Citations": 19,
+      "Latest Paper": "A review of DAO governance: Recent literature and emerging trends",
+      "Latest Date": "2025-01-04",
+      "Location": "Journal of Corporate Finance",
+      "Years": {
+        "2025": 2,
+        "2008": 1,
+        "2024": 1
       }
     },
     {
@@ -6324,6 +7242,19 @@
       }
     },
     {
+      "Author": "Paolo Sodini",
+      "Papers": 3,
+      "Citations": 368,
+      "Latest Paper": "Countercyclical Income Risk and Portfolio Choices: Evidence from Sweden",
+      "Latest Date": "2024-07-23",
+      "Location": "",
+      "Years": {
+        "2013": 1,
+        "2024": 1,
+        "2001": 1
+      }
+    },
+    {
       "Author": "George O. Aragon",
       "Papers": 3,
       "Citations": 158,
@@ -6347,6 +7278,19 @@
         "2015": 1,
         "1998": 1,
         "1984": 1
+      }
+    },
+    {
+      "Author": "Ahmed Tahoun",
+      "Papers": 3,
+      "Citations": 62,
+      "Latest Paper": "The Anatomy of Cyber Risk",
+      "Latest Date": "2023-05-10",
+      "Location": "",
+      "Years": {
+        "2021": 1,
+        "2023": 1,
+        "2011": 1
       }
     },
     {
@@ -6385,6 +7329,32 @@
         "2023": 1,
         "2018": 1,
         "2025": 1
+      }
+    },
+    {
+      "Author": "Antonio Gargano",
+      "Papers": 3,
+      "Citations": 8,
+      "Latest Paper": "Foreign Exchange Volume",
+      "Latest Date": "2021-08-30",
+      "Location": "Review of Financial Studies",
+      "Years": {
+        "2021": 1,
+        "2014": 1,
+        "2013": 1
+      }
+    },
+    {
+      "Author": "Michael Reher",
+      "Papers": 3,
+      "Citations": 4,
+      "Latest Paper": "Real Effects of Rollover Risk: Evidence from Hotels in Crisis",
+      "Latest Date": "2023-10-01",
+      "Location": "",
+      "Years": {
+        "2023": 1,
+        "2018": 1,
+        "2019": 1
       }
     },
     {
@@ -6451,6 +7421,19 @@
       }
     },
     {
+      "Author": "Michael Razen",
+      "Papers": 3,
+      "Citations": 0,
+      "Latest Paper": "Experiential learning in finance education - Applying experimental finance methodology",
+      "Latest Date": "2022-10-18",
+      "Location": "Edward Elgar Publishing eBooks",
+      "Years": {
+        "2019": 1,
+        "2021": 1,
+        "2022": 1
+      }
+    },
+    {
       "Author": "Izidin El Kalak",
       "Papers": 3,
       "Citations": 0,
@@ -6463,16 +7446,28 @@
       }
     },
     {
-      "Author": "Paulo F. Maio",
+      "Author": "Keeyoung Rhee",
       "Papers": 3,
       "Citations": 0,
-      "Latest Paper": "On the (Ir)Relevance of Long-Run Consumption Growth for Cross-Sectional Equity Risk Premia",
-      "Latest Date": "2024-01-01",
+      "Latest Paper": "(In-)Visible Risks of Blockchain-Based Financing for Capital Allocation Efficiency",
+      "Latest Date": "2025-01-01",
       "Location": "SSRN Electronic Journal",
       "Years": {
-        "2016": 1,
-        "2018": 1,
-        "2024": 1
+        "2021": 1,
+        "2020": 1,
+        "2025": 1
+      }
+    },
+    {
+      "Author": "Mete Kilic",
+      "Papers": 2,
+      "Citations": 12,
+      "Latest Paper": "The Fed and the Wall Street Put",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2015": 1,
+        "2025": 1
       }
     },
     {
@@ -6500,6 +7495,18 @@
       }
     },
     {
+      "Author": "Quentin Vandeweyer",
+      "Papers": 2,
+      "Citations": 3,
+      "Latest Paper": "Cross-Currency Basis Risk and International Capital Flows *",
+      "Latest Date": "2024-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2024": 1,
+        "2019": 1
+      }
+    },
+    {
       "Author": "Alexandre Corhay",
       "Papers": 2,
       "Citations": 2,
@@ -6509,6 +7516,18 @@
       "Years": {
         "2025": 1,
         "1989": 1
+      }
+    },
+    {
+      "Author": "Emilio Bisetti",
+      "Papers": 2,
+      "Citations": 1,
+      "Latest Paper": "Poverty Spreads in Deposit Markets",
+      "Latest Date": "2025-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2012": 1,
+        "2025": 1
       }
     },
     {
@@ -6560,6 +7579,42 @@
       }
     },
     {
+      "Author": "Paulo F. Maio",
+      "Papers": 2,
+      "Citations": 0,
+      "Latest Paper": "On the (Ir)Relevance of Long-Run Consumption Growth for Cross-Sectional Equity Risk Premia",
+      "Latest Date": "2024-01-01",
+      "Location": "SSRN Electronic Journal",
+      "Years": {
+        "2016": 1,
+        "2024": 1
+      }
+    },
+    {
+      "Author": "Samuel Kruger",
+      "Papers": 2,
+      "Citations": 0,
+      "Latest Paper": "Replication Code and Data for: How Has COVID-19 Impacted Research Production in Economics and Financ",
+      "Latest Date": "2022-09-20",
+      "Location": "Harvard Dataverse",
+      "Years": {
+        "2014": 1,
+        "2022": 1
+      }
+    },
+    {
+      "Author": "Stephan Hollander",
+      "Papers": 2,
+      "Citations": 0,
+      "Latest Paper": "Who CARES? Evidence on the Corporate Tax Provisions of the Coronavirus Aid, Relief, and Economic Sec",
+      "Latest Date": "2020-01-01",
+      "Location": "RePEc: Research Papers in Economics",
+      "Years": {
+        "2007": 1,
+        "2020": 1
+      }
+    },
+    {
       "Author": "Jack Liebersohn",
       "Papers": 1,
       "Citations": 695,
@@ -6593,6 +7648,17 @@
       }
     },
     {
+      "Author": "Leland Bybee",
+      "Papers": 1,
+      "Citations": 4,
+      "Latest Paper": "Surveying Generative AI's Economic Expectations",
+      "Latest Date": "2023-05-04",
+      "Location": "arXiv (Cornell University)",
+      "Years": {
+        "2023": 1
+      }
+    },
+    {
       "Author": "Erik J. Mayer",
       "Papers": 1,
       "Citations": 1,
@@ -6604,16 +7670,27 @@
       }
     },
     {
-      "Author": "Naveen Gondhi",
+      "Author": "Thummim Cho",
       "Papers": 1,
       "Citations": 0,
-      "Latest Paper": "Does Sign Matter More Than Size? An Investigation into the Source of Investor Overconfidence",
-      "Latest Date": "2010-11-01",
-      "Location": "RePEc: Research Papers in Economics",
+      "Latest Paper": "Essays in Asset Pricing and Macroeconomics",
+      "Latest Date": "2017-05-13",
+      "Location": "Digital Access to Scholarship at Harvard (DASH) (H",
       "Years": {
-        "2010": 1
+        "2017": 1
+      }
+    },
+    {
+      "Author": "Taisiya Sikorskaya",
+      "Papers": 1,
+      "Citations": 0,
+      "Latest Paper": "Replication Data for: Benchmarking Intensity",
+      "Latest Date": "2022-08-28",
+      "Location": "Harvard Dataverse",
+      "Years": {
+        "2022": 1
       }
     }
   ],
-  "last_updated": "2025-11-18 13:08:34 UTC"
+  "last_updated": "2025-11-18 21:57:20 UTC"
 }
