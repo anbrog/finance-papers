@@ -47,6 +47,14 @@ def get_author_rankings(journals=['aer', 'jf', 'jfe', 'qje', 'rfs'], year=None, 
                     except:
                         continue
                     
+                    # Extract year from publication date
+                    paper_year = None
+                    if pub_date:
+                        try:
+                            paper_year = int(pub_date.split('-')[0])
+                        except:
+                            pass
+                    
                     for author in authors:
                         name = author.get('name')
                         if not name:
@@ -57,11 +65,18 @@ def get_author_rankings(journals=['aer', 'jf', 'jfe', 'qje', 'rfs'], year=None, 
                                 'papers': 0,
                                 'citations': 0,
                                 'latest_date': '',
-                                'latest_title': ''
+                                'latest_title': '',
+                                'papers_by_year': {}
                             }
                         
                         authors_data[name]['papers'] += 1
                         authors_data[name]['citations'] += citations or 0
+                        
+                        # Track papers by year
+                        if paper_year:
+                            if paper_year not in authors_data[name]['papers_by_year']:
+                                authors_data[name]['papers_by_year'][paper_year] = 0
+                            authors_data[name]['papers_by_year'][paper_year] += 1
                         
                         if pub_date and (not authors_data[name]['latest_date'] or pub_date > authors_data[name]['latest_date']):
                             authors_data[name]['latest_date'] = pub_date
@@ -79,7 +94,8 @@ def get_author_rankings(journals=['aer', 'jf', 'jfe', 'qje', 'rfs'], year=None, 
             'Papers': stats['papers'],
             'Citations': stats['citations'],
             'Latest Paper': stats['latest_title'][:100] if stats['latest_title'] else '',
-            'Latest Date': stats['latest_date']
+            'Latest Date': stats['latest_date'],
+            'Years': stats['papers_by_year']
         })
     
     # Sort by papers then citations
@@ -120,17 +136,32 @@ def get_working_papers_rankings(top_n=250):
                 if not author_name:
                     continue
                 
+                # Extract year from publication date
+                paper_year = None
+                if pub_date:
+                    try:
+                        paper_year = int(pub_date.split('-')[0])
+                    except:
+                        pass
+                
                 if author_name not in authors_data:
                     authors_data[author_name] = {
                         'papers': 0,
                         'citations': 0,
                         'latest_date': '',
                         'latest_title': '',
-                        'latest_location': ''
+                        'latest_location': '',
+                        'papers_by_year': {}
                     }
                 
                 authors_data[author_name]['papers'] += 1
                 authors_data[author_name]['citations'] += citations or 0
+                
+                # Track papers by year
+                if paper_year:
+                    if paper_year not in authors_data[author_name]['papers_by_year']:
+                        authors_data[author_name]['papers_by_year'][paper_year] = 0
+                    authors_data[author_name]['papers_by_year'][paper_year] += 1
                 
                 if pub_date and (not authors_data[author_name]['latest_date'] or pub_date > authors_data[author_name]['latest_date']):
                     authors_data[author_name]['latest_date'] = pub_date
@@ -151,7 +182,8 @@ def get_working_papers_rankings(top_n=250):
             'Citations': stats['citations'],
             'Latest Paper': stats['latest_title'][:100] if stats['latest_title'] else '',
             'Latest Date': stats['latest_date'],
-            'Location': stats['latest_location'][:50] if stats['latest_location'] else ''
+            'Location': stats['latest_location'][:50] if stats['latest_location'] else '',
+            'Years': stats['papers_by_year']
         })
     
     # Sort by papers then citations

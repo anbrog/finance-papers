@@ -430,6 +430,15 @@
             <div class="table-container">
                 <div class="table-controls">
                     <input type="text" id="searchInput" placeholder="Search by author name...">
+                    <select id="yearFilter">
+                        <option value="all">All Years</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                    </select>
                     <select id="sortBy">
                         <option value="papers">Sort by Papers</option>
                         <option value="citations">Sort by Citations</option>
@@ -652,6 +661,9 @@
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
+            // Store current tab
+            window.currentTab = tabName;
+            
             // Determine which tab to show
             if (tabName === 'journals') {
                 // Show journals, which is the existing tableWrapper
@@ -661,11 +673,57 @@
                 // For working papers, we need to switch the display
                 document.querySelector('.tab-btn[onclick*=\"working-papers-tab\"]').classList.add('active');
                 if (typeof allDataWP !== 'undefined' && allDataWP.length > 0) {
-                    displayDataWP(allDataWP);
+                    filterDataWP();
                 } else {
                     document.getElementById('tableWrapper').innerHTML = '<div class=\"empty-state\"><h3>No working papers data yet</h3><p>Run the finance-papers CLI and choose to update working papers</p></div>';
                 }
             }
+        }
+        
+        function filterDataWP() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const minPapers = parseInt(document.getElementById('minPapers').value) || 0;
+            const sortBy = document.getElementById('sortBy').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            
+            let filtered = allDataWP.filter(row => {
+                const matchesSearch = !searchTerm || (row.Author || '').toLowerCase().includes(searchTerm);
+                
+                // Filter by year if specified
+                let matchesYear = true;
+                if (yearFilter !== 'all' && row.Years) {
+                    const year = parseInt(yearFilter);
+                    matchesYear = row.Years[year] > 0;
+                }
+                
+                // Calculate papers count for the filtered year
+                let papersCount = row.Papers || 0;
+                if (yearFilter !== 'all' && row.Years) {
+                    const year = parseInt(yearFilter);
+                    papersCount = row.Years[year] || 0;
+                }
+                
+                const matchesPapers = papersCount >= minPapers;
+                return matchesSearch && matchesYear && matchesPapers;
+            });
+            
+            // Adjust paper counts for display if year filter is active
+            if (yearFilter !== 'all') {
+                const year = parseInt(yearFilter);
+                filtered = filtered.map(row => ({
+                    ...row,
+                    Papers: row.Years && row.Years[year] ? row.Years[year] : 0
+                }));
+            }
+            
+            filtered.sort((a, b) => {
+                if (sortBy === 'citations') {
+                    return (b.Citations || 0) - (a.Citations || 0);
+                }
+                return (b.Papers || 0) - (a.Papers || 0);
+            });
+            
+            displayDataWP(filtered);
         }
         
         function sortTableWP(column) {
@@ -678,12 +736,37 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const minPapers = parseInt(document.getElementById('minPapers').value) || 0;
             const sortBy = document.getElementById('sortBy').value;
+            const yearFilter = document.getElementById('yearFilter').value;
             
             let filtered = allData.filter(row => {
                 const matchesSearch = !searchTerm || (row.Author || '').toLowerCase().includes(searchTerm);
-                const matchesPapers = (row.Papers || 0) >= minPapers;
-                return matchesSearch && matchesPapers;
+                
+                // Filter by year if specified
+                let matchesYear = true;
+                if (yearFilter !== 'all' && row.Years) {
+                    const year = parseInt(yearFilter);
+                    matchesYear = row.Years[year] > 0;
+                }
+                
+                // Calculate papers count for the filtered year
+                let papersCount = row.Papers || 0;
+                if (yearFilter !== 'all' && row.Years) {
+                    const year = parseInt(yearFilter);
+                    papersCount = row.Years[year] || 0;
+                }
+                
+                const matchesPapers = papersCount >= minPapers;
+                return matchesSearch && matchesYear && matchesPapers;
             });
+            
+            // Adjust paper counts for display if year filter is active
+            if (yearFilter !== 'all') {
+                const year = parseInt(yearFilter);
+                filtered = filtered.map(row => ({
+                    ...row,
+                    Papers: row.Years && row.Years[year] ? row.Years[year] : 0
+                }));
+            }
             
             filtered.sort((a, b) => {
                 if (sortBy === 'citations') {
@@ -744,9 +827,37 @@
             document.getElementById('totalCitations').textContent = '0';
         }
         
-        document.getElementById('searchInput').addEventListener('input', filterData);
-        document.getElementById('minPapers').addEventListener('input', filterData);
-        document.getElementById('sortBy').addEventListener('change', filterData);
+        document.getElementById('searchInput').addEventListener('input', () => {
+            if (window.currentTab === 'working-papers-tab') {
+                filterDataWP();
+            } else {
+                filterData();
+            }
+        });
+        document.getElementById('minPapers').addEventListener('input', () => {
+            if (window.currentTab === 'working-papers-tab') {
+                filterDataWP();
+            } else {
+                filterData();
+            }
+        });
+        document.getElementById('sortBy').addEventListener('change', () => {
+            if (window.currentTab === 'working-papers-tab') {
+                filterDataWP();
+            } else {
+                filterData();
+            }
+        });
+        document.getElementById('yearFilter').addEventListener('change', () => {
+            if (window.currentTab === 'working-papers-tab') {
+                filterDataWP();
+            } else {
+                filterData();
+            }
+        });
+        
+        // Initialize current tab
+        window.currentTab = 'journals';
         
         loadData();
     </script>
