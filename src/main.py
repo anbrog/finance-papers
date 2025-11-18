@@ -304,7 +304,8 @@ def main():
         
         for journal in journals:
             for year in years:
-                cmd = ['python3', 'getpapers_openalex.py', journal, str(year)]
+                script_path = os.path.join(script_dir, 'getpapers_openalex.py')
+                cmd = [sys.executable, script_path, journal, str(year)]
                 if force:
                     cmd.append('--force')
                 
@@ -367,7 +368,8 @@ def main():
             print(f"✅ Using years: {', '.join(map(str, ranking_years))} (querying all years)")
     
     # First run rank-authors to see the rankings
-    cmd = ['python3', 'query_openalex_db.py', 'rank-authors', journal_arg]
+    script_path = os.path.join(script_dir, 'query_openalex_db.py')
+    cmd = [sys.executable, script_path, 'rank-authors', journal_arg]
     if year_arg:
         cmd.append(year_arg)
     cmd.append('--250')
@@ -377,7 +379,7 @@ def main():
     # Only create new author list CSV if papers were updated
     if update_papers == 'y':
         # Then create the author list CSV
-        cmd = ['python3', 'query_openalex_db.py', 'make-author-list', journal_arg]
+        cmd = [sys.executable, script_path, 'make-author-list', journal_arg]
         if year_arg:
             cmd.append(year_arg)
         cmd.append('--250')
@@ -415,7 +417,8 @@ def main():
         csv_abs_path = os.path.abspath(latest_csv)
         
         # Fetch working papers (without year filter - get all years)
-        cmd = ['python3', 'get_wp.py', csv_abs_path]
+        script_path = os.path.join(script_dir, 'get_wp.py')
+        cmd = [sys.executable, script_path, csv_abs_path]
         
         run_command(cmd, "Fetching Working Papers for Top 250 Authors")
         
@@ -440,7 +443,8 @@ def main():
     wp_db = os.path.join(DB_DIR, 'working_papers.db')
     
     if os.path.exists(wp_db):
-        cmd = ['python3', 'query_wp_db.py', 'rank', '--250']
+        script_path = os.path.join(script_dir, 'query_wp_db.py')
+        cmd = [sys.executable, script_path, 'rank', '--250']
         
         run_command(cmd, "Author Rankings by Working Papers")
     else:
