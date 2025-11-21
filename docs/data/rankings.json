@@ -6161,6 +6161,24 @@
       }
     },
     {
+      "Author": "Marianne Andries",
+      "Papers": 14,
+      "Citations": 15,
+      "Latest Paper": "Financial Advisors and Investors' Bias",
+      "Latest Date": "2025-08-01",
+      "Location": "",
+      "Years": {
+        "2012": 1,
+        "2015": 2,
+        "2017": 2,
+        "2023": 5,
+        "2024": 1,
+        "2025": 1,
+        "2016": 1,
+        "2019": 1
+      }
+    },
+    {
       "Author": "Dan Green",
       "Papers": 14,
       "Citations": 15,
@@ -6357,23 +6375,6 @@
         "2016": 1,
         "2020": 1,
         "2025": 1
-      }
-    },
-    {
-      "Author": "Marianne Andries",
-      "Papers": 12,
-      "Citations": 15,
-      "Latest Paper": "Financial Advisors and Investors' Bias",
-      "Latest Date": "2025-08-01",
-      "Location": "",
-      "Years": {
-        "2012": 1,
-        "2015": 2,
-        "2017": 1,
-        "2023": 5,
-        "2024": 1,
-        "2025": 1,
-        "2016": 1
       }
     },
     {
@@ -7692,5 +7693,5 @@
       }
     }
   ],
-  "last_updated": "2025-11-18 21:57:20 UTC"
+  "last_updated": "2025-11-21 15:09:42 UTC"
 }
