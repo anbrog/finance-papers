@@ -179,6 +179,108 @@ def get_working_papers(author_filter=None, year=None, top_n=100):
     
     return pd.DataFrame(data)
 
+@st.cache_data(ttl=300)
+def get_authors_by_topic_from_db(topic_name="Financial Markets and Investment Strategies", min_papers=1, max_authors=250):
+    """Get authors from local database who have papers on a specific topic
+
+    Args:
+        topic_name: Name of the topic to search for (case-insensitive partial match)
+        min_papers: Minimum number of papers an author must have on this topic
+        max_authors: Maximum number of authors to return
+
+    Returns:
+        List of dicts with author info
+    """
+    # Get all journal database files
+    pattern = os.path.join(DB_DIR, 'openalex_*.db')
+    db_files = glob.glob(pattern)
+
+    if not db_files:
+        return []
+
+    # Count papers per author on the topic
+    author_topic_counts = {}  # {author_name: {'count': N, 'total_citations': N, 'papers': [...]}}
+
+    topic_lower = topic_name.lower()
+
+    for db_file in db_files:
+        try:
+            conn = sqlite3.connect(db_file)
+            cursor = conn.cursor()
+
+            # Check if topics_json column exists
+            cursor.execute("PRAGMA table_info(openalex_articles)")
+            columns = [row[1] for row in cursor.fetchall()]
+            if 'topics_json' not in columns:
+                conn.close()
+                continue
+
+            cursor.execute('SELECT authors_json, topics_json, cited_by_count, title FROM openalex_articles')
+
+            for row in cursor.fetchall():
+                authors_json, topics_json, citations, title = row
+
+                if not topics_json:
+                    continue
+
+                # Check if this paper has the topic
+                try:
+                    topics = json.loads(topics_json)
+                    has_topic = False
+                    for topic in topics:
+                        topic_display = topic.get('name', '') or topic.get('display_name', '')
+                        if topic_lower in topic_display.lower():
+                            has_topic = True
+                            break
+
+                    if not has_topic:
+                        continue
+
+                    # Paper has the topic - count for each author
+                    authors = json.loads(authors_json)
+                    for author in authors:
+                        name = author.get('name')
+                        if not name:
+                            continue
+
+                        if name not in author_topic_counts:
+                            author_topic_counts[name] = {
+                                'count': 0,
+                                'total_citations': 0,
+                                'author_id': author.get('id', ''),
+                                'papers': []
+                            }
+
+                        author_topic_counts[name]['count'] += 1
+                        author_topic_counts[name]['total_citations'] += citations or 0
+                        author_topic_counts[name]['papers'].append(title[:50] if title else '')
+
+                except (json.JSONDecodeError, TypeError):
+                    continue
+
+            conn.close()
+
+        except sqlite3.Error:
+            continue
+
+    # Filter by minimum papers and convert to list
+    authors = []
+    for name, data in author_topic_counts.items():
+        if data['count'] >= min_papers:
+            authors.append({
+                'name': name,
+                'author_id': data['author_id'],
+                'topic_papers': data['count'],
+                'total_citations': data['total_citations'],
+                'sample_papers': data['papers'][:3]  # Keep first 3 as sample
+            })
+
+    # Sort by topic paper count (descending)
+    authors.sort(key=lambda x: (x['topic_papers'], x['total_citations']), reverse=True)
+
+    return authors[:max_authors]
+
+
 @st.cache_data(ttl=60)
 def get_database_stats():
     """Get statistics about the databases"""
@@ -306,23 +408,23 @@ def main():
     # Tab 2: Working Papers
     with tab2:
         st.header("Working Papers")
-        
+
         if not dbs.get('working_papers'):
-            st.warning("No working papers database found. Run working papers update first.")
+            st.warning("No working papers database found. Go to 'Update Data' tab to fetch working papers first.")
         else:
             col1, col2, col3 = st.columns(3)
-            
+
             with col1:
                 author_search = st.text_input("Search by Author", "")
-            
+
             with col2:
                 wp_year_options = ["All Years"] + sorted(list(all_years), reverse=True) if all_years else ["All Years"]
                 wp_year = st.selectbox("Year", wp_year_options, key="wp_year")
                 wp_year_val = None if wp_year == "All Years" else int(wp_year)
-            
+
             with col3:
                 wp_limit = st.number_input("Limit", min_value=10, max_value=500, value=100, step=10)
-            
+
             if st.button("🔍 Show Working Papers", key="show_wp"):
                 with st.spinner("Loading working papers..."):
                     wp_df = get_working_papers(
@@ -330,16 +432,16 @@ def main():
                         year=wp_year_val,
                         top_n=wp_limit
                     )
-                    
+
                     if len(wp_df) > 0:
                         st.success(f"Found {len(wp_df)} working papers")
-                        
+
                         st.dataframe(
                             wp_df,
                             use_container_width=True,
                             height=600
                         )
-                        
+
                         # Download button
                         csv = wp_df.to_csv(index=False)
                         st.download_button(
@@ -444,40 +546,160 @@ def main():
         
         st.markdown("---")
         st.subheader("Update Working Papers")
-        
-        csv_pattern = os.path.join(DB_DIR, 'author_list_*.csv')
-        csv_files = glob.glob(csv_pattern)
-        
-        if not csv_files:
-            st.warning("No author list CSV found. Run author rankings first.")
+
+        # Source selection
+        wp_source_update = st.radio(
+            "Select author source:",
+            ["Top 250 (from author list CSV)", "Topic-based (from database)"],
+            key="wp_source_update",
+            horizontal=True
+        )
+
+        if wp_source_update == "Top 250 (from author list CSV)":
+            csv_pattern = os.path.join(DB_DIR, 'author_list_*.csv')
+            csv_files = glob.glob(csv_pattern)
+
+            if not csv_files:
+                st.warning("No author list CSV found. Run author rankings first.")
+            else:
+                csv_file = st.selectbox("Select Author List", [os.path.basename(f) for f in csv_files])
+                wp_year_update = st.number_input("Year", min_value=2020, max_value=current_year, value=current_year, key="wp_year_update")
+
+                if st.button("🔄 Update Working Papers", key="update_wp_btn"):
+                    status_text = st.empty()
+                    status_text.text("Fetching working papers...")
+
+                    csv_path = os.path.join(DB_DIR, csv_file)
+                    cmd = [sys.executable, 'src/get_wp.py', csv_path, str(wp_year_update)]
+
+                    try:
+                        result = subprocess.run(
+                            cmd,
+                            capture_output=True,
+                            text=True,
+                            timeout=600
+                        )
+                        if result.returncode == 0:
+                            st.success("✅ Working papers updated!")
+                        else:
+                            st.error(f"Error: {result.stderr}")
+                    except subprocess.TimeoutExpired:
+                        st.error("Timeout updating working papers")
+                    except Exception as e:
+                        st.error(f"Error: {str(e)}")
+
+                    st.cache_data.clear()
+
         else:
-            csv_file = st.selectbox("Select Author List", [os.path.basename(f) for f in csv_files])
-            wp_year_update = st.number_input("Year", min_value=2020, max_value=current_year, value=current_year, key="wp_year_update")
-            
-            if st.button("🔄 Update Working Papers", key="update_wp_btn"):
-                status_text = st.empty()
-                status_text.text("Fetching working papers...")
-                
-                csv_path = os.path.join(DB_DIR, csv_file)
-                cmd = [sys.executable, 'src/get_wp.py', csv_path, str(wp_year_update)]
-                
-                try:
-                    result = subprocess.run(
-                        cmd,
-                        capture_output=True,
-                        text=True,
-                        timeout=600
+            # Topic-based source
+            st.info("Fetch working papers for authors who have published on a specific topic in JF/RFS/JFE")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                topic_input = st.text_input(
+                    "Topic",
+                    value="Financial Markets and Investment Strategies",
+                    help="Enter topic name (partial match, case-insensitive)",
+                    key="topic_input"
+                )
+
+            with col2:
+                min_papers_update = st.number_input(
+                    "Min papers on topic",
+                    min_value=1,
+                    max_value=20,
+                    value=2,
+                    step=1,
+                    help="Authors must have at least this many papers on the topic",
+                    key="min_papers_update"
+                )
+
+            col3, col4 = st.columns(2)
+
+            with col3:
+                max_authors_update = st.number_input(
+                    "Max authors",
+                    min_value=10,
+                    max_value=500,
+                    value=100,
+                    step=10,
+                    key="max_authors_update"
+                )
+
+            with col4:
+                wp_year_topic_update = st.number_input(
+                    "Year",
+                    min_value=2020,
+                    max_value=current_year,
+                    value=current_year,
+                    key="wp_year_topic_update"
+                )
+
+            if st.button("🔄 Update Working Papers (Topic)", key="update_wp_topic_btn"):
+                # Step 1: Find authors by topic
+                with st.spinner(f"Finding authors with '{topic_input}' papers..."):
+                    topic_authors = get_authors_by_topic_from_db(
+                        topic_name=topic_input,
+                        min_papers=min_papers_update,
+                        max_authors=max_authors_update
                     )
-                    if result.returncode == 0:
-                        st.success("✅ Working papers updated!")
-                    else:
-                        st.error(f"Error: {result.stderr}")
-                except subprocess.TimeoutExpired:
-                    st.error("Timeout updating working papers")
-                except Exception as e:
-                    st.error(f"Error: {str(e)}")
-                
-                st.cache_data.clear()
+
+                if not topic_authors:
+                    st.warning(f"No authors found with papers on '{topic_input}'. Check the topic name or lower the minimum papers threshold.")
+                else:
+                    st.success(f"Found {len(topic_authors)} authors with {min_papers_update}+ papers on '{topic_input}'")
+
+                    # Show preview
+                    with st.expander("Preview authors"):
+                        preview_data = [{"Author": a['name'], "Papers on Topic": a['topic_papers']} for a in topic_authors[:20]]
+                        st.dataframe(pd.DataFrame(preview_data), hide_index=True)
+
+                    # Step 2: Create temporary CSV and run get_wp.py
+                    import tempfile
+                    import csv
+
+                    with st.spinner("Fetching working papers from OpenAlex..."):
+                        # Create temp CSV with author list
+                        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+                            writer = csv.DictWriter(f, fieldnames=['Rank', 'Author Name', 'Author ID', 'Paper Count'])
+                            writer.writeheader()
+                            for i, author in enumerate(topic_authors, 1):
+                                writer.writerow({
+                                    'Rank': i,
+                                    'Author Name': author['name'],
+                                    'Author ID': author.get('author_id', ''),
+                                    'Paper Count': author['topic_papers']
+                                })
+                            temp_csv = f.name
+
+                        # Run get_wp.py with the temp CSV
+                        cmd = [sys.executable, 'src/get_wp.py', temp_csv, str(wp_year_topic_update)]
+
+                        try:
+                            result = subprocess.run(
+                                cmd,
+                                capture_output=True,
+                                text=True,
+                                timeout=600
+                            )
+                            if result.returncode == 0:
+                                st.success("✅ Working papers updated!")
+                                st.text(result.stdout[-1000:] if len(result.stdout) > 1000 else result.stdout)
+                            else:
+                                st.error(f"Error: {result.stderr}")
+                        except subprocess.TimeoutExpired:
+                            st.error("Timeout updating working papers")
+                        except Exception as e:
+                            st.error(f"Error: {str(e)}")
+                        finally:
+                            # Clean up temp file
+                            try:
+                                os.unlink(temp_csv)
+                            except:
+                                pass
+
+                    st.cache_data.clear()
     
     # Footer
     st.sidebar.markdown("---")

@@ -10,17 +10,17 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="finance-papers",
-    version="0.1.0",
+    version="0.2.0",
     author="Andreas Brogger",
     description="A tool to scrape and analyze finance research papers",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests", "tests.*", "src", "src.*"]),
     python_requires=">=3.8",
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "finance-papers=src.main:main",
+            "finance-papers=finance_papers.cli:main",
         ],
     },
     classifiers=[

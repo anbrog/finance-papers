@@ -4,11 +4,14 @@ import json
 import os
 import sys
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 BASE_URL = "https://api.openalex.org/works"
 
 # Journal configurations
 JOURNALS = {
+    # Top 3 Finance Journals
     'jf': {
         'name': 'The Journal of Finance',
         'source_id': 'S5353659'
@@ -20,7 +23,35 @@ JOURNALS = {
     'jfe': {
         'name': 'Journal of Financial Economics',
         'source_id': 'S149240962'
+    },
+    # Top 5 Economics Journals
+    'qje': {
+        'name': 'The Quarterly Journal of Economics',
+        'source_id': 'S203860005'
+    },
+    'aer': {
+        'name': 'American Economic Review',
+        'source_id': 'S23254222'
+    },
+    'ecma': {
+        'name': 'Econometrica',
+        'source_id': 'S95464858'
+    },
+    'jpe': {
+        'name': 'Journal of Political Economy',
+        'source_id': 'S95323914'
+    },
+    'restud': {
+        'name': 'The Review of Economic Studies',
+        'source_id': 'S88935262'
     }
+}
+
+# Journal group definitions
+JOURNAL_GROUPS = {
+    'top3': ['jf', 'rfs', 'jfe'],  # Top 3 Finance journals
+    'econ5': ['qje', 'aer', 'ecma', 'jpe', 'restud'],  # Top 5 Economics journals
+    'alltop': ['jf', 'rfs', 'jfe', 'qje', 'aer', 'ecma', 'jpe', 'restud'],  # All top journals
 }
 
 def get_filters(journal_key, year):
@@ -33,11 +64,10 @@ def get_filters(journal_key, year):
 def fetch_articles(filters):
     """Fetch articles from OpenAlex API with given filters"""
     cursor = "*"
+    mailto = os.getenv("OPENALEX_MAILTO")
     while cursor:
         params = {"filter": filters, "per-page": 200, "cursor": cursor}
-        # Optional: include a mailto to be a good API citizen (read from env if set)
-        import os
-        mailto = os.getenv("OPENALEX_MAILTO")
+        # Optional: include a mailto to be a good API citizen
         if mailto:
             params["mailto"] = mailto
 
@@ -68,6 +98,18 @@ def fetch_articles(filters):
                 word_positions.sort()
                 abstract_text = " ".join([word for _, word in word_positions])
             
+            # Extract topics (OpenAlex provides these as classified concepts)
+            topics = work.get("topics", [])
+            topics_data = [
+                {
+                    "name": t.get("display_name"),
+                    "score": t.get("score"),
+                    "subfield": t.get("subfield", {}).get("display_name") if t.get("subfield") else None,
+                    "field": t.get("field", {}).get("display_name") if t.get("field") else None,
+                }
+                for t in topics[:5]  # Keep top 5 topics
+            ]
+
             yield {
                 "id": work.get("id"),
                 "title": work.get("title"),
@@ -75,6 +117,7 @@ def fetch_articles(filters):
                 "doi": work.get("doi"),
                 "cited_by_count": work.get("cited_by_count", 0),
                 "abstract": abstract_text,
+                "topics": topics_data,
                 "authors": [
                     {
                         "name": auth.get("author", {}).get("display_name"),
@@ -114,9 +157,16 @@ def save_to_db(articles, db_filename='openalex_articles.db', force_update=False)
             cited_by_count INTEGER DEFAULT 0,
             abstract TEXT,
             authors_json TEXT,
+            topics_json TEXT,
             scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # Add topics_json column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute('ALTER TABLE openalex_articles ADD COLUMN topics_json TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     
     # Create indexes
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_openalex_id ON openalex_articles(openalex_id)')
@@ -136,14 +186,16 @@ def save_to_db(articles, db_filename='openalex_articles.db', force_update=False)
         
         if existing:
             if force_update:
-                # Update existing record with new citation count and abstract
+                # Update existing record with new citation count, abstract, authors, and topics
                 cursor.execute('''
-                    UPDATE openalex_articles 
-                    SET cited_by_count = ?, abstract = ?, scraped_at = ?
+                    UPDATE openalex_articles
+                    SET cited_by_count = ?, abstract = ?, authors_json = ?, topics_json = ?, scraped_at = ?
                     WHERE openalex_id = ?
                 ''', (
                     article.get('cited_by_count', 0),
                     article.get('abstract', ''),
+                    json.dumps(article['authors']),
+                    json.dumps(article.get('topics', [])),
                     datetime.now().isoformat(),
                     openalex_id
                 ))
@@ -151,11 +203,11 @@ def save_to_db(articles, db_filename='openalex_articles.db', force_update=False)
             else:
                 duplicate_count += 1
             continue
-        
+
         # Insert article
         cursor.execute('''
-            INSERT INTO openalex_articles (openalex_id, title, publication_date, doi, cited_by_count, abstract, authors_json, scraped_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO openalex_articles (openalex_id, title, publication_date, doi, cited_by_count, abstract, authors_json, topics_json, scraped_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             openalex_id,
             article['title'],
@@ -164,6 +216,7 @@ def save_to_db(articles, db_filename='openalex_articles.db', force_update=False)
             article.get('cited_by_count', 0),
             article.get('abstract', ''),
             json.dumps(article['authors']),
+            json.dumps(article.get('topics', [])),
             datetime.now().isoformat()
         ))
         new_count += 1
@@ -185,37 +238,85 @@ def main():
     # Parse command line arguments
     if len(sys.argv) < 2:
         print("Usage: get-papers <journal> [year] [--force]")
-        print(f"Available journals: {', '.join(JOURNALS.keys())}, top3")
+        print(f"Available journals: {', '.join(JOURNALS.keys())}")
+        print(f"Journal groups: {', '.join(JOURNAL_GROUPS.keys())}")
         print("Example: get-papers jf 2024")
         print("Example: get-papers top3 2024 --force")
+        print("Example: get-papers alltop 2024  # All finance + econ journals")
         print("\nOptions:")
         print("  --force    Update existing articles with new citation counts")
         sys.exit(1)
-    
+
     journal_key = sys.argv[1].lower()
     year = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith('--') else "2024"
     force_update = '--force' in sys.argv
-    
-    # Handle 'top3' to fetch all journals
-    if journal_key == 'top3':
-        journals_to_fetch = list(JOURNALS.keys())
+
+    # Handle journal groups (top3, econ5, alltop)
+    if journal_key in JOURNAL_GROUPS:
+        journals_to_fetch = JOURNAL_GROUPS[journal_key]
     elif journal_key in JOURNALS:
         journals_to_fetch = [journal_key]
     else:
         print(f"Error: Unknown journal '{journal_key}'")
-        print(f"Available journals: {', '.join(JOURNALS.keys())}, top3")
+        print(f"Available journals: {', '.join(JOURNALS.keys())}")
+        print(f"Journal groups: {', '.join(JOURNAL_GROUPS.keys())}")
         sys.exit(1)
     
-    # Fetch articles for each journal
-    for jkey in journals_to_fetch:
+    # Thread-safe print lock
+    print_lock = threading.Lock()
+
+    def fetch_journal_articles(jkey):
+        """Fetch articles for a single journal (thread worker)"""
         filters = get_filters(jkey, year)
         journal_name = JOURNALS[jkey]['name']
-        
+
+        with print_lock:
+            print(f"[{jkey.upper()}] Starting fetch for {journal_name} ({year})...")
+
+        articles = list(fetch_articles(filters))
+
+        return jkey, journal_name, articles
+
+    # Use parallel fetching if multiple journals
+    mailto = os.getenv("OPENALEX_MAILTO")
+    max_workers = min(len(journals_to_fetch), 8 if mailto else 3)  # More workers with mailto
+
+    if len(journals_to_fetch) > 1:
+        print(f"\nFetching {len(journals_to_fetch)} journals in parallel ({max_workers} workers)...")
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(fetch_journal_articles, jkey): jkey for jkey in journals_to_fetch}
+
+            for future in as_completed(futures):
+                jkey, journal_name, articles = future.result()
+
+                with print_lock:
+                    print(f"\n{'='*80}")
+                    print(f"[{jkey.upper()}] Completed: {journal_name} ({year})")
+                    print(f"Total articles fetched: {len(articles)}")
+
+                    if articles:
+                        # Show example
+                        article = articles[0]
+                        print(f"  Example: {article['title'][:60]}...")
+                        authors = [a['name'] for a in article['authors'] if a['name']]
+                        print(f"  Authors: {', '.join(authors[:2])}{' ...' if len(authors) > 2 else ''}")
+                    print('='*80)
+
+                if articles:
+                    db_filename = f'openalex_{jkey}_{year}.db'
+                    save_to_db(articles, db_filename, force_update=force_update)
+    else:
+        # Single journal - fetch sequentially with verbose output
+        jkey = journals_to_fetch[0]
+        filters = get_filters(jkey, year)
+        journal_name = JOURNALS[jkey]['name']
+
         print(f"\n{'='*80}")
         print(f"Fetching articles from {journal_name} ({year})")
         print(f"Filters: {filters}")
         print('='*80)
-        
+
         articles = []
         for article in fetch_articles(filters):
             articles.append(article)
@@ -229,11 +330,10 @@ def main():
                 if len(authors) > 3:
                     author_str += f", ... ({len(authors)} total)"
                 print(f"  Authors: {author_str}")
-        
+
         print(f"\nTotal articles fetched: {len(articles)}")
-        
+
         if articles:
-            # Use journal-specific database filename
             db_filename = f'openalex_{jkey}_{year}.db'
             save_to_db(articles, db_filename, force_update=force_update)
 

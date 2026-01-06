@@ -47,3 +47,6 @@ out/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# VS Code Local History
+.history/
