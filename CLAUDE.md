@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-CLI tool for analyzing academic papers from top finance journals (JF, RFS, JFE) using the OpenAlex API. Fetches paper metadata, stores in SQLite databases, ranks authors by publications, and tracks working papers.
+CLI tool for analyzing academic papers from top finance and economics journals using the OpenAlex API. Fetches paper metadata, stores in SQLite databases, ranks authors by publications/citations, and tracks working papers.
 
 ## Installation & Running
 
@@ -17,21 +17,26 @@ finance-papers papers -a "Fama"
 streamlit run streamlit_app.py # Web dashboard
 ```
 
+Alternative: `./fp` shell wrapper runs `python3 -m finance_papers.cli`
+
 ## Architecture
 
-The codebase was recently refactored from standalone scripts to a proper package:
+**Package structure** (`finance_papers/`):
+- `core.py` - Core functionality: API calls, database ops, author ranking, working papers (~2,200 lines)
+- `cli.py` - Command-line interface with subcommands (~730 lines)
+- `__init__.py` - Public API exports (40+ functions/classes)
 
-**Current structure** (`finance_papers/`):
-- `core.py` - All functionality: API calls, database ops, author ranking, working papers
-- `cli.py` - Command-line interface with subcommands (update, rank, papers, topic)
-- `__init__.py` - Public API exports
+**Legacy scripts** (`archive/`):
+- Old standalone scripts before package refactoring (kept for reference)
+- Includes legacy docs: QUICKSTART.md, USAGE_GUIDE.md, INSTALL.md
 
-**Legacy scripts** (`src/archive/`):
-- Old standalone scripts before refactoring (kept for reference)
+**Tests** (`tests/`):
+- `conftest.py` - Fixtures: sample databases, mocked API responses
+- `test_finance_papers.py` - Unit tests
 
 **Key data types** (in `core.py`):
-- `Author` dataclass: name, openalex_id, paper_count, citations, affiliation
-- `Paper` dataclass: title, authors, year, citations, abstract, doi, topics
+- `Author` dataclass: name, openalex_id, paper_count, citations, affiliation, latest_paper
+- `Paper` dataclass: title, authors, year, pub_date, citations, abstract, doi, openalex_id, topics, journal
 
 ## Database Schema
 
@@ -45,7 +50,8 @@ openalex_articles (
     cited_by_count INTEGER,
     abstract TEXT,
     authors_json TEXT,        -- JSON array of author objects
-    topics_json TEXT          -- JSON array of topic objects
+    topics_json TEXT,         -- JSON array of topic objects
+    scraped_at TIMESTAMP
 )
 ```
 
@@ -60,13 +66,23 @@ working_papers (
 )
 ```
 
+**Unified papers**: `papers.db`
+```sql
+papers (
+    openalex_id, title, publication_date, doi,
+    author_name, author_affiliation, author_openalex_id,
+    source, journal, cited_by_count, abstract, topics_json,
+    UNIQUE(openalex_id, author_name)
+)
+```
+
 ## OpenAlex API
 
 Base URL: `https://api.openalex.org/works`
 
 Journal source IDs (in `JOURNALS` dict):
-- JF: S5353659, RFS: S170137484, JFE: S149240962
-- Also includes top 5 econ journals (QJE, AER, Econometrica, JPE, REStud)
+- Finance: JF (S5353659), RFS (S170137484), JFE (S149240962)
+- Econ: QJE, AER, Econometrica, JPE, REStud
 
 Key implementation details:
 - Cursor-based pagination with 200 items per page
@@ -84,7 +100,8 @@ finance-papers rank -n 250 --citations       # Rank by citations
 finance-papers rank --working-papers         # Rank by WP count
 finance-papers rank -o authors.csv           # Export to CSV
 finance-papers papers -a "Cochrane" -y 2024  # Search by author
-finance-papers topic "Asset Pricing"         # Find papers by topic
+finance-papers topic "Asset Pricing"         # Find papers by topic (fzf support)
+finance-papers chat                          # Chat with Claude about papers
 ```
 
 Year parsing accepts: `2024`, `2023-2025`, `2023,2024,2025`
@@ -99,6 +116,8 @@ Database:
 - `save_articles(articles, journal, year, force)` - Store articles
 - `iter_articles(db_files)` - Iterator over all articles in DBs
 - `get_db_files(journals, years)` - Find matching database files
+- `build_unified_db()` - Create unified papers database from article DBs
+- `iter_unified_papers()` - Iterate unified papers with filtering
 
 Author operations:
 - `rank_authors(journals, years, top_n, by_citations)` - Rank by pubs/citations
@@ -108,6 +127,13 @@ Author operations:
 Working papers:
 - `update_working_papers(authors, year, max_authors, clean)` - Parallel fetch
 - `rank_by_working_papers(top_n, year)` - Rank by WP count
+- `iter_working_papers()` - Iterate working papers database
+
+Paper search:
+- `search_papers(author, title, journal)` - Search by criteria
+- `get_author_papers(name)` - Get papers by author name
+- `get_recent_papers(n)` - Get N most recent papers
+- `get_topic_counts()` - Count papers by topic
 
 ## Configuration
 
@@ -115,6 +141,7 @@ Environment variables:
 - `OPENALEX_MAILTO` - Email for polite API usage (optional but recommended)
 
 Constants in `core.py`:
-- `JOURNAL_GROUPS`: top3, econ5, alltop
+- `JOURNAL_GROUPS`: top3 (finance), econ5, alltop
 - `AUTHOR_NAME_FIXES`: Name normalization mapping
 - `HIGHLIGHTED_AUTHORS`: Names to highlight in output (blue)
+- `DB_DIR`: Output database directory (`out/data/`)

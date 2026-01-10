@@ -1,312 +1,120 @@
-# Finance Papers - Academic Paper Scraping & Analysis System
+# Finance Papers
 
-A comprehensive system for scraping and analyzing academic papers from top finance journals using OpenAlex API. This system automatically downloads paper metadata, stores it in a database, ranks authors, fetches working papers, and provides convenient interfaces for accessing the data.
+CLI tool for analyzing academic papers from top finance and economics journals using the OpenAlex API.
 
 ## Supported Journals
 
-- **JF** - Journal of Finance
-- **RFS** - Review of Financial Studies
-- **JFE** - Journal of Financial Economics
+**Finance (top3):** JF, RFS, JFE
+
+**Economics (econ5):** QJE, AER, Econometrica, JPE, REStud
 
 ## Installation
 
-### Install as a Python Package
-
 ```bash
-# Clone or navigate to the project directory
-cd SS\ scrape-papers
-
-# Install in development mode (editable)
 pip install -e .
-
-# Or install normally
-pip install .
 ```
 
-After installation, you'll have access to this command-line tool:
-- `finance-papers` - Main orchestration script (runs the complete workflow)
-
-Other scripts remain available in the `src/` directory and can be run directly with Python if needed.
-
-### Manual Setup (Alternative)
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+This creates the `finance-papers` command.
 
 ## Quick Start
 
-### Using Installed Console Script
-
 ```bash
-# Run the complete workflow (recommended)
+# Interactive mode - guided workflow
 finance-papers
 
-# Use --force to update all years instead of just the latest
-finance-papers --force
+# Update journal articles
+finance-papers update articles
+
+# Rank top 100 authors
+finance-papers rank -n 100
+
+# Search papers by author
+finance-papers papers -a "Fama"
+
+# Web dashboard
+streamlit run streamlit_app.py
 ```
 
-### Using Python Scripts Directly
+## Commands
+
+### Update Data
 
 ```bash
-# Complete workflow
-python3 src/main.py
-
-# Individual commands
-python3 src/getpapers_openalex.py jf 2024
-python3 src/query_openalex_db.py rank-authors top3 --250
+finance-papers update articles                # Fetch latest articles
+finance-papers update articles -y 2024        # Specific year
+finance-papers update articles -y 2023-2025   # Year range
+finance-papers update articles --force        # Refresh citation counts
+finance-papers update working-papers          # Fetch working papers for top authors
 ```
 
-### Using Web Interface
+### Rank Authors
 
-Launch the Streamlit web dashboard:
+```bash
+finance-papers rank -n 250                    # Top 250 by publications
+finance-papers rank -n 250 --citations        # Rank by citations
+finance-papers rank --working-papers          # Rank by working paper count
+finance-papers rank -o authors.csv            # Export to CSV
+```
+
+### Search Papers
+
+```bash
+finance-papers papers -a "Cochrane"           # By author
+finance-papers papers -a "Fama" -y 2024       # By author and year
+finance-papers topic "Asset Pricing"          # By topic (interactive fzf)
+```
+
+### Chat
+
+```bash
+finance-papers chat                           # Chat with Claude about papers
+```
+
+## Web Dashboard
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-The web interface provides:
+Features:
 - Interactive author rankings with filtering
 - Working papers browser
 - Database statistics
 - Data update tools
-- Export to CSV
+- CSV export
 
-See [STREAMLIT.md](STREAMLIT.md) for deployment options and detailed documentation.
+## Data Storage
 
-## Main Workflow (`finance-papers`)
+All databases stored in `out/data/`:
 
-The main script orchestrates the complete workflow:
-
-```bash
-# Run complete workflow (incremental mode - only latest year)
-finance-papers
-
-# Force mode - update all years (2023-present)
-finance-papers --force
-```
-
-**Workflow Steps:**
-1. **Update Journal Articles** - Fetches latest papers from JF, RFS, JFE
-2. **Choose Ranking Years** - Select which years to include in author rankings (default: all years)
-3. **Rank Authors** - Analyzes and ranks top 250 authors by publications
-4. **Generate Author List** - Creates CSV of top authors (only if papers updated)
-5. **Fetch Working Papers** - Collects working papers for top authors
-6. **Display Rankings** - Shows comprehensive author and paper statistics
-
-**Interactive Prompts:**
-- Update journal articles: y (use default years), n (skip), or specify years (2024, 2023-2025, etc.)
-- Choose years for author ranking (Enter for all, or specify: 2024, 2023-2025, etc.)
-- Choose whether to update working papers (y/n)
-- Press Enter to advance through steps
-
-### Command-Line Tools
-
-#### `get-papers` - Fetch Journal Articles
-
-```bash
-# Fetch specific journal and year
-get-papers jf 2024
-get-papers rfs 2024
-
-# Fetch all top 3 journals
-get-papers top3 2024
-
-# Force update (refresh citation counts)
-get-papers jf 2024 --force
-```
-
-#### `query-papers` - Query and Analyze Articles
-
-```bash
-# Rank top 250 authors across all journals
-query-papers rank-authors top3 --250
-
-# Rank by citations instead of papers
-query-papers rank-authors top3 --250 --citations
-
-# Rank from specific year only
-query-papers rank-authors top3 2024 --250
-
-# Generate CSV file of top authors
-query-papers make-author-list top3 --250
-
-# List all articles
-query-papers list-articles jf 2024
-
-# Search by author
-query-papers list-articles top3 2024 --author="Fama"
-```
-
-#### `get-wp` - Fetch Working Papers
-
-```bash
-# Fetch working papers for authors in CSV file
-get-wp author_list_top3_2024_top250.csv 2024
-
-# Limit to first N authors (faster testing)
-get-wp author_list.csv 2024 --N 50
-```
-
-#### `query-wp` - Query Working Papers
-
-```bash
-# Rank authors by working papers (top 250)
-query-wp rank --250
-
-# Rank for specific year
-query-wp rank 2024 --250
-
-# List all working papers
-query-wp list
-
-# List for specific year
-query-wp list 2024
-
-# Filter by author
-query-wp list --author="Fama"
-
-# Limit results
-query-wp list --N 50
-```
-
-#### `extract-agendas` - Research Agenda Analysis
-
-```bash
-# Extract research agendas for top 250 authors
-extract-agendas 250
-
-# Display previously saved results
-extract-agendas 250 --display
-```
-
-## Features
-
-### Data Storage
-- **SQLite Databases**: 
-  - `openalex_{journal}_{year}.db` - Journal articles by journal and year
-  - `working_papers.db` or `working_papers_{year}.db` - Working papers
-- **CSV Exports**: Author lists with rankings and metadata
-- **Duplicate Detection**: Automatic deduplication based on OpenAlex IDs
-- **Metadata**: Complete article information (title, authors, abstract, publication date, citations, etc.)
-
-### Author Analysis
-- **Ranking System**: Rank authors by number of papers or total citations
-- **Research Agendas**: LLM-powered extraction of research focus areas
-- **Working Papers**: Track recent working papers for top authors
-- **Affiliations**: Collect institutional affiliations from author profiles
-- **Pagination**: Terminal-height-aware display with automatic page breaks
-
-### Advanced Features
-- **OpenAlex API**: Comprehensive academic metadata from OpenAlex
-- **Rate Limiting**: Automatic delays and retry mechanisms
-- **Citation Tracking**: Monitor citation counts over time with --force updates
-- **Cross-referencing**: Link journal articles with working papers by author
+- `openalex_{journal}_{year}.db` - Journal articles
+- `working_papers.db` - Working papers
+- `papers.db` - Unified papers database
 
 ## Project Structure
 
 ```
-scrape-papers/
-├── setup.py               # Package installation configuration
-├── src/                   # Source code package
-│   ├── __init__.py       # Package initialization
-│   ├── main.py           # Main orchestration script
-│   ├── getpapers_openalex.py    # Fetch journal articles
-│   ├── query_openalex_db.py     # Query journal article database
-│   ├── get_wp.py                # Fetch working papers
-│   ├── query_wp_db.py           # Query working papers database
-│   └── extract_research_agendas.py  # LLM-based agenda extraction
-├── out/data/             # Output directory (created automatically)
-│   ├── openalex_*.db     # Journal article databases
-│   ├── working_papers*.db # Working papers databases
-│   └── author_list_*.csv  # Generated author rankings
-├── requirements.txt      # Python dependencies
-└── README.md            # This file
+finance-papers/
+├── finance_papers/          # Main package
+│   ├── core.py             # Core functionality
+│   ├── cli.py              # CLI interface
+│   └── __init__.py         # Public API
+├── archive/                 # Legacy scripts (reference)
+├── tests/                   # Test suite
+├── streamlit_app.py         # Web dashboard
+├── setup.py                 # Package config
+└── requirements.txt         # Dependencies
 ```
+
+## Configuration
+
+Set `OPENALEX_MAILTO` environment variable for polite API usage (recommended).
 
 ## Dependencies
 
-Core dependencies (see requirements.txt):
-- **requests** - HTTP requests and API calls
-- **beautifulsoup4** - HTML parsing (for legacy scrapers)
-- **openai** - LLM API for research agenda extraction
-- **sqlite3** - Database operations (built-in)
-
-## Usage Examples
-
-### Daily Workflow
-```bash
-# Morning: Check for new articles and update everything
-finance-papers
-
-# Response: y (update journal articles)
-# Response: y (update working papers)
-# View rankings and statistics
-```
-
-### Targeted Updates
-```bash
-# Just update one journal
-get-papers jf 2024 --force
-
-# Quick check on top authors
-query-papers rank-authors jf 2024 --250
-
-# See recent working papers
-query-wp list --N 30
-```
-
-### Research Workflows
-```bash
-# Build complete author database
-finance-papers --force
-
-# Extract research agendas
-extract-agendas 250
-
-# View saved agendas later
-extract-agendas 250 --display
-
-# Find specific author's papers
-query-papers list-articles top3 --author="Cochrane"
-query-wp list --author="Cochrane"
-```
-
-### Research Workflow
-```bash
-# Get latest papers for review
-./bin/articles latest 20
-
-# Check JF forthcoming for finance research
-./bin/articles forth jf
-
-# Get database statistics
-./bin/articles stats
-```
-
-### Historical Data Collection
-```bash
-# Scrape specific volumes
-./bin/scrape qje 139 1
-./bin/scrape qje 139 2
-./bin/scrape qje 139 3
-
-# Check results
-./bin/articles stats
-```
-
-## Technical Notes
-
-- **Anti-Bot Measures**: Academic publishers use sophisticated blocking. Scrapers include multiple fallback strategies.
-- **Rate Limiting**: Respectful delays prevent overwhelming servers
-- **Data Integrity**: Comprehensive duplicate detection and validation
-- **Cross-Platform**: Works on macOS, Linux, and Windows (with appropriate dmenu alternatives)
-
-## Troubleshooting
-
-- **Virtual Environment**: Ensure `.venv` or `venv` directory exists with required packages
-- **Database Issues**: Database is created automatically in `out/data/`
-- **dmenu Problems**: Falls back to terminal menus automatically
-- **Scraping Blocked**: RSS feeds provide fallback access when direct scraping fails
+- requests
+- beautifulsoup4
+- openai
+- anthropic
+- streamlit
+- pandas
