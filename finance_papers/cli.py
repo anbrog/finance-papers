@@ -25,9 +25,9 @@ from finance_papers.core import (
     # Operations
     update_articles, rank_authors, search_papers,
     update_working_papers, export_author_csv, read_author_csv,
-    rank_by_working_papers, get_author_papers, get_topic_counts,
+    rank_by_working_papers, get_topic_counts,
     get_recent_papers, get_papers_from_last_update,
-    build_unified_db,
+    get_last_update_date,
     # Chat
     save_paper_context, load_paper_context, clear_paper_context,
     chat_with_papers, export_papers_to_file,
@@ -196,31 +196,24 @@ def select_rank_years() -> list:
 
 def select_rank_topic(journals: list = None, years: list = None) -> str:
     """Select topic for ranking with 'all' option."""
-    # Get available topics
     topic_counts, total_papers = get_topic_counts(journals, years)
     if not topic_counts:
         return None
 
-    # Format options with counts, "all" first
     options = [f"{total_papers:>4} | all (no filter)"]
     options.extend([f"{count:>4} | {name}" for name, count in list(topic_counts.items())[:100]])
 
     result = fzf_select(options, "Select topic")
     if result and 'all (no filter)' not in result:
-        # Parse selection: "count | topic name" -> "topic name"
         return result.split(' | ', 1)[1] if ' | ' in result else result
-    return None  # None means no topic filter
+    return None
 
 
 def cmd_update(args):
     """Handle update command."""
     current_year = datetime.now().year
 
-    # If only building DB, skip article/wp updates
-    only_build_db = (args.build_db or args.rebuild_db) and not args.working_papers and not args.dropdown
-
     if args.dropdown:
-        # Interactive dropdown mode
         source = select_update_source()
         if source in ('articles', 'all'):
             years = select_years()
@@ -230,20 +223,12 @@ def cmd_update(args):
             journals = ['top3']
         update_wp = source in ('working-papers', 'all')
         update_articles_flag = source in ('articles', 'all')
-    elif only_build_db:
-        # Just building DB, no updates
-        update_wp = False
-        update_articles_flag = False
-        years = None
-        journals = None
     else:
-        # Default or explicit arguments mode
         years = parse_years(args.years) if args.years else [current_year]
         journals = args.journals.split(',') if args.journals else ['top3']
         update_wp = args.working_papers
         update_articles_flag = not args.working_papers
 
-        # Show defaults if updating articles with defaults
         if update_articles_flag and not args.years and args.journals == 'top3':
             print(f"\033[90mDefaults: journals=top3, years={current_year}\033[0m")
 
@@ -254,7 +239,10 @@ def cmd_update(args):
 
     # Update working papers
     if update_wp:
-        print("\nUpdating working papers...")
+        last_wp_date = get_last_update_date(source='working-papers')
+        if last_wp_date:
+            print(f"\n\033[90mLast working papers update: {last_wp_date}\033[0m")
+        print("Updating working papers...")
         import glob
         pattern = str(DB_DIR / 'author_list_*.csv')
         csv_files = glob.glob(pattern)
@@ -263,13 +251,13 @@ def cmd_update(args):
             authors = read_author_csv(Path(csv_file))
             update_working_papers(authors, year=years[0] if years else None,
                                  max_authors=args.limit, clean=args.clean)
+            # Show working papers from this update
+            wp_papers = get_papers_from_last_update(source='working-papers')
+            if wp_papers:
+                display_papers(papers=wp_papers, title="Working Papers from Update",
+                             offer_chat=False)
         else:
             print("No author list found. Run 'finance-papers rank -o' first.")
-
-    # Build unified database
-    if args.build_db or args.rebuild_db:
-        print("Building unified papers database...")
-        build_unified_db(rebuild=args.rebuild_db)
 
 
 def cmd_rank(args):
@@ -277,38 +265,31 @@ def cmd_rank(args):
     current_year = datetime.now().year
 
     if args.dropdown:
-        # Interactive dropdown mode
         source = select_rank_source()
         working_papers = (source == 'working-papers')
 
         if working_papers:
-            # Working papers don't need journal/year/topic filters
             journals = None
             years = None
             topic = None
         else:
-            # Articles: prompt for years, journals, topic
             years = select_rank_years()
             journals = select_journals()
             topic = select_rank_topic(journals, years)
     else:
-        # Default or explicit arguments mode
         journals = args.journals.split(',') if args.journals else None
         years = parse_years(args.years) if args.years else None
         working_papers = args.working_papers
 
-        # Handle topic filtering
         topic = None
         if hasattr(args, 'topic') and args.topic is not None:
             if args.topic == '':
-                # Empty string means user wants fzf selection
                 topic = select_topic_fzf(journals, years)
                 if not topic:
                     return
             else:
                 topic = args.topic
 
-        # Show defaults if no filters specified
         if not args.journals and not args.years and not working_papers and topic is None:
             print(f"\033[90mDefaults: journals=top3, years=all, topic=all (use -d for dropdown selection)\033[0m")
 
@@ -320,11 +301,9 @@ def cmd_rank(args):
         if topic:
             title += f" (Topic: {topic})"
     else:
-        # Get all authors first to build minimum papers dropdown
         all_authors = rank_authors(journals=journals, years=years, top_n=10000,
                                    by_citations=args.citations, topic=topic)
 
-        # Build options for minimum papers dropdown
         if all_authors:
             max_papers = max(a.paper_count for a in all_authors)
             options = []
@@ -333,14 +312,12 @@ def cmd_rank(args):
                 if count > 0:
                     options.append(f"{n} ({count} authors)")
 
-            # Select minimum papers via fzf
             selected = fzf_select(options, "Minimum papers")
             if selected:
                 min_papers = int(selected.split()[0])
             else:
                 min_papers = 1
 
-            # Filter authors by minimum papers (no limit - dropdown shows the count)
             authors = [a for a in all_authors if a.paper_count >= min_papers]
         else:
             authors = all_authors
@@ -359,7 +336,6 @@ def cmd_rank(args):
         print_author_table(authors, title, journals=journals, years=years,
                           working_papers=working_papers, topic=topic)
 
-        # Ask if user wants to save the author list
         if authors and not working_papers:
             try:
                 response = input(f"\nSave author list ({len(authors)} authors)? (y/n) [n]: ").strip().lower()
@@ -377,19 +353,17 @@ def cmd_papers(args):
     years = parse_years(args.years) if args.years else None
     source = 'working-papers' if args.working_papers else 'articles'
 
-    # Handle topic: empty string means fzf selection
     topic = None
     if hasattr(args, 'topic') and args.topic is not None:
         if args.topic == '':
             topic = select_topic_fzf(journals, years, author=args.author, title=args.title)
-            if topic is None:  # User cancelled
+            if topic is None:
                 return
-            if topic == '':  # User selected "all"
+            if topic == '':
                 topic = None
         else:
             topic = args.topic
 
-    # Search papers (works for both articles and working papers)
     papers = search_papers(
         author=args.author,
         title=args.title,
@@ -400,9 +374,10 @@ def cmd_papers(args):
         source=source
     )
 
-    # Build title
     label = "Working Papers" if args.working_papers else "Papers"
-    title = label
+    last_date = get_last_update_date(source=source)
+    date_suffix = f" [{last_date}]" if last_date else ""
+    title = f"{label}{date_suffix}"
     if args.author:
         title += f" by {args.author}"
     elif topic:
@@ -420,7 +395,6 @@ def cmd_chat(args):
         return
 
     if args.export:
-        # Export to file instead of chat
         output_path = Path(args.export) if args.export != 'auto' else None
         result = export_papers_to_file(output_path=output_path)
         if result:
@@ -430,7 +404,6 @@ def cmd_chat(args):
         return
 
     if args.show:
-        # Just show what's in context
         papers, query = load_paper_context()
         if not papers:
             print("No papers in context.")
@@ -446,7 +419,6 @@ def cmd_chat(args):
             print(f"  {i}. {authors} ({year}): {p.title[:50]}...")
         return
 
-    # Load papers
     source = 'working-papers' if args.working_papers else 'articles'
     label = "working papers" if args.working_papers else "articles"
 
@@ -469,7 +441,6 @@ def cmd_chat(args):
     save_paper_context(papers, context_desc)
     print(msg)
 
-    # Start chat
     chat_with_papers(papers, context_desc)
 
 
@@ -517,18 +488,15 @@ def interactive_mode():
         print("Skipping author list export.")
         csv_path = None
     else:
-        # Get all authors first to build the dropdown options
         all_authors = rank_authors(top_n=10000)
 
-        # Build options showing count of authors for each minimum paper threshold
         max_papers = max(a.paper_count for a in all_authors) if all_authors else 1
         options = []
-        for n in range(1, min(max_papers + 1, 20)):  # Up to 19 or max papers
+        for n in range(1, min(max_papers + 1, 20)):
             count = len([a for a in all_authors if a.paper_count >= n])
             if count > 0:
                 options.append(f"{n} ({count} authors)")
 
-        # Select minimum papers via fzf
         selected = fzf_select(options, "Minimum papers")
         if selected:
             min_papers = int(selected.split()[0])
@@ -538,7 +506,6 @@ def interactive_mode():
         filtered_authors = [a for a in all_authors if a.paper_count >= min_papers]
         print(f"{len(filtered_authors)} authors have at least {min_papers} paper(s)")
 
-        # Ask how many to export
         export_n_str = input(f"How many authors? [all]: ").strip().lower()
         if export_n_str == '' or export_n_str == 'all':
             export_authors = filtered_authors
@@ -552,7 +519,6 @@ def interactive_mode():
     print("\n[Step 4/4] Update Working Papers")
     print("-" * 40)
 
-    # Find most recent author list CSV
     pattern = str(DB_DIR / 'author_list_*.csv')
     csv_files = glob.glob(pattern)
     if csv_files:
@@ -579,7 +545,6 @@ def interactive_mode():
     print("Workflow Complete")
     print("=" * 60)
 
-    # Show working paper rankings if available
     wp_authors = rank_by_working_papers(top_n=top_n)
     if wp_authors:
         print_author_table(wp_authors, title="Ranking by Working Papers",
@@ -618,7 +583,7 @@ Examples:
 
     # Main parser options (paper search - default mode)
     parser.add_argument('-i', '--interactive', action='store_true',
-                       help='Run interactive workflow (update → rank → export)')
+                       help='Run interactive workflow (update -> rank -> export)')
     parser.add_argument('-a', '--author', help='Filter by author name')
     parser.add_argument('--title', help='Filter by title keyword')
     parser.add_argument('-j', '--journals', help='Filter by journals')
@@ -645,8 +610,6 @@ Examples:
     p_update.add_argument('--force', action='store_true', help='Update existing records')
     p_update.add_argument('--clean', action='store_true', help='Remove old working papers')
     p_update.add_argument('-n', '--limit', type=int, help='Limit number of authors (for working papers)')
-    p_update.add_argument('--build-db', action='store_true', help='Build unified papers database')
-    p_update.add_argument('--rebuild-db', action='store_true', help='Rebuild unified database from scratch')
 
     # rank
     p_rank = subparsers.add_parser('rank',
@@ -693,20 +656,17 @@ Examples:
         return
 
     # Default: paper search mode
-    # If no filters specified, show papers from last update (or recent with -r)
     has_filters = args.author or args.title or args.topic is not None
     if not has_filters:
         source = 'working-papers' if args.working_papers else 'articles'
         label = "Working Papers" if args.working_papers else "Papers"
 
         if args.recent:
-            # Show most recent papers by scraped_at
             limit = args.top or 40
             papers = get_recent_papers(source=source, limit=limit)
             context_desc = f"recent {label.lower()}"
             title = f"Most Recent {label}"
         else:
-            # Show from last update
             papers = get_papers_from_last_update(source=source)
             context_desc = f"{label.lower()} from last update"
             title = f"{label} from Last Update"

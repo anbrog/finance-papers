@@ -70,6 +70,19 @@ AUTHOR_NAME_FIXES = {
 # Authors to highlight in output
 HIGHLIGHTED_AUTHORS = ['Andreas Brøgger']
 
+# Topic display abbreviations
+TOPIC_FILLER_WORDS = {'and', 'of', 'the', 'in', 'for', 'on', 'to', 'a', 'an'}
+TOPIC_ABBREVIATIONS = {
+    'finance': 'Fin', 'financial': 'Fin', 'economics': 'Econ', 'economic': 'Econ',
+    'market': 'Mkt', 'markets': 'Mkts', 'corporate': 'Corp', 'corporation': 'Corp',
+    'investment': 'Inv', 'investments': 'Inv', 'investor': 'Inv', 'investors': 'Inv',
+    'government': 'Gov', 'governance': 'Gov', 'international': 'Intl',
+    'management': 'Mgmt', 'development': 'Dev', 'regulation': 'Reg',
+    'monetary': 'Mon', 'policy': 'Pol', 'banking': 'Bank', 'behavior': 'Behav',
+    'behavioral': 'Behav', 'sustainable': 'Sust', 'sustainability': 'Sust',
+    'environmental': 'Env', 'volatility': 'Vol', 'dynamics': 'Dyn',
+}
+
 
 # =============================================================================
 # DATA TYPES
@@ -152,6 +165,11 @@ def get_db_files(journals: list = None, years: list = None) -> list:
             db_files.extend(DB_DIR.glob(f'openalex_*_{y}.db'))
 
     return sorted(set(db_files))
+
+
+def _journal_from_db_file(db_file: Path) -> str:
+    """Extract journal code from database filename."""
+    return db_file.name.split('_')[1] if '_' in db_file.name else None
 
 
 def iter_articles(db_files: list) -> Iterator[dict]:
@@ -252,240 +270,6 @@ def save_articles(articles: list, journal: str, year: int, force_update: bool = 
         conn.commit()
 
     return new_count, updated_count
-
-
-# =============================================================================
-# UNIFIED PAPERS DATABASE
-# =============================================================================
-
-UNIFIED_DB_PATH = DB_DIR / 'papers.db'
-
-
-def _create_unified_schema(conn):
-    """Create the unified papers table schema."""
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS papers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            openalex_id TEXT NOT NULL,
-            title TEXT,
-            publication_date TEXT,
-            doi TEXT,
-            author_name TEXT,
-            author_affiliation TEXT,
-            author_openalex_id TEXT,
-            source TEXT,
-            journal TEXT,
-            cited_by_count INTEGER DEFAULT 0,
-            abstract TEXT,
-            topics_json TEXT,
-            scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(openalex_id, author_name)
-        )
-    ''')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_papers_openalex ON papers(openalex_id)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_papers_author ON papers(author_name)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_papers_source ON papers(source)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_papers_journal ON papers(journal)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_papers_date ON papers(publication_date)')
-    conn.commit()
-
-
-def build_unified_db(rebuild: bool = False):
-    """Build unified papers database from article DBs and working papers.
-
-    Args:
-        rebuild: If True, drop and recreate the table. If False, only add new entries.
-    """
-    ensure_db_dir()
-
-    with db_connection(UNIFIED_DB_PATH) as conn:
-        cursor = conn.cursor()
-
-        if rebuild:
-            cursor.execute('DROP TABLE IF EXISTS papers')
-            conn.commit()
-
-        _create_unified_schema(conn)
-
-        # Import articles from all article DBs
-        article_count = 0
-        article_dbs = list(DB_DIR.glob('openalex_*_*.db'))
-        for db_file in article_dbs:
-            # Extract journal from filename: openalex_{journal}_{year}.db
-            parts = db_file.stem.split('_')
-            if len(parts) >= 3:
-                journal = parts[1]
-            else:
-                journal = None
-
-            with db_connection(db_file) as article_conn:
-                article_cursor = article_conn.cursor()
-                article_cursor.execute('''
-                    SELECT openalex_id, title, publication_date, doi,
-                           cited_by_count, abstract, authors_json, topics_json, scraped_at
-                    FROM openalex_articles
-                ''')
-                for row in article_cursor:
-                    authors = json.loads(row['authors_json']) if row['authors_json'] else []
-                    for author in authors:
-                        author_name = author.get('name')
-                        if not author_name:
-                            continue
-                        author_name = normalize_name(author_name)
-                        institutions = author.get('institutions', [])
-                        affiliation = institutions[0] if institutions else ''
-                        author_id = author.get('id')
-
-                        try:
-                            cursor.execute('''
-                                INSERT OR IGNORE INTO papers
-                                (openalex_id, title, publication_date, doi, author_name,
-                                 author_affiliation, author_openalex_id, source, journal,
-                                 cited_by_count, abstract, topics_json, scraped_at)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            ''', (
-                                row['openalex_id'],
-                                row['title'],
-                                row['publication_date'],
-                                row['doi'],
-                                author_name,
-                                affiliation,
-                                author_id,
-                                'article',
-                                journal,
-                                row['cited_by_count'] or 0,
-                                row['abstract'],
-                                row['topics_json'],
-                                row['scraped_at'],
-                            ))
-                            if cursor.rowcount > 0:
-                                article_count += 1
-                        except Exception:
-                            pass
-
-        conn.commit()
-        print(f"Imported {article_count} author-paper entries from articles")
-
-        # Import working papers
-        wp_count = 0
-        wp_db = DB_DIR / 'working_papers.db'
-        if wp_db.exists():
-            with db_connection(wp_db) as wp_conn:
-                wp_cursor = wp_conn.cursor()
-                wp_cursor.execute('''
-                    SELECT openalex_id, title, publication_date, doi,
-                           author_name, author_affiliation, cited_by_count,
-                           topics_json, scraped_at
-                    FROM working_papers
-                    WHERE doi NOT LIKE '%10.1257/rct%' OR doi IS NULL
-                ''')
-                for row in wp_cursor:
-                    author_name = row['author_name']
-                    if not author_name:
-                        continue
-                    author_name = normalize_name(author_name)
-
-                    try:
-                        cursor.execute('''
-                            INSERT OR IGNORE INTO papers
-                            (openalex_id, title, publication_date, doi, author_name,
-                             author_affiliation, author_openalex_id, source, journal,
-                             cited_by_count, abstract, topics_json, scraped_at)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (
-                            row['openalex_id'],
-                            row['title'],
-                            row['publication_date'],
-                            row['doi'],
-                            author_name,
-                            row['author_affiliation'] or '',
-                            None,
-                            'working-paper',
-                            None,
-                            row['cited_by_count'] or 0,
-                            None,
-                            row['topics_json'],
-                            row['scraped_at'],
-                        ))
-                        if cursor.rowcount > 0:
-                            wp_count += 1
-                    except Exception:
-                        pass
-
-        conn.commit()
-        print(f"Imported {wp_count} working paper entries")
-        print(f"Total: {article_count + wp_count} entries in unified database")
-
-
-def iter_unified_papers(source: str = None, journals: list = None, years: list = None) -> Iterator[dict]:
-    """Iterate over papers in unified database.
-
-    Args:
-        source: Filter by 'article' or 'working-paper'
-        journals: Filter by journal codes (articles only)
-        years: Filter by publication years
-    """
-    if not UNIFIED_DB_PATH.exists():
-        return
-
-    with db_connection(UNIFIED_DB_PATH) as conn:
-        cursor = conn.cursor()
-
-        # Build query with filters
-        query = '''
-            SELECT openalex_id, title, publication_date, doi, author_name,
-                   author_affiliation, source, journal, cited_by_count, topics_json
-            FROM papers
-            WHERE (doi NOT LIKE '%10.1257/rct%' OR doi IS NULL)
-        '''
-        params = []
-
-        if source:
-            query += ' AND source = ?'
-            params.append(source)
-
-        if journals:
-            # Expand journal groups
-            expanded = []
-            for j in journals:
-                if j in JOURNAL_GROUPS:
-                    expanded.extend(JOURNAL_GROUPS[j])
-                else:
-                    expanded.append(j)
-            placeholders = ','.join('?' * len(expanded))
-            query += f' AND (journal IN ({placeholders}) OR source = ?)'
-            params.extend(expanded)
-            params.append('working-paper')  # Include WPs when filtering journals
-
-        if years:
-            year_conditions = ' OR '.join(['publication_date LIKE ?' for _ in years])
-            query += f' AND ({year_conditions})'
-            params.extend([f'{y}%' for y in years])
-
-        query += ' ORDER BY publication_date DESC'
-
-        cursor.execute(query, params)
-        for row in cursor:
-            topics = []
-            if row['topics_json']:
-                try:
-                    topics = json.loads(row['topics_json'])
-                except json.JSONDecodeError:
-                    pass
-
-            yield {
-                'openalex_id': row['openalex_id'],
-                'title': row['title'],
-                'pub_date': row['publication_date'],
-                'doi': row['doi'],
-                'name': row['author_name'],
-                'affiliation': row['author_affiliation'] or '',
-                'source': row['source'],
-                'journal': row['journal'],
-                'citations': row['cited_by_count'] or 0,
-                'topics': topics,
-            }
 
 
 # =============================================================================
@@ -629,6 +413,20 @@ def fetch_author_works(author_id: str, from_year: int = None) -> list:
                 if "10.1257/rct" in doi:
                     continue
 
+                # Extract primary location source name
+                primary_loc = work.get("primary_location") or {}
+                source = primary_loc.get("source") or {}
+                primary_location = source.get("display_name")
+
+                # Extract topics
+                topics = [
+                    {
+                        "name": t.get("display_name"),
+                        "score": t.get("score"),
+                    }
+                    for t in work.get("topics", [])[:5]
+                ]
+
                 all_papers.append({
                     "openalex_id": work.get("id"),
                     "title": work.get("title"),
@@ -636,6 +434,8 @@ def fetch_author_works(author_id: str, from_year: int = None) -> list:
                     "doi": doi,
                     "type": work.get("type"),
                     "cited_by_count": work.get("cited_by_count", 0),
+                    "primary_location": primary_location,
+                    "topics": topics,
                 })
 
             cursor = data.get("meta", {}).get("next_cursor")
@@ -683,8 +483,6 @@ def get_topic_counts(journals: list = None, years: list = None,
                      author: str = None, title: str = None) -> tuple:
     """Get all topics with paper counts, sorted by prevalence.
 
-    Optionally filter by author and/or title to show relevant topic counts.
-
     Returns:
         tuple: (topic_counts dict, total_paper_count int)
     """
@@ -693,13 +491,11 @@ def get_topic_counts(journals: list = None, years: list = None,
     total_papers = 0
 
     for article in iter_articles(db_files):
-        # Filter by author if specified
         if author:
             author_names = [(a.get('name') or '').lower() for a in article.get('authors', []) if a]
             if not any(author.lower() in name for name in author_names):
                 continue
 
-        # Filter by title if specified
         if title:
             article_title = article.get('title', '').lower()
             if title.lower() not in article_title:
@@ -714,9 +510,17 @@ def get_topic_counts(journals: list = None, years: list = None,
     return dict(sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)), total_papers
 
 
+def _matches_topic(topics: list, topic_filter: str) -> bool:
+    """Check if any topic matches the filter (case-insensitive partial match)."""
+    topic_lower = topic_filter.lower()
+    return any(topic_lower in (t.get('name', '') or '').lower() for t in topics)
+
+
 def rank_authors(journals: list = None, years: list = None, top_n: int = 250,
                  by_citations: bool = False, topic: str = None, source: str = None) -> list:
     """Rank authors by publication count or citations.
+
+    Iterates directly over per-journal article DBs and working_papers.db.
 
     Args:
         journals: Filter by journal codes (for articles)
@@ -726,38 +530,61 @@ def rank_authors(journals: list = None, years: list = None, top_n: int = 250,
         topic: Filter by topic (partial match)
         source: Filter by 'article' or 'working-paper' (None = both)
     """
-    if not UNIFIED_DB_PATH.exists():
-        print("Unified database not found. Run 'finance-papers update --build-db' first.")
-        return []
-
     author_stats = defaultdict(lambda: {'count': 0, 'citations': 0, 'latest': ('', ''), 'affiliation': ''})
 
     # Initialize highlighted authors
     for name in HIGHLIGHTED_AUTHORS:
         author_stats[name]
 
-    # Iterate over papers (years filtering done in SQL by iter_unified_papers)
-    for item in iter_unified_papers(source=source, journals=journals, years=years):
-        # Filter by topic if specified
-        if topic:
-            item_topics = [t.get('name', '').lower() for t in item.get('topics', [])]
-            if not any(topic.lower() in t for t in item_topics):
+    # Count articles
+    if source is None or source == 'article':
+        db_files = get_db_files(journals, years)
+        for article in iter_articles(db_files):
+            if topic and not _matches_topic(article.get('topics', []), topic):
                 continue
 
-        name = item.get('name')
-        if not name:
-            continue
+            citations = article.get('citations', 0) or 0
+            pub_date = article.get('pub_date') or ''
+            title = article.get('title') or ''
 
-        name = normalize_name(name)
-        stats = author_stats[name]
-        stats['count'] += 1
-        stats['citations'] += item.get('citations', 0) or 0
+            for author in article['authors']:
+                name = normalize_name(author.get('name') or '')
+                if not name:
+                    continue
+                stats = author_stats[name]
+                stats['count'] += 1
+                stats['citations'] += citations
+                if pub_date > stats['latest'][0]:
+                    stats['latest'] = (pub_date, title)
+                    institutions = author.get('institutions', [])
+                    if institutions:
+                        stats['affiliation'] = institutions[0]
 
-        pub_date = item.get('pub_date') or ''
-        if pub_date > stats['latest'][0]:
-            stats['latest'] = (pub_date, item.get('title') or '')
-            if item.get('affiliation'):
-                stats['affiliation'] = item['affiliation']
+    # Count working papers
+    if source is None or source == 'working-paper':
+        for wp in iter_working_papers():
+            # Year filter
+            if years:
+                wp_date = wp.get('pub_date') or ''
+                if wp_date and int(wp_date[:4]) not in years:
+                    continue
+
+            if topic and not _matches_topic(wp.get('topics', []), topic):
+                continue
+
+            citations = wp.get('citations', 0) or 0
+            pub_date = wp.get('pub_date') or ''
+            title = wp.get('title') or ''
+
+            for author in wp['authors']:
+                name = normalize_name(author.get('name') or '')
+                if not name:
+                    continue
+                stats = author_stats[name]
+                stats['count'] += 1
+                stats['citations'] += citations
+                if pub_date > stats['latest'][0]:
+                    stats['latest'] = (pub_date, title)
 
     # Sort
     if by_citations:
@@ -824,15 +651,8 @@ def search_papers(author: str = None, title: str = None, journals: list = None,
     """Search papers with filters.
 
     Args:
-        author: Filter by author name
-        title: Filter by title keyword
-        journals: Filter by journals (articles only)
-        years: Filter by years
-        topic: Filter by topic
-        limit: Maximum number of papers to return
         source: 'articles' or 'working-papers'
     """
-    # Get iterator for the source
     if source == 'working-papers':
         items = iter_working_papers()
     else:
@@ -842,37 +662,28 @@ def search_papers(author: str = None, title: str = None, journals: list = None,
     papers = []
     author_search = normalize_for_search(author) if author else None
     for item in items:
-        # Filter by author (normalize both search term and names for matching)
         if author_search:
             author_names = [normalize_for_search(normalize_name(a.get('name') or '')) for a in item['authors']]
             if not any(author_search in name for name in author_names):
                 continue
 
-        # Filter by year (for working papers; articles are pre-filtered by db file)
         if years and source == 'working-papers':
             pub_date = item.get('pub_date')
             if not pub_date:
                 continue
-            paper_year = int(pub_date[:4])
-            if paper_year not in years:
+            if int(pub_date[:4]) not in years:
                 continue
 
-        # Filter by title
         if title:
             if title.lower() not in (item['title'] or '').lower():
                 continue
 
-        # Filter by topic
-        if topic:
-            item_topics = [t.get('name', '').lower() for t in item.get('topics', [])]
-            if not any(topic.lower() in t for t in item_topics):
-                continue
+        if topic and not _matches_topic(item.get('topics', []), topic):
+            continue
 
-        # Get journal from item or extract from db_file
         journal = item.get('journal')
         if journal is None and 'db_file' in item:
-            db_name = item['db_file'].name
-            journal = db_name.split('_')[1] if '_' in db_name else None
+            journal = _journal_from_db_file(item['db_file'])
 
         papers.append(Paper(
             title=item['title'],
@@ -890,7 +701,6 @@ def search_papers(author: str = None, title: str = None, journals: list = None,
         if limit and len(papers) >= limit:
             break
 
-    # Sort by date descending
     papers.sort(key=lambda p: p.pub_date or '', reverse=True)
     return papers
 
@@ -916,7 +726,6 @@ def _short_source(primary_location: str) -> str:
         return 'EconStor'
     if 'zenodo' in loc:
         return 'Zenodo'
-    # Check for journal names (might be published versions)
     if 'journal of finance' in loc:
         return 'JF'
     if 'review of financial studies' in loc:
@@ -979,16 +788,32 @@ def iter_working_papers():
 
     with db_connection(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute('''
-            SELECT openalex_id, title, publication_date, doi, cited_by_count,
-                   author_name, primary_location, topics_json
+
+        # Use column-safe query: check what columns exist
+        table_info = conn.execute("PRAGMA table_info(working_papers)").fetchall()
+        col_names = {row['name'] for row in table_info}
+
+        has_primary_location = 'primary_location' in col_names
+        has_topics_json = 'topics_json' in col_names
+
+        columns = ['openalex_id', 'title', 'publication_date', 'doi',
+                    'cited_by_count', 'author_name']
+        if has_primary_location:
+            columns.append('primary_location')
+        if has_topics_json:
+            columns.append('topics_json')
+
+        cursor.execute(f'''
+            SELECT {', '.join(columns)}
             FROM working_papers
             WHERE doi NOT LIKE '%10.1257/rct%' OR doi IS NULL
             ORDER BY publication_date DESC
         ''')
 
         for row in cursor:
-            topics = json.loads(row['topics_json']) if row['topics_json'] else []
+            primary_loc = row['primary_location'] if has_primary_location else None
+            topics_json = row['topics_json'] if has_topics_json else None
+            topics = json.loads(topics_json) if topics_json else []
             yield {
                 'openalex_id': row['openalex_id'],
                 'title': row['title'],
@@ -998,61 +823,72 @@ def iter_working_papers():
                 'authors': [{'name': row['author_name']}] if row['author_name'] else [],
                 'topics': topics,
                 'abstract': None,
-                'journal': _short_source(row['primary_location']),
+                'journal': _short_source(primary_loc),
             }
-
-
-def get_author_papers(author_name: str, journals: list = None, years: list = None) -> list:
-    """Get all papers by an author."""
-    return search_papers(author=author_name, journals=journals, years=years, limit=1000)
 
 
 def get_recent_papers(journals: list = None, years: list = None, limit: int = 20,
                       source: str = 'articles') -> list:
-    """Get recently added papers, ordered by scraped_at timestamp.
+    """Get recently added papers, ordered by publication date."""
+    papers = []
 
-    Args:
-        journals: List of journal keys to filter (for articles)
-        years: List of years to filter (for articles)
-        limit: Maximum number of papers to return
-        source: 'articles' or 'working-papers'
+    if source == 'working-papers':
+        db_path = DB_DIR / 'working_papers.db'
+        if not db_path.exists():
+            return []
+        with db_connection(db_path) as conn:
+            # Check available columns
+            table_info = conn.execute("PRAGMA table_info(working_papers)").fetchall()
+            col_names = {row['name'] for row in table_info}
+            columns = ['openalex_id', 'title', 'publication_date', 'doi',
+                        'author_name', 'type', 'cited_by_count']
+            if 'primary_location' in col_names:
+                columns.append('primary_location')
+            if 'topics_json' in col_names:
+                columns.append('topics_json')
 
-    Returns:
-        List of Paper objects ordered by most recently added
-    """
-    config = _SOURCE_CONFIG.get(source, _SOURCE_CONFIG['articles'])
-    db_files = _get_db_files_for_source(source, journals, years)
-    if not db_files:
-        return []
-
-    # Collect papers from all dbs
-    all_papers = []
-    for db_file in db_files:
-        journal = _get_journal_from_db(db_file, source)
-
-        with db_connection(db_file) as conn:
             cursor = conn.cursor()
             cursor.execute(f'''
-                SELECT {config['columns']}
-                FROM {config['table']}
+                SELECT {', '.join(columns)}
+                FROM working_papers
                 ORDER BY publication_date DESC
                 LIMIT ?
             ''', (limit,))
-
             for row in cursor:
-                all_papers.append(config['converter'](row, journal))
+                papers.append(_wp_row_to_paper(row))
+    else:
+        db_files = get_db_files(journals, years)
+        for db_file in db_files:
+            journal = _journal_from_db_file(db_file)
+            with db_connection(db_file) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT openalex_id, title, publication_date, doi,
+                           cited_by_count, abstract, authors_json, topics_json
+                    FROM openalex_articles
+                    ORDER BY publication_date DESC
+                    LIMIT ?
+                ''', (limit,))
+                for row in cursor:
+                    papers.append(_article_row_to_paper(row, journal))
 
-    # Sort by publication date descending and take top N
-    all_papers.sort(key=lambda p: p.pub_date or '', reverse=True)
-    return all_papers[:limit]
+    papers.sort(key=lambda p: p.pub_date or '', reverse=True)
+    return papers[:limit]
 
 
-def get_last_update_timestamp(journal: str = None, year: int = None) -> Optional[str]:
-    """Get the most recent scraped_at timestamp from the database.
+def get_last_update_timestamp(journal: str = None, year: int = None,
+                              source: str = 'articles') -> Optional[str]:
+    """Get the most recent scraped_at timestamp from the database."""
+    if source == 'working-papers':
+        db_path = DB_DIR / 'working_papers.db'
+        if not db_path.exists():
+            return None
+        with db_connection(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT MAX(scraped_at) FROM working_papers')
+            row = cursor.fetchone()
+            return row[0] if row and row[0] else None
 
-    If journal/year specified, checks that specific db.
-    Otherwise checks all article dbs.
-    """
     if journal and year:
         db_path = DB_DIR / f'openalex_{journal}_{year}.db'
         if not db_path.exists():
@@ -1074,94 +910,101 @@ def get_last_update_timestamp(journal: str = None, year: int = None) -> Optional
     return latest
 
 
-# Source configurations for unified paper queries
-_SOURCE_CONFIG = {
-    'working-papers': {
-        'table': 'working_papers',
-        'columns': 'openalex_id, title, publication_date, doi, author_name, type, cited_by_count, primary_location, topics_json',
-        'converter': lambda row, _: _wp_row_to_paper(row),
-    },
-    'articles': {
-        'table': 'openalex_articles',
-        'columns': 'openalex_id, title, publication_date, doi, cited_by_count, abstract, authors_json, topics_json',
-        'converter': _article_row_to_paper,
-    },
-}
-
-
-def _get_db_files_for_source(source: str, journals: list = None, years: list = None) -> list:
-    """Get database files for a given source."""
-    if source == 'working-papers':
-        db_path = DB_DIR / 'working_papers.db'
-        return [db_path] if db_path.exists() else []
-    else:
-        return get_db_files(journals, years)
-
-
-def _get_journal_from_db(db_file: Path, source: str) -> str:
-    """Extract journal name from database file."""
-    if source == 'working-papers':
-        return None  # Working papers use primary_location instead
-    return db_file.name.split('_')[1] if '_' in db_file.name else None
+def get_last_update_date(source: str = 'articles') -> Optional[str]:
+    """Get the date of the most recent update as a human-readable string."""
+    ts = get_last_update_timestamp(source=source)
+    if not ts:
+        return None
+    try:
+        dt = datetime.fromisoformat(ts)
+        return dt.strftime('%Y-%m-%d')
+    except (ValueError, TypeError):
+        return ts[:10] if len(ts) >= 10 else ts
 
 
 def get_papers_from_last_update(journals: list = None, years: list = None,
                                 source: str = 'articles') -> list:
     """Get papers from the most recent update batch.
 
-    Returns all papers that share the latest scraped_at date,
-    representing the most recent update that added new papers.
+    Returns all papers that share the latest scraped_at date.
     """
-    config = _SOURCE_CONFIG.get(source, _SOURCE_CONFIG['articles'])
-    db_files = _get_db_files_for_source(source, journals, years)
-    if not db_files:
-        return []
-
-    # Find the global latest date across all matching dbs
-    latest_date = None
-    for db_file in db_files:
-        with db_connection(db_file) as conn:
-            cursor = conn.cursor()
-            cursor.execute(f"SELECT DATE(MAX(scraped_at)) FROM {config['table']}")
-            row = cursor.fetchone()
-            if row and row[0]:
-                if latest_date is None or row[0] > latest_date:
-                    latest_date = row[0]
-
-    if not latest_date:
-        return []
-
-    # Get all papers from that date
     papers = []
-    for db_file in db_files:
-        journal = _get_journal_from_db(db_file, source)
 
-        with db_connection(db_file) as conn:
+    if source == 'working-papers':
+        db_path = DB_DIR / 'working_papers.db'
+        if not db_path.exists():
+            return []
+
+        with db_connection(db_path) as conn:
             cursor = conn.cursor()
+            cursor.execute("SELECT DATE(MAX(scraped_at)) FROM working_papers")
+            row = cursor.fetchone()
+            if not row or not row[0]:
+                return []
+            latest_date = row[0]
+
+            # Check available columns
+            table_info = conn.execute("PRAGMA table_info(working_papers)").fetchall()
+            col_names = {row['name'] for row in table_info}
+            columns = ['openalex_id', 'title', 'publication_date', 'doi',
+                        'author_name', 'type', 'cited_by_count']
+            if 'primary_location' in col_names:
+                columns.append('primary_location')
+            if 'topics_json' in col_names:
+                columns.append('topics_json')
+
             cursor.execute(f'''
-                SELECT {config['columns']}
-                FROM {config['table']}
+                SELECT {', '.join(columns)}
+                FROM working_papers
                 WHERE DATE(scraped_at) = ?
                 ORDER BY publication_date DESC
             ''', (latest_date,))
-
             for row in cursor:
-                papers.append(config['converter'](row, journal))
+                papers.append(_wp_row_to_paper(row))
+    else:
+        db_files = get_db_files(journals, years)
+        if not db_files:
+            return []
+
+        # Find latest date across all DBs
+        latest_date = None
+        for db_file in db_files:
+            with db_connection(db_file) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT DATE(MAX(scraped_at)) FROM openalex_articles")
+                row = cursor.fetchone()
+                if row and row[0]:
+                    if latest_date is None or row[0] > latest_date:
+                        latest_date = row[0]
+
+        if not latest_date:
+            return []
+
+        for db_file in db_files:
+            journal = _journal_from_db_file(db_file)
+            with db_connection(db_file) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT openalex_id, title, publication_date, doi,
+                           cited_by_count, abstract, authors_json, topics_json
+                    FROM openalex_articles
+                    WHERE DATE(scraped_at) = ?
+                    ORDER BY publication_date DESC
+                ''', (latest_date,))
+                for row in cursor:
+                    papers.append(_article_row_to_paper(row, journal))
 
     papers.sort(key=lambda p: p.pub_date or '', reverse=True)
     return papers
 
 
 def get_papers_added_since(timestamp: str, journals: list = None, years: list = None) -> list:
-    """Get papers added after a given timestamp.
-
-    Used to show newly added papers after an update.
-    """
+    """Get papers added after a given timestamp."""
     db_files = get_db_files(journals, years)
     papers = []
 
     for db_file in db_files:
-        journal = db_file.name.split('_')[1] if '_' in db_file.name else None
+        journal = _journal_from_db_file(db_file)
 
         with db_connection(db_file) as conn:
             cursor = conn.cursor()
@@ -1198,10 +1041,10 @@ def read_author_csv(csv_path: Path) -> list:
     return authors
 
 
-def save_working_papers(papers: list, db_filename: str = 'working_papers.db', clean: bool = False):
+def save_working_papers(papers: list, clean: bool = False):
     """Save working papers to database."""
     ensure_db_dir()
-    db_path = DB_DIR / db_filename
+    db_path = DB_DIR / 'working_papers.db'
 
     with db_connection(db_path) as conn:
         cursor = conn.cursor()
@@ -1220,9 +1063,18 @@ def save_working_papers(papers: list, db_filename: str = 'working_papers.db', cl
                 author_affiliation TEXT,
                 type TEXT,
                 cited_by_count INTEGER DEFAULT 0,
+                primary_location TEXT,
+                topics_json TEXT,
                 scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+
+        # Add columns if upgrading from old schema
+        existing_cols = {row['name'] for row in conn.execute("PRAGMA table_info(working_papers)").fetchall()}
+        if 'primary_location' not in existing_cols:
+            cursor.execute('ALTER TABLE working_papers ADD COLUMN primary_location TEXT')
+        if 'topics_json' not in existing_cols:
+            cursor.execute('ALTER TABLE working_papers ADD COLUMN topics_json TEXT')
 
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_wp_author ON working_papers(author_name)')
 
@@ -1231,8 +1083,9 @@ def save_working_papers(papers: list, db_filename: str = 'working_papers.db', cl
             try:
                 cursor.execute('''
                     INSERT OR IGNORE INTO working_papers
-                    (openalex_id, title, publication_date, doi, author_name, type, cited_by_count, scraped_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (openalex_id, title, publication_date, doi, author_name, type,
+                     cited_by_count, primary_location, topics_json, scraped_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     paper['openalex_id'],
                     paper['title'],
@@ -1241,6 +1094,8 @@ def save_working_papers(papers: list, db_filename: str = 'working_papers.db', cl
                     paper.get('author_name', ''),
                     paper['type'],
                     paper['cited_by_count'],
+                    paper.get('primary_location'),
+                    json.dumps(paper.get('topics', [])),
                     datetime.now().isoformat()
                 ))
                 if cursor.rowcount > 0:
@@ -1278,21 +1133,14 @@ def update_working_papers(authors: list, year: int = None, max_authors: int = No
             print(f"[{i}/{len(authors)}] {author_name}: {len(papers)} papers")
 
     if all_papers:
-        db_name = f"working_papers{'_' + str(year) if year else ''}.db"
-        new_count = save_working_papers(all_papers, db_name, clean)
+        new_count = save_working_papers(all_papers, clean)
         print(f"Saved {new_count} new working papers")
 
     return all_papers
 
 
 def rank_by_working_papers(top_n: int = 250, years: list = None, topic: str = None) -> list:
-    """Rank authors by working paper count.
-
-    Args:
-        top_n: Number of top authors to return
-        years: Filter by publication years (list of ints)
-        topic: Filter by topic name (partial match)
-    """
+    """Rank authors by working paper count."""
     return rank_authors(top_n=top_n, years=years, topic=topic, source='working-paper')
 
 
@@ -1367,7 +1215,6 @@ def shorten_affiliation(affiliation: str, max_len: int = 18) -> str:
     """Shorten institution name to fit display."""
     if not affiliation:
         return ''
-    # Common shortenings
     s = affiliation
     s = s.replace('University of California', 'UC')
     s = s.replace('University of ', 'U ')
@@ -1403,7 +1250,6 @@ def format_author_row(author: Author, rank: int, width: int = 80) -> str:
     full_name = author.name
     if len(full_name) > 20:
         full_name = full_name[:18] + '..'
-        # Recalculate parts for truncated name
         name_parts = full_name.split()
         if len(name_parts) > 1:
             firstname = ' '.join(name_parts[:-1])
@@ -1420,7 +1266,6 @@ def format_author_row(author: Author, rank: int, width: int = 80) -> str:
         name_formatted = surname
         name_display_len = len(surname)
 
-    # Pad to 20 chars (accounting for ANSI codes)
     padding = ' ' * max(0, 20 - name_display_len)
     name_formatted += padding
 
@@ -1475,12 +1320,18 @@ def _pagination_input(prompt: str, allow_prev: bool = False):
     return ch + input()
 
 
-def _prompt_return_or_chat():
-    """Prompt user to return (Enter) or chat (c). Returns True if chat requested."""
-    print("Press Enter to return, or 'c' to chat: ", end='', flush=True)
-    ch = _getch()
-    print()  # New line after keypress
-    return ch.lower() == 'c'
+def _shorten_topic(name: str) -> str:
+    """Shorten a single topic name using abbreviations."""
+    words = []
+    for w in name.split():
+        wl = w.lower()
+        if wl in TOPIC_FILLER_WORDS:
+            continue
+        if wl in TOPIC_ABBREVIATIONS:
+            words.append(TOPIC_ABBREVIATIONS[wl])
+        else:
+            words.append(w[:4])
+    return ' '.join(words[:4])
 
 
 def format_paper(paper: Paper, index: int) -> str:
@@ -1504,59 +1355,29 @@ def format_paper(paper: Paper, index: int) -> str:
     title = (paper.title or 'Untitled')[:50]
     line1 = f"{index:3}. {journal}{pub_date} ({paper.citations}) {title}"
 
-    # Line 2: authors and topics (brown, shortened)
+    # Line 2: authors and topics
     base_line2 = f"     {authors}"
     line2 = base_line2
     if paper.topics:
-        # Shorten topic names: remove filler words, use common abbreviations
-        FILLER = {'and', 'of', 'the', 'in', 'for', 'on', 'to', 'a', 'an'}
-        ABBREV = {
-            'finance': 'Fin', 'financial': 'Fin', 'economics': 'Econ', 'economic': 'Econ',
-            'market': 'Mkt', 'markets': 'Mkts', 'corporate': 'Corp', 'corporation': 'Corp',
-            'investment': 'Inv', 'investments': 'Inv', 'investor': 'Inv', 'investors': 'Inv',
-            'government': 'Gov', 'governance': 'Gov', 'international': 'Intl',
-            'management': 'Mgmt', 'development': 'Dev', 'regulation': 'Reg',
-            'monetary': 'Mon', 'policy': 'Pol', 'banking': 'Bank', 'behavior': 'Behav',
-            'behavioral': 'Behav', 'sustainable': 'Sust', 'sustainability': 'Sust',
-            'environmental': 'Env', 'volatility': 'Vol', 'dynamics': 'Dyn',
-        }
         topic_names = []
         for t in paper.topics:
             name = t.get('name', '') if isinstance(t, dict) else str(t)
             if name:
-                words = []
-                for w in name.split():
-                    wl = w.lower()
-                    if wl in FILLER:
-                        continue
-                    # Use abbreviation if exists, otherwise truncate to 4 chars
-                    if wl in ABBREV:
-                        words.append(ABBREV[wl])
-                    else:
-                        words.append(w[:4])
-                name = ' '.join(words[:4])
-                topic_names.append(name)
+                topic_names.append(_shorten_topic(name))
 
         if topic_names:
-            # Available space for topics
             available = term_width - len(base_line2) - 5
             if available > 10:
-                # Build topics string, adding as many as fit
                 topics_str = ''
                 included = 0
                 for i, topic in enumerate(topic_names):
-                    if i == 0:
-                        test = topic
-                    else:
-                        test = topics_str + '; ' + topic
-                    # Reserve space for "+" if more topics remain
+                    test = topic if i == 0 else topics_str + '; ' + topic
                     reserve = 2 if i < len(topic_names) - 1 else 0
                     if len(test) <= available - reserve:
                         topics_str = test
                         included += 1
                     else:
                         break
-                # Add "+" if not all topics shown
                 if included < len(topic_names):
                     topics_str += ' +'
                 line2 += f" {BROWN}| {topics_str}{RESET}"
@@ -1575,20 +1396,7 @@ def display_papers(papers: list = None, title: str = None, context_desc: str = N
     """Display papers with pagination and optional chat.
 
     Can either pass papers directly, or pass search parameters to fetch them.
-
-    Args:
-        papers: List of Paper objects (if None, will search using other params)
-        title: Header title to display
-        context_desc: Description for chat context
-        author: Author name to search
-        title_search: Title keyword to search
-        journals: Journal filter
-        years: Year filter
-        topic: Topic filter
-        limit: Max papers to fetch
-        offer_chat: Whether to offer chat option at end
     """
-    # Fetch papers if not provided
     if papers is None:
         papers = search_papers(author=author, title=title_search, journals=journals,
                               years=years, topic=topic, limit=limit)
@@ -1600,7 +1408,6 @@ def display_papers(papers: list = None, title: str = None, context_desc: str = N
             input("Press Enter to return...")
         return
 
-    # Build context description if not provided
     if context_desc is None:
         parts = []
         if author:
@@ -1611,10 +1418,8 @@ def display_papers(papers: list = None, title: str = None, context_desc: str = N
             parts.append(f"topic: {topic}")
         context_desc = ', '.join(parts) if parts else "papers search"
 
-    # Save to context for chat
     save_paper_context(papers, context_desc)
 
-    # Build title if not provided
     if title is None:
         if author:
             title = f"Papers by {author}"
@@ -1623,19 +1428,13 @@ def display_papers(papers: list = None, title: str = None, context_desc: str = N
         else:
             title = "Papers"
 
-    # Build header
     header = f"{'=' * 60}\n{title} ({len(papers)} found)\n{'=' * 60}\n"
 
-    # Calculate pagination - 3 lines per paper (info, authors/topic, doi)
     terminal_lines = shutil.get_terminal_size().lines
     lines_per_paper = 3
-    # Account for header (4 lines) and footer (2 lines)
     papers_per_page = max(3, (terminal_lines - 6) // lines_per_paper)
 
-    # Display with pagination
     indexed_papers = list(enumerate(papers, 1))
-
-    # Chat callback for 'c' key during pagination
     chat_cb = (lambda: chat_with_papers(papers, context_desc)) if offer_chat else None
 
     paginate(indexed_papers, page_size=papers_per_page,
@@ -1657,12 +1456,10 @@ def _find_author_match(query: str, authors: list) -> str:
     """Find best matching author name from query."""
     query_lower = query.lower().strip()
 
-    # Exact match first
     for author in authors:
         if author.name.lower() == query_lower:
             return author.name
 
-    # Partial match (query is substring of name)
     matches = []
     for author in authors:
         if query_lower in author.name.lower():
@@ -1671,7 +1468,6 @@ def _find_author_match(query: str, authors: list) -> str:
     if len(matches) == 1:
         return matches[0]
     elif len(matches) > 1:
-        # Multiple matches - show options
         print(f"\nMultiple matches for '{query}':")
         for i, name in enumerate(matches[:10], 1):
             print(f"  {i}. {name}")
@@ -1698,11 +1494,6 @@ def print_author_table(authors: list, title: str = "Author Rankings", paginated:
     - \\ (backslash): previous page
     - q: quit
     - Or start typing an author name to view their papers
-
-    Args:
-        working_papers: If True, display working papers instead of journal articles
-        years: Year filter to apply when viewing author's papers (for both articles and working papers)
-        topic: Topic filter to apply when viewing author's papers
     """
     width = min(shutil.get_terminal_size().columns, 120)
     page_size = max(10, shutil.get_terminal_size().lines - 8)
@@ -1714,26 +1505,29 @@ def print_author_table(authors: list, title: str = "Author Rankings", paginated:
         print("=" * width)
 
     def print_page(start_idx: int):
-        """Print a page of authors starting at start_idx."""
         batch = authors[start_idx:start_idx + page_size]
         for j, author in enumerate(batch, start_idx + 1):
             print(format_author_row(author, j, width))
 
+    def handle_author_input(name_query):
+        """Handle author name input - show their papers."""
+        match = _find_author_match(name_query.strip(), authors)
+        if match:
+            if working_papers:
+                _display_author_working_papers(match, years)
+            else:
+                display_papers(author=match, journals=journals, years=years, topic=topic)
+            return True
+        else:
+            print(f"No author found matching '{name_query}'")
+            input("Press Enter...")
+            return True
+
     def prompt_for_author():
-        """Prompt user to enter author name, return True to redisplay."""
         try:
             user_input = input("Enter author name (or press Enter to exit): ").strip()
             if user_input:
-                match = _find_author_match(user_input, authors)
-                if match:
-                    if working_papers:
-                        _display_author_working_papers(match, years)
-                    else:
-                        display_papers(author=match, journals=journals, years=years, topic=topic)
-                    return True  # Redisplay
-                else:
-                    print(f"No author found matching '{user_input}'")
-                    return True  # Stay and prompt again
+                return handle_author_input(user_input)
         except EOFError:
             pass
         return False
@@ -1745,7 +1539,6 @@ def print_author_table(authors: list, title: str = "Author Rankings", paginated:
             print(format_author_row(author, i, width))
         print("=" * width)
         print(f"Total: {len(authors)} authors")
-        # Allow author lookup even with single page
         while prompt_for_author():
             print_header()
             for i, author in enumerate(authors, 1):
@@ -1759,55 +1552,32 @@ def print_author_table(authors: list, title: str = "Author Rankings", paginated:
             print_header()
             print_page(i)
 
-            if i + page_size < len(authors):
-                try:
-                    prev = "\\=prev, " if i > 0 else ""
-                    result = _pagination_input(f"[{min(i + page_size, len(authors))}/{len(authors)}] {prev}Enter, q=quit, or name: ", i > 0)
-
-                    if result == 'quit':
-                        break
-                    elif result == 'prev':
-                        i = max(0, i - page_size)
-                    elif result == 'next':
-                        i += page_size
-                    else:
-                        # Author name entered
-                        match = _find_author_match(result.strip(), authors)
-                        if match:
-                            if working_papers:
-                                _display_author_working_papers(match, years)
-                            else:
-                                display_papers(author=match, journals=journals, years=years, topic=topic)
-                        else:
-                            print(f"No author found matching '{result}'")
-                            input("Press Enter...")
-                except (EOFError, KeyboardInterrupt):
-                    break
-            else:
-                # Last page - show footer and allow author lookup or go back
+            is_last_page = i + page_size >= len(authors)
+            if is_last_page:
                 print("=" * width)
                 print(f"Total: {len(authors)} authors")
-                try:
-                    prev = "\\=prev, " if i > 0 else ""
-                    result = _pagination_input(f"{prev}Enter/name: ", i > 0)
 
-                    if result == 'quit' or result == 'next':
+            try:
+                prev = "\\=prev, " if i > 0 else ""
+                if is_last_page:
+                    result = _pagination_input(f"{prev}Enter/name: ", i > 0)
+                else:
+                    result = _pagination_input(
+                        f"[{min(i + page_size, len(authors))}/{len(authors)}] {prev}Enter, q=quit, or name: ",
+                        i > 0
+                    )
+
+                if result == 'quit':
+                    break
+                elif result == 'prev':
+                    i = max(0, i - page_size)
+                elif result == 'next':
+                    if is_last_page:
                         break
-                    elif result == 'prev':
-                        i = max(0, i - page_size)
-                    else:
-                        # Author name entered
-                        match = _find_author_match(result.strip(), authors)
-                        if match:
-                            if working_papers:
-                                _display_author_working_papers(match, years)
-                            else:
-                                display_papers(author=match, journals=journals, years=years, topic=topic)
-                        else:
-                            print(f"No author found matching '{result}'")
-                            input("Press Enter...")
-                except (EOFError, KeyboardInterrupt):
-                    pass
+                    i += page_size
+                else:
+                    handle_author_input(result)
+            except (EOFError, KeyboardInterrupt):
                 break
 
 
@@ -1839,7 +1609,7 @@ def update_articles(journals: list = None, years: list = None, force: bool = Fal
 
     total_new = 0
     total_updated = 0
-    stats = []  # Track per-journal stats for summary
+    stats = []
 
     for journal in expanded:
         for year in years:
@@ -1852,7 +1622,6 @@ def update_articles(journals: list = None, years: list = None, force: bool = Fal
                 total_updated += updated
                 stats.append((journal.upper(), year, new, updated))
 
-    # Print summary if multiple journals/years
     if len(stats) > 1:
         print(f"\n{'='*50}")
         print("Summary:")
@@ -1864,9 +1633,7 @@ def update_articles(journals: list = None, years: list = None, force: bool = Fal
         print(f"  {'Total':6}     : {total_new:3} new, {total_updated:3} updated")
         print(f"{'='*50}")
 
-    # Show new papers from this update
     if total_new > 0:
-        # Get papers added since pre_update_timestamp
         new_papers = get_papers_added_since(
             pre_update_timestamp or '1970-01-01',
             expanded,
@@ -1874,7 +1641,6 @@ def update_articles(journals: list = None, years: list = None, force: bool = Fal
         )
         display_papers(papers=new_papers, title="New Papers Added", offer_chat=False)
     else:
-        # No new papers - show most recent ones from last update that had new papers
         recent = get_recent_papers(expanded, years, limit=20)
         if recent:
             display_papers(papers=recent, title="Most Recent Papers (from previous updates)", offer_chat=False)
@@ -2020,12 +1786,10 @@ def format_papers_for_llm(papers: list, max_papers: int = 50) -> str:
 
 def get_anthropic_api_key() -> str:
     """Get Anthropic API key from environment or .env file."""
-    # Check environment first
     key = os.environ.get('ANTHROPIC_API_KEY')
     if key:
         return key
 
-    # Check .env file
     if ENV_FILE.exists():
         with open(ENV_FILE, 'r') as f:
             for line in f:
@@ -2040,12 +1804,10 @@ def save_anthropic_api_key(key: str):
     """Save Anthropic API key to .env file."""
     lines = []
 
-    # Read existing .env if it exists
     if ENV_FILE.exists():
         with open(ENV_FILE, 'r') as f:
             lines = f.readlines()
 
-    # Update or add the key
     key_found = False
     for i, line in enumerate(lines):
         if line.strip().startswith('ANTHROPIC_API_KEY='):
@@ -2059,7 +1821,6 @@ def save_anthropic_api_key(key: str):
     with open(ENV_FILE, 'w') as f:
         f.writelines(lines)
 
-    # Also set in current environment
     os.environ['ANTHROPIC_API_KEY'] = key
 
 
@@ -2076,7 +1837,6 @@ def chat_with_papers(papers: list = None, query_description: str = ""):
         print("Install with: pip install anthropic")
         return
 
-    # Get or prompt for API key
     api_key = get_anthropic_api_key()
     if not api_key:
         print("Anthropic API key not found.")
@@ -2087,7 +1847,6 @@ def chat_with_papers(papers: list = None, query_description: str = ""):
         save_anthropic_api_key(api_key)
         print(f"API key saved to {ENV_FILE}")
 
-    # Load papers from context if not provided
     if papers is None:
         papers, query_description = load_paper_context()
 
@@ -2097,10 +1856,8 @@ def chat_with_papers(papers: list = None, query_description: str = ""):
         print("         finance-papers topic 'Asset Pricing'")
         return
 
-    # Format papers for context
     paper_context = format_papers_for_llm(papers)
 
-    # System prompt
     system_prompt = f"""You are a helpful research assistant specializing in academic finance and economics.
 You have been given a set of academic papers to discuss. Answer questions about these papers,
 summarize them, compare their findings, or help the user understand the research.
@@ -2110,10 +1867,8 @@ summarize them, compare their findings, or help the user understand the research
 When discussing papers, refer to them by author names and year. Be precise and academic in tone.
 If asked about something not covered in the papers, say so clearly."""
 
-    # Initialize client
     client = anthropic.Anthropic(api_key=api_key)
 
-    # Print header
     print(f"\n{'='*60}")
     print(f"Chat about {len(papers)} papers")
     if query_description:
@@ -2123,7 +1878,6 @@ If asked about something not covered in the papers, say so clearly."""
     print("Type 'papers' to list the papers in context.")
     print()
 
-    # Chat loop
     messages = []
 
     while True:
@@ -2151,12 +1905,9 @@ If asked about something not covered in the papers, say so clearly."""
             print()
             continue
 
-        # Add user message
         messages.append({"role": "user", "content": user_input})
 
-        # Get response from Claude
         try:
-            # Show thinking indicator
             print("\nThinking...", end='', flush=True)
 
             response = client.messages.create(
@@ -2166,8 +1917,7 @@ If asked about something not covered in the papers, say so clearly."""
                 messages=messages
             )
 
-            # Clear thinking indicator and show response
-            print('\r' + ' ' * 12 + '\r', end='')  # Clear "Thinking..."
+            print('\r' + ' ' * 12 + '\r', end='')
 
             assistant_message = response.content[0].text
             messages.append({"role": "assistant", "content": assistant_message})
@@ -2176,4 +1926,4 @@ If asked about something not covered in the papers, say so clearly."""
 
         except anthropic.APIError as e:
             print(f"\nAPI Error: {e}\n")
-            messages.pop()  # Remove failed user message
+            messages.pop()

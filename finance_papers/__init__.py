@@ -25,17 +25,14 @@ from finance_papers.core import (
     get_topic_counts,
     # Papers
     search_papers,
-    get_author_papers,
     get_recent_papers,
     get_papers_from_last_update,
+    get_last_update_date,
     # Working papers
     update_working_papers,
     rank_by_working_papers,
-    # Unified database
-    build_unified_db,
-    iter_unified_papers,
     # High-level
     update_articles,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

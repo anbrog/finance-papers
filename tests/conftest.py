@@ -93,7 +93,7 @@ def sample_db(tmp_path):
 
 @pytest.fixture
 def sample_db_dir(tmp_path, sample_db):
-    """Create a mock DB_DIR with sample database and unified papers.db."""
+    """Create a mock DB_DIR with sample database."""
     # Create out/data structure
     data_dir = tmp_path / 'out' / 'data'
     data_dir.mkdir(parents=True)
@@ -101,65 +101,6 @@ def sample_db_dir(tmp_path, sample_db):
     # Copy sample_db to data_dir
     import shutil
     shutil.copy(sample_db, data_dir / sample_db.name)
-
-    # Build unified papers.db from the sample article DB
-    papers_db = data_dir / 'papers.db'
-    conn = sqlite3.connect(str(papers_db))
-
-    conn.execute('''
-        CREATE TABLE papers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            openalex_id TEXT NOT NULL,
-            title TEXT,
-            publication_date TEXT,
-            doi TEXT,
-            author_name TEXT,
-            author_affiliation TEXT,
-            author_openalex_id TEXT,
-            source TEXT,
-            journal TEXT,
-            cited_by_count INTEGER DEFAULT 0,
-            abstract TEXT,
-            topics_json TEXT,
-            scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(openalex_id, author_name)
-        )
-    ''')
-
-    # Import from article DB
-    article_conn = sqlite3.connect(str(sample_db))
-    article_conn.row_factory = sqlite3.Row
-    cursor = article_conn.cursor()
-    cursor.execute('SELECT * FROM openalex_articles')
-
-    for row in cursor:
-        authors = json.loads(row['authors_json']) if row['authors_json'] else []
-        for author in authors:
-            name = author.get('name')
-            if name:
-                institutions = author.get('institutions', [])
-                affiliation = institutions[0] if institutions else ''
-                conn.execute('''
-                    INSERT OR IGNORE INTO papers
-                    (openalex_id, title, publication_date, doi, author_name,
-                     author_affiliation, source, journal, cited_by_count, topics_json)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    row['openalex_id'],
-                    row['title'],
-                    row['publication_date'],
-                    row['doi'],
-                    name,
-                    affiliation,
-                    'article',
-                    'jf',
-                    row['cited_by_count'] or 0,
-                    row['topics_json'],
-                ))
-
-    conn.commit()
-    conn.close()
-    article_conn.close()
 
     return data_dir
 

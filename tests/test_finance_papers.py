@@ -79,7 +79,6 @@ class TestAuthorRanking:
         from finance_papers import rank_authors
         import finance_papers.core as core
         monkeypatch.setattr(core, 'DB_DIR', sample_db_dir)
-        monkeypatch.setattr(core, 'UNIFIED_DB_PATH', sample_db_dir / 'papers.db')
 
         authors = rank_authors(top_n=10)
 
@@ -92,7 +91,6 @@ class TestAuthorRanking:
         from finance_papers import rank_authors
         import finance_papers.core as core
         monkeypatch.setattr(core, 'DB_DIR', sample_db_dir)
-        monkeypatch.setattr(core, 'UNIFIED_DB_PATH', sample_db_dir / 'papers.db')
 
         authors = rank_authors(top_n=10, by_citations=True)
 
@@ -105,7 +103,6 @@ class TestAuthorRanking:
         from finance_papers import rank_authors, HIGHLIGHTED_AUTHORS
         import finance_papers.core as core
         monkeypatch.setattr(core, 'DB_DIR', sample_db_dir)
-        monkeypatch.setattr(core, 'UNIFIED_DB_PATH', sample_db_dir / 'papers.db')
 
         authors = rank_authors(top_n=100)
         author_names = [a.name for a in authors]
@@ -138,11 +135,11 @@ class TestPaperSearch:
         assert 'Machine Learning' in papers[0].title
 
     def test_get_author_papers(self, sample_db_dir, monkeypatch):
-        from finance_papers import get_author_papers
+        from finance_papers import search_papers
         import finance_papers.core as core
         monkeypatch.setattr(core, 'DB_DIR', sample_db_dir)
 
-        papers = get_author_papers('Eugene Fama')
+        papers = search_papers(author='Eugene Fama')
 
         assert len(papers) == 2
 
