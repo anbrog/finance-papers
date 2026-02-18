@@ -661,15 +661,18 @@ Examples:
         source = 'working-papers' if args.working_papers else 'articles'
         label = "Working Papers" if args.working_papers else "Papers"
 
+        last_date = get_last_update_date(source=source)
+        date_suffix = f" [{last_date}]" if last_date else ""
+
         if args.recent:
             limit = args.top or 40
             papers = get_recent_papers(source=source, limit=limit)
             context_desc = f"recent {label.lower()}"
-            title = f"Most Recent {label}"
+            title = f"Most Recent {label}{date_suffix}"
         else:
             papers = get_papers_from_last_update(source=source)
             context_desc = f"{label.lower()} from last update"
-            title = f"{label} from Last Update"
+            title = f"{label} from Last Update{date_suffix}"
 
         if not papers:
             print(f"No {source} in database. Run 'finance-papers update' first.")
