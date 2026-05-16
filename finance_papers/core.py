@@ -34,8 +34,31 @@ SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 DB_DIR = PROJECT_ROOT / 'out' / 'data'
 CONFIG_DIR = Path.home() / '.finance-papers'
+CACHE_DIR = Path.home() / '.cache' / 'finance-papers'
 CONTEXT_FILE = CONFIG_DIR / 'context.json'
 ENV_FILE = PROJECT_ROOT / '.env'
+READ_FILE = DB_DIR / 'read_papers.json'
+
+
+def _load_dotenv(path: Path) -> None:
+    """Populate os.environ from a KEY=VALUE .env file. Existing env wins."""
+    if not path.exists():
+        return
+    try:
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith('#') or '=' not in line:
+                continue
+            key, _, val = line.partition('=')
+            key = key.strip()
+            val = val.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = val
+    except OSError:
+        pass
+
+
+_load_dotenv(ENV_FILE)
 
 # OpenAlex API
 OPENALEX_BASE_URL = "https://api.openalex.org"
@@ -85,6 +108,275 @@ TOPIC_ABBREVIATIONS = {
 
 
 # =============================================================================
+# READ TRACKING
+# =============================================================================
+
+def load_read_set() -> set:
+    """Load the set of read paper openalex_ids."""
+    if READ_FILE.exists():
+        return set(json.loads(READ_FILE.read_text()))
+    return set()
+
+
+def save_read_set(read_set: set):
+    """Persist the set of read paper openalex_ids."""
+    READ_FILE.parent.mkdir(parents=True, exist_ok=True)
+    READ_FILE.write_text(json.dumps(sorted(read_set)))
+
+
+def toggle_read(openalex_id: str) -> bool:
+    """Toggle read status for a paper. Returns new read state."""
+    read_set = load_read_set()
+    if openalex_id in read_set:
+        read_set.discard(openalex_id)
+        is_read = False
+    else:
+        read_set.add(openalex_id)
+        is_read = True
+    save_read_set(read_set)
+    return is_read
+
+
+# =============================================================================
+# PEEK CACHE
+# =============================================================================
+
+def _peek_cache_path(source: str) -> Path:
+    """Return cache file path for a peek source ('articles' or 'working-papers')."""
+    return CACHE_DIR / f'peek_{source.replace("-", "_")}.json'
+
+
+def save_peek_cache(papers: list, source: str):
+    """Save peek results to cache."""
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    data = {
+        'cached_at': datetime.now().isoformat(),
+        'papers': [
+            {
+                'title': p.title,
+                'authors': p.authors,
+                'year': p.year,
+                'pub_date': p.pub_date,
+                'citations': p.citations,
+                'abstract': p.abstract,
+                'doi': p.doi,
+                'openalex_id': p.openalex_id,
+                'topics': p.topics,
+                'journal': p.journal,
+                'queried_author': p.queried_author,
+            }
+            for p in papers
+        ],
+    }
+    _peek_cache_path(source).write_text(json.dumps(data))
+
+
+def load_peek_cache(source: str, max_age_minutes: Optional[int] = 30) -> Optional[list]:
+    """Load peek results from cache if fresh enough. Returns None if stale/missing.
+
+    Pass max_age_minutes=None to load the cache regardless of age.
+    """
+    path = _peek_cache_path(source)
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text())
+        cached_at = datetime.fromisoformat(data['cached_at'])
+        age_minutes = (datetime.now() - cached_at).total_seconds() / 60
+        if max_age_minutes is not None and age_minutes > max_age_minutes:
+            return None
+        return [
+            Paper(
+                title=p['title'],
+                authors=p.get('authors', []),
+                year=p.get('year'),
+                pub_date=p.get('pub_date'),
+                citations=p.get('citations', 0),
+                abstract=p.get('abstract'),
+                doi=p.get('doi'),
+                openalex_id=p.get('openalex_id'),
+                topics=p.get('topics', []),
+                journal=p.get('journal'),
+                queried_author=p.get('queried_author'),
+            )
+            for p in data.get('papers', [])
+        ]
+    except (json.JSONDecodeError, KeyError, ValueError):
+        return None
+
+
+def peek_cache_age_minutes(source: str) -> Optional[float]:
+    """Return numeric age (minutes) of the cache, or None if no cache."""
+    path = _peek_cache_path(source)
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text())
+        cached_at = datetime.fromisoformat(data['cached_at'])
+        return (datetime.now() - cached_at).total_seconds() / 60
+    except (json.JSONDecodeError, KeyError, ValueError):
+        return None
+
+
+def peek_cache_age(source: str) -> Optional[str]:
+    """Return human-readable age of the cache, or None if no cache."""
+    path = _peek_cache_path(source)
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text())
+        cached_at = datetime.fromisoformat(data['cached_at'])
+        minutes = int((datetime.now() - cached_at).total_seconds() / 60)
+        if minutes < 1:
+            return "just now"
+        elif minutes < 60:
+            return f"{minutes}m ago"
+        else:
+            return f"{minutes // 60}h {minutes % 60}m ago"
+    except (json.JSONDecodeError, KeyError, ValueError):
+        return None
+
+
+# =============================================================================
+# NTFY NOTIFICATIONS
+# =============================================================================
+
+def _ntfy_default_topic(working_papers: bool = False) -> str:
+    """Topic name from $NTFY_TOPIC, else derived from the source."""
+    env_topic = os.environ.get('NTFY_TOPIC')
+    if env_topic:
+        return env_topic
+    return 'finance-papers-w' if working_papers else 'finance-papers'
+
+
+def _ntfy_post(title: str, body: str, click: Optional[str] = None,
+               priority: Optional[str] = None,
+               working_papers: bool = False) -> bool:
+    """Low-level ntfy.sh POST. Returns True on success, False on error."""
+    topic = _ntfy_default_topic(working_papers)
+    server = os.environ.get('NTFY_SERVER', 'https://ntfy.sh').rstrip('/')
+    token = os.environ.get('NTFY_TOKEN')
+    headers = {'Title': title, 'Tags': 'books'}
+    if priority:
+        headers['Priority'] = priority
+    if click:
+        headers['Click'] = click
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
+    try:
+        resp = requests.post(f'{server}/{topic}',
+                             data=body.encode('utf-8'),
+                             headers=headers, timeout=10)
+        return resp.ok
+    except requests.RequestException:
+        return False
+
+
+def notify_ntfy_heartbeat(label: str = "Papers", since: str = "",
+                          total_fetched: int = 0,
+                          working_papers: bool = False) -> bool:
+    """Send a 'still alive, no new papers' notification at low priority."""
+    ts = datetime.now().strftime('%Y-%m-%d %H:%M')
+    title = f"No new {label.lower()}{since}"
+    body = f"Checked at {ts}. Fetched {total_fetched} papers from API; none new vs cache."
+    return _ntfy_post(title, body, priority='low', working_papers=working_papers)
+
+
+NTFY_DEFAULT_CAP = 20
+
+
+def notify_ntfy(papers: list, since: str = "", working_papers: bool = False) -> int:
+    """Push one ntfy.sh notification per new paper, capped to NTFY_CAP (default 20).
+
+    Topic default depends on `working_papers`: 'finance-papers-w' if True else
+    'finance-papers'. Override with $NTFY_TOPIC.
+    Server from $NTFY_SERVER (default: 'https://ntfy.sh'). Set NTFY_TOKEN for auth.
+    Cap from $NTFY_CAP (default 20). When papers > cap, the first `cap` get
+    individual notifications and one extra summary notification is sent for the rest.
+    Returns the number of notifications successfully sent (individuals + summary).
+    Network errors are swallowed so a cron call never crashes.
+    """
+    if not papers:
+        return 0
+
+    topic = _ntfy_default_topic(working_papers)
+    server = os.environ.get('NTFY_SERVER', 'https://ntfy.sh').rstrip('/')
+    token = os.environ.get('NTFY_TOKEN')
+    try:
+        cap = int(os.environ.get('NTFY_CAP', NTFY_DEFAULT_CAP))
+    except ValueError:
+        cap = NTFY_DEFAULT_CAP
+    if cap < 0:
+        cap = NTFY_DEFAULT_CAP
+    url = f'{server}/{topic}'
+
+    auth_header = {'Authorization': f'Bearer {token}'} if token else {}
+
+    individuals = papers[:cap] if cap > 0 else []
+    overflow = papers[cap:] if cap > 0 else papers
+
+    sent = 0
+    for p in individuals:
+        authors = ', '.join((a.split()[-1] if a else '') for a in (p.authors or [])[:3])
+        if p.authors and len(p.authors) > 3:
+            authors += ' et al.'
+        j = getattr(p, 'journal', '') or ''
+
+        title_parts = []
+        if j:
+            title_parts.append(f"[{j}]")
+        if authors:
+            title_parts.append(authors)
+        title_text = ' '.join(title_parts) or 'New paper'
+        if since:
+            title_text += f"{since}"
+
+        body = (p.title or '').strip() or '(untitled)'
+
+        headers = {'Title': title_text, 'Tags': 'books', **auth_header}
+        doi = getattr(p, 'doi', None)
+        if doi:
+            headers['Click'] = doi if doi.startswith('http') else f'https://doi.org/{doi}'
+        elif getattr(p, 'openalex_id', None):
+            headers['Click'] = p.openalex_id
+
+        try:
+            resp = requests.post(url, data=body.encode('utf-8'),
+                                 headers=headers, timeout=10)
+            if resp.ok:
+                sent += 1
+        except requests.RequestException:
+            pass
+
+    if overflow:
+        lines = []
+        for p in overflow[:15]:
+            authors = ', '.join((a.split()[-1] if a else '') for a in (p.authors or [])[:2])
+            if p.authors and len(p.authors) > 2:
+                authors += ' et al.'
+            j = getattr(p, 'journal', '') or ''
+            t = (p.title or '').strip()
+            if len(t) > 80:
+                t = t[:77] + '…'
+            prefix = f"[{j}] " if j else ''
+            lines.append(f"• {prefix}{authors} — {t}" if authors else f"• {prefix}{t}")
+        if len(overflow) > 15:
+            lines.append(f"… and {len(overflow) - 15} more not listed")
+        summary_title = f"… and {len(overflow)} more new papers{since}"
+        summary_body = '\n'.join(lines)
+        summary_headers = {'Title': summary_title, 'Tags': 'books', **auth_header}
+        try:
+            resp = requests.post(url, data=summary_body.encode('utf-8'),
+                                 headers=summary_headers, timeout=10)
+            if resp.ok:
+                sent += 1
+        except requests.RequestException:
+            pass
+
+    return sent
+
+
+# =============================================================================
 # DATA TYPES
 # =============================================================================
 
@@ -96,6 +388,7 @@ class Author:
     citations: int = 0
     affiliation: Optional[str] = None
     latest_paper: tuple = ('', '')  # (date, title)
+    wp_count: int = 0
 
 
 @dataclass
@@ -110,6 +403,7 @@ class Paper:
     openalex_id: Optional[str] = None
     topics: list = field(default_factory=list)
     journal: Optional[str] = None
+    queried_author: Optional[str] = None  # author whose query found this paper
 
 
 # =============================================================================
@@ -289,8 +583,9 @@ def _rate_limited_request(url: str, params: dict = None, timeout: int = 30, max_
         with _request_lock:
             now = time.time()
             elapsed = now - _last_request_time
-            if elapsed < 0.2:  # 200ms minimum between requests
-                time.sleep(0.2 - elapsed)
+            min_interval = 0.05 if OPENALEX_MAILTO else 0.1  # 20/s polite, 10/s free
+            if elapsed < min_interval:
+                time.sleep(min_interval - elapsed)
             _last_request_time = time.time()
 
         try:
@@ -379,7 +674,8 @@ def fetch_journal_articles(journal: str, year: int, force: bool = False) -> list
         cursor = data.get("meta", {}).get("next_cursor")
         print(f"Fetched {len(articles)} articles...", end='\r', flush=True)
 
-    print(f"Fetched {len(articles)} articles from {JOURNALS[journal]['name']} ({year})")
+    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(f"[{ts}] Fetched {len(articles)} articles from {JOURNALS[journal]['name']} ({year})")
     return articles
 
 
@@ -388,7 +684,7 @@ def fetch_author_works(author_id: str, from_year: int = None) -> list:
     if author_id.startswith('https://openalex.org/'):
         author_id = author_id.split('/')[-1]
 
-    all_papers = []
+    all_papers = {}  # keyed by openalex_id to deduplicate
 
     # Fetch non-article works and SSRN papers
     for type_filter in ["type:!article", "primary_location.source.id:S4210172589"]:
@@ -408,6 +704,10 @@ def fetch_author_works(author_id: str, from_year: int = None) -> list:
 
             data = resp.json()
             for work in data.get("results", []):
+                oa_id = work.get("id")
+                if oa_id in all_papers:
+                    continue
+
                 # Skip AEA RCT Registry entries (trial registrations, not papers)
                 doi = work.get("doi") or ""
                 if "10.1257/rct" in doi:
@@ -427,8 +727,14 @@ def fetch_author_works(author_id: str, from_year: int = None) -> list:
                     for t in work.get("topics", [])[:5]
                 ]
 
-                all_papers.append({
-                    "openalex_id": work.get("id"),
+                authors = [
+                    auth.get("author", {}).get("display_name")
+                    for auth in work.get("authorships", [])
+                    if auth.get("author", {}).get("display_name")
+                ]
+
+                all_papers[oa_id] = {
+                    "openalex_id": oa_id,
                     "title": work.get("title"),
                     "publication_date": work.get("publication_date"),
                     "doi": doi,
@@ -436,11 +742,12 @@ def fetch_author_works(author_id: str, from_year: int = None) -> list:
                     "cited_by_count": work.get("cited_by_count", 0),
                     "primary_location": primary_location,
                     "topics": topics,
-                })
+                    "authors": authors,
+                }
 
             cursor = data.get("meta", {}).get("next_cursor")
 
-    return all_papers
+    return list(all_papers.values())
 
 
 # =============================================================================
@@ -530,18 +837,26 @@ def rank_authors(journals: list = None, years: list = None, top_n: int = 250,
         topic: Filter by topic (partial match)
         source: Filter by 'article' or 'working-paper' (None = both)
     """
-    author_stats = defaultdict(lambda: {'count': 0, 'citations': 0, 'latest': ('', ''), 'affiliation': ''})
+    author_stats = defaultdict(lambda: {'count': 0, 'wp_count': 0, 'citations': 0, 'latest': ('', ''), 'affiliation': ''})
 
     # Initialize highlighted authors
     for name in HIGHLIGHTED_AUTHORS:
         author_stats[name]
 
-    # Count articles
+    # Count articles (always — ranking is based on published papers only)
     if source is None or source == 'article':
         db_files = get_db_files(journals, years)
+        seen_articles = set()
         for article in iter_articles(db_files):
             if topic and not _matches_topic(article.get('topics', []), topic):
                 continue
+
+            # Deduplicate across per-journal/per-year DBs
+            oa_id = article.get('openalex_id')
+            if oa_id and oa_id in seen_articles:
+                continue
+            if oa_id:
+                seen_articles.add(oa_id)
 
             citations = article.get('citations', 0) or 0
             pub_date = article.get('pub_date') or ''
@@ -560,7 +875,7 @@ def rank_authors(journals: list = None, years: list = None, top_n: int = 250,
                     if institutions:
                         stats['affiliation'] = institutions[0]
 
-    # Count working papers
+    # Count working papers (always — shown as a separate column, not used for ranking)
     if source is None or source == 'working-paper':
         for wp in iter_working_papers():
             # Year filter
@@ -572,21 +887,13 @@ def rank_authors(journals: list = None, years: list = None, top_n: int = 250,
             if topic and not _matches_topic(wp.get('topics', []), topic):
                 continue
 
-            citations = wp.get('citations', 0) or 0
-            pub_date = wp.get('pub_date') or ''
-            title = wp.get('title') or ''
-
             for author in wp['authors']:
                 name = normalize_name(author.get('name') or '')
                 if not name:
                     continue
-                stats = author_stats[name]
-                stats['count'] += 1
-                stats['citations'] += citations
-                if pub_date > stats['latest'][0]:
-                    stats['latest'] = (pub_date, title)
+                author_stats[name]['wp_count'] += 1
 
-    # Sort
+    # Sort by published papers only (articles), not WPs
     if by_citations:
         ranked = sorted(author_stats.items(),
                        key=lambda x: (x[1]['citations'], x[1]['count']), reverse=True)
@@ -599,6 +906,7 @@ def rank_authors(journals: list = None, years: list = None, top_n: int = 250,
         Author(
             name=name,
             paper_count=stats['count'],
+            wp_count=stats['wp_count'],
             citations=stats['citations'],
             latest_paper=stats['latest'],
             affiliation=stats['affiliation'],
@@ -745,15 +1053,24 @@ def _wp_row_to_paper(row) -> Paper:
     topics = json.loads(topics_json) if topics_json else []
     primary_loc = row['primary_location'] if 'primary_location' in row.keys() else None
     openalex_id = row['openalex_id'] if 'openalex_id' in row.keys() else None
+    authors_json = row['authors_json'] if 'authors_json' in row.keys() else None
+    if authors_json:
+        authors = json.loads(authors_json)
+    elif row['author_name']:
+        authors = [row['author_name']]
+    else:
+        authors = []
+    queried = row['author_name'] if row['author_name'] else None
     return Paper(
         title=row['title'],
-        authors=[row['author_name']] if row['author_name'] else [],
+        authors=authors,
         pub_date=row['publication_date'],
         citations=row['cited_by_count'] or 0,
         doi=row['doi'],
         openalex_id=openalex_id,
         journal=_short_source(primary_loc),
         topics=topics,
+        queried_author=queried,
     )
 
 
@@ -795,6 +1112,7 @@ def iter_working_papers():
 
         has_primary_location = 'primary_location' in col_names
         has_topics_json = 'topics_json' in col_names
+        has_authors_json = 'authors_json' in col_names
 
         columns = ['openalex_id', 'title', 'publication_date', 'doi',
                     'cited_by_count', 'author_name']
@@ -802,6 +1120,8 @@ def iter_working_papers():
             columns.append('primary_location')
         if has_topics_json:
             columns.append('topics_json')
+        if has_authors_json:
+            columns.append('authors_json')
 
         cursor.execute(f'''
             SELECT {', '.join(columns)}
@@ -820,7 +1140,7 @@ def iter_working_papers():
                 'pub_date': row['publication_date'],
                 'doi': row['doi'],
                 'citations': row['cited_by_count'] or 0,
-                'authors': [{'name': row['author_name']}] if row['author_name'] else [],
+                'authors': [a if isinstance(a, dict) else {'name': a} for a in json.loads(row['authors_json'])] if has_authors_json and row['authors_json'] else ([{'name': row['author_name']}] if row['author_name'] else []),
                 'topics': topics,
                 'abstract': None,
                 'journal': _short_source(primary_loc),
@@ -846,6 +1166,8 @@ def get_recent_papers(journals: list = None, years: list = None, limit: int = 20
                 columns.append('primary_location')
             if 'topics_json' in col_names:
                 columns.append('topics_json')
+            if 'authors_json' in col_names:
+                columns.append('authors_json')
 
             cursor = conn.cursor()
             cursor.execute(f'''
@@ -922,6 +1244,42 @@ def get_last_update_date(source: str = 'articles') -> Optional[str]:
         return ts[:10] if len(ts) >= 10 else ts
 
 
+def get_previous_update_date(source: str = 'articles') -> Optional[str]:
+    """Get the second-most-recent update date (the update before the latest).
+
+    Returns a date string like '2025-04-28', or None if there's only one update.
+    """
+    if source == 'working-papers':
+        db_path = DB_DIR / 'working_papers.db'
+        if not db_path.exists():
+            return None
+        with db_connection(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT DISTINCT DATE(scraped_at) as d
+                FROM working_papers
+                ORDER BY d DESC
+                LIMIT 2
+            ''')
+            dates = [row[0] for row in cursor]
+            return dates[1] if len(dates) >= 2 else None
+    else:
+        # Collect all distinct scraped_at dates across article DBs
+        all_dates = set()
+        for db_file in get_db_files():
+            with db_connection(db_file) as conn:
+                cursor = conn.cursor()
+                try:
+                    cursor.execute('SELECT DISTINCT DATE(scraped_at) FROM openalex_articles')
+                    all_dates.update(row[0] for row in cursor if row[0])
+                except sqlite3.OperationalError:
+                    pass
+        if len(all_dates) < 2:
+            return None
+        sorted_dates = sorted(all_dates, reverse=True)
+        return sorted_dates[1]
+
+
 def get_papers_from_last_update(journals: list = None, years: list = None,
                                 source: str = 'articles') -> list:
     """Get papers from the most recent update batch.
@@ -952,6 +1310,8 @@ def get_papers_from_last_update(journals: list = None, years: list = None,
                 columns.append('primary_location')
             if 'topics_json' in col_names:
                 columns.append('topics_json')
+            if 'authors_json' in col_names:
+                columns.append('authors_json')
 
             cursor.execute(f'''
                 SELECT {', '.join(columns)}
@@ -996,6 +1356,63 @@ def get_papers_from_last_update(journals: list = None, years: list = None,
 
     papers.sort(key=lambda p: p.pub_date or '', reverse=True)
     return papers
+
+
+def peek_new_articles(journals: list = None, years: list = None) -> list:
+    """Fetch articles from OpenAlex and return only those not already in the DB.
+
+    Does NOT save anything — a read-only preview of what 'update' would add.
+    """
+    if journals is None:
+        journals = ['top3']
+    if years is None:
+        years = [datetime.now().year]
+
+    # Expand journal groups
+    expanded = []
+    for j in journals:
+        if j in JOURNAL_GROUPS:
+            expanded.extend(JOURNAL_GROUPS[j])
+        elif j in JOURNALS:
+            expanded.append(j)
+
+    # Collect existing openalex_ids
+    existing_ids = set()
+    for journal in expanded:
+        for year in years:
+            db_path = DB_DIR / f'openalex_{journal}_{year}.db'
+            if db_path.exists():
+                with db_connection(db_path) as conn:
+                    cursor = conn.cursor()
+                    try:
+                        cursor.execute('SELECT openalex_id FROM openalex_articles')
+                        existing_ids.update(row['openalex_id'] for row in cursor)
+                    except sqlite3.OperationalError:
+                        pass
+
+    # Fetch from API and filter to new only
+    new_papers = []
+    for journal in expanded:
+        for year in years:
+            articles = fetch_journal_articles(journal, year)
+            for article in articles:
+                if article['id'] not in existing_ids:
+                    topics = article.get('topics', [])
+                    new_papers.append(Paper(
+                        title=article['title'],
+                        authors=[a.get('name') for a in article['authors'] if a.get('name')],
+                        pub_date=article['publication_date'],
+                        year=int(article['publication_date'][:4]) if article.get('publication_date') else None,
+                        citations=article.get('cited_by_count', 0),
+                        abstract=article.get('abstract'),
+                        doi=article['doi'],
+                        openalex_id=article['id'],
+                        topics=topics,
+                        journal=journal,
+                    ))
+
+    new_papers.sort(key=lambda p: p.pub_date or '', reverse=True)
+    return new_papers
 
 
 def get_papers_added_since(timestamp: str, journals: list = None, years: list = None) -> list:
@@ -1075,6 +1492,8 @@ def save_working_papers(papers: list, clean: bool = False):
             cursor.execute('ALTER TABLE working_papers ADD COLUMN primary_location TEXT')
         if 'topics_json' not in existing_cols:
             cursor.execute('ALTER TABLE working_papers ADD COLUMN topics_json TEXT')
+        if 'authors_json' not in existing_cols:
+            cursor.execute('ALTER TABLE working_papers ADD COLUMN authors_json TEXT')
 
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_wp_author ON working_papers(author_name)')
 
@@ -1084,8 +1503,8 @@ def save_working_papers(papers: list, clean: bool = False):
                 cursor.execute('''
                     INSERT OR IGNORE INTO working_papers
                     (openalex_id, title, publication_date, doi, author_name, type,
-                     cited_by_count, primary_location, topics_json, scraped_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     cited_by_count, primary_location, topics_json, authors_json, scraped_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     paper['openalex_id'],
                     paper['title'],
@@ -1096,6 +1515,7 @@ def save_working_papers(papers: list, clean: bool = False):
                     paper['cited_by_count'],
                     paper.get('primary_location'),
                     json.dumps(paper.get('topics', [])),
+                    json.dumps(paper.get('authors', [])),
                     datetime.now().isoformat()
                 ))
                 if cursor.rowcount > 0:
@@ -1108,11 +1528,25 @@ def save_working_papers(papers: list, clean: bool = False):
     return new_count
 
 
+def _dedup_authors(authors: list) -> list:
+    """Deduplicate authors by OpenAlex ID, keeping first occurrence."""
+    seen_ids = set()
+    unique = []
+    for a in authors:
+        if a.openalex_id:
+            if a.openalex_id in seen_ids:
+                continue
+            seen_ids.add(a.openalex_id)
+        unique.append(a)
+    return unique
+
+
 def update_working_papers(authors: list, year: int = None, max_authors: int = None,
                           clean: bool = False):
     """Fetch and store working papers for authors."""
     if max_authors:
         authors = authors[:max_authors]
+    authors = _dedup_authors(authors)
 
     all_papers = []
 
@@ -1124,19 +1558,109 @@ def update_working_papers(authors: list, year: int = None, max_authors: int = No
             return author.name, papers
         return author.name, []
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    t0 = time.time()
+    workers = 20 if OPENALEX_MAILTO else 10
+    with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {executor.submit(fetch_for_author, a): a for a in authors}
 
         for i, future in enumerate(as_completed(futures), 1):
             author_name, papers = future.result()
             all_papers.extend(papers)
-            print(f"[{i}/{len(authors)}] {author_name}: {len(papers)} papers")
+            print(f"\r\033[K[{i}/{len(authors)}] {author_name}: {len(papers)} papers", end='', flush=True)
 
+    elapsed = time.time() - t0
+    print(f"\nFetched {len(all_papers)} working papers in {elapsed:.1f}s")
     if all_papers:
         new_count = save_working_papers(all_papers, clean)
         print(f"Saved {new_count} new working papers")
 
     return all_papers
+
+
+def peek_new_working_papers(authors: list = None, year: int = None,
+                            max_authors: int = None) -> list:
+    """Fetch working papers from OpenAlex and return only those not already in the DB.
+
+    Does NOT save anything — a read-only preview of what 'update -w' would add.
+    """
+    # Load author list from CSV if not provided
+    if authors is None:
+        pattern = str(DB_DIR / 'author_list_*.csv')
+        csv_files = glob.glob(pattern)
+        if not csv_files:
+            print("No author list found. Run 'finance-papers rank -o' first.")
+            return []
+        csv_file = max(csv_files, key=lambda x: Path(x).stat().st_mtime)
+        authors = read_author_csv(Path(csv_file))
+        print(f"Using: {Path(csv_file).name} ({len(authors)} authors)")
+
+    if max_authors:
+        authors = authors[:max_authors]
+    authors = _dedup_authors(authors)
+
+    if year is None:
+        year = datetime.now().year  # fetch_author_works subtracts 1, so this covers current + previous year
+
+    # Collect existing openalex_ids from working papers DB
+    existing_ids = set()
+    db_path = DB_DIR / 'working_papers.db'
+    if db_path.exists():
+        with db_connection(db_path) as conn:
+            try:
+                cursor = conn.cursor()
+                cursor.execute('SELECT openalex_id FROM working_papers')
+                existing_ids.update(row['openalex_id'] for row in cursor)
+            except sqlite3.OperationalError:
+                pass
+
+    # Fetch from API in parallel, filter to new only
+    all_papers = []
+
+    def fetch_for_author(author):
+        if author.openalex_id:
+            papers = fetch_author_works(author.openalex_id, year)
+            for p in papers:
+                p['author_name'] = author.name
+            return author.name, papers
+        return author.name, []
+
+    t0 = time.time()
+    workers = 20 if OPENALEX_MAILTO else 10
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = {executor.submit(fetch_for_author, a): a for a in authors}
+        for i, future in enumerate(as_completed(futures), 1):
+            author_name, papers = future.result()
+            new = [p for p in papers if p['openalex_id'] not in existing_ids]
+            all_papers.extend(new)
+            # Clear line and show progress
+            print(f"\r\033[K[{i}/{len(authors)}] {author_name}", end='', flush=True)
+            if new:
+                print(f": {len(new)} new")
+
+    elapsed = time.time() - t0
+    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(f"\r\033[K[{ts}] Fetched {len(authors)} authors in {elapsed:.1f}s, {len(all_papers)} new papers")
+
+    # Convert to Paper objects
+    result = []
+    for p in all_papers:
+        topics = p.get('topics', [])
+        primary_loc = p.get('primary_location')
+        result.append(Paper(
+            title=p['title'],
+            authors=p.get('authors') or ([p.get('author_name', '')] if p.get('author_name') else []),
+            pub_date=p['publication_date'],
+            year=int(p['publication_date'][:4]) if p.get('publication_date') else None,
+            citations=p.get('cited_by_count', 0),
+            doi=p.get('doi'),
+            openalex_id=p['openalex_id'],
+            topics=topics,
+            journal=_short_source(primary_loc),
+            queried_author=p.get('author_name'),
+        ))
+
+    result.sort(key=lambda p: p.pub_date or '', reverse=True)
+    return result
 
 
 def rank_by_working_papers(top_n: int = 250, years: list = None, topic: str = None) -> list:
@@ -1149,7 +1673,8 @@ def rank_by_working_papers(top_n: int = 250, years: list = None, topic: str = No
 # =============================================================================
 
 def paginate(items: list, page_size: int = None, formatter=None, header: str = None,
-             chat_callback=None):
+             chat_callback=None, next_callback=None, next_label: str = "next",
+             read_callback=None, find_callback=None):
     """Display items with pagination.
 
     Args:
@@ -1158,6 +1683,11 @@ def paginate(items: list, page_size: int = None, formatter=None, header: str = N
         formatter: Function to format each item
         header: Header to repeat on each page
         chat_callback: Optional function to call when 'c' is pressed (for chat)
+        next_callback: Optional function to call when Enter is pressed on last page
+        next_label: Label shown for next_callback in nav hint (e.g. "working papers")
+        read_callback: Optional function to call when 'r' is pressed (toggle read)
+        find_callback: Optional function to call when '/' is pressed. Should return
+            an int item index to jump to (page containing that index), or None to stay.
     """
     if page_size is None:
         page_size = max(5, shutil.get_terminal_size().lines - 8)
@@ -1188,6 +1718,12 @@ def paginate(items: list, page_size: int = None, formatter=None, header: str = N
             nav.append("\\ back")
         if page_num < total_pages - 1:
             nav.append("Enter next")
+        elif next_callback:
+            nav.append(f"Enter {next_label}")
+        if find_callback:
+            nav.append("/ find")
+        if read_callback:
+            nav.append("r read")
         if chat_callback:
             nav.append("c chat")
         nav.append("q exit")
@@ -1204,6 +1740,16 @@ def paginate(items: list, page_size: int = None, formatter=None, header: str = N
             current_page -= 1
         elif key in ('\r', '\n', ' ') and current_page < total_pages - 1:
             current_page += 1
+        elif key in ('\r', '\n', ' ') and current_page >= total_pages - 1 and next_callback:
+            next_callback()
+            break
+        elif key == 'r' and read_callback:
+            read_callback()
+            # Redisplay current page to show updated read marks
+        elif key == '/' and find_callback:
+            idx = find_callback()
+            if isinstance(idx, int) and 0 <= idx < len(items):
+                current_page = idx // page_size
         elif key == 'c' and chat_callback:
             chat_callback()
             # After chat, continue showing papers
@@ -1273,10 +1819,12 @@ def format_author_row(author: Author, rank: int, width: int = 80) -> str:
     date = author.latest_paper[0][:7] if author.latest_paper[0] else '       '
     title = author.latest_paper[1][:28] + '..' if len(author.latest_paper[1]) > 30 else author.latest_paper[1]
 
+    wp_str = str(author.wp_count) if author.wp_count > 0 else '-'
+
     if author.name in HIGHLIGHTED_AUTHORS:
-        line = f"{rank:>4} {author.paper_count:>4} {BLUE}{author.citations:>6}{RESET}  {BLUE}{author.name:<20}{RESET} {BLUE}{affil:<10}{RESET} {BLUE}{date}{RESET} {title}"
+        line = f"{rank:>4} {author.paper_count:>4} {GRAY}{wp_str:>4}{RESET} {BLUE}{author.citations:>6}{RESET}  {BLUE}{author.name:<20}{RESET} {BLUE}{affil:<10}{RESET} {BLUE}{date}{RESET} {title}"
     else:
-        line = f"{rank:>4} {author.paper_count:>4} {GRAY}{author.citations:>6}{RESET}  {name_formatted} {GRAY}{affil:<10}{RESET} {GRAY}{date}{RESET} {title}"
+        line = f"{rank:>4} {author.paper_count:>4} {GRAY}{wp_str:>4}{RESET} {GRAY}{author.citations:>6}{RESET}  {name_formatted} {GRAY}{affil:<10}{RESET} {GRAY}{date}{RESET} {title}"
 
     return line
 
@@ -1348,12 +1896,17 @@ def format_paper(paper: Paper, index: int) -> str:
     authors = ', '.join(surnames)
     if len(paper.authors) > 3:
         authors += ' +'
+    if paper.queried_author:
+        queried_surname = paper.queried_author.split()[-1] if paper.queried_author.split() else paper.queried_author
+        authors = f"[{queried_surname}] {authors}"
     journal = f"[{paper.journal.upper()}] " if paper.journal else ''
     pub_date = paper.pub_date or 'N/A'
 
-    # Line 1: index, journal, date, citations, title
+    # Line 1: index, read indicator, journal, date, citations, title
+    read_set = load_read_set()
+    read_mark = "\033[32mx\033[0m" if paper.openalex_id and paper.openalex_id in read_set else "o"
     title = (paper.title or 'Untitled')[:50]
-    line1 = f"{index:3}. {journal}{pub_date} ({paper.citations}) {title}"
+    line1 = f"{index:3}.{read_mark} {journal}{pub_date} ({paper.citations}) {title}"
 
     # Line 2: authors and topics
     base_line2 = f"     {authors}"
@@ -1392,10 +1945,12 @@ def format_paper(paper: Paper, index: int) -> str:
 def display_papers(papers: list = None, title: str = None, context_desc: str = None,
                    author: str = None, title_search: str = None, journals: list = None,
                    years: list = None, topic: str = None, limit: int = None,
-                   offer_chat: bool = True):
+                   offer_chat: bool = True, print_mode: bool = False,
+                   next_callback=None, next_label: str = "next"):
     """Display papers with pagination and optional chat.
 
     Can either pass papers directly, or pass search parameters to fetch them.
+    Set print_mode=True to print all papers to stdout without pagination.
     """
     if papers is None:
         papers = search_papers(author=author, title=title_search, journals=journals,
@@ -1404,7 +1959,7 @@ def display_papers(papers: list = None, title: str = None, context_desc: str = N
     if not papers:
         search_term = author or title_search or "search"
         print(f"\nNo papers found for '{search_term}'")
-        if offer_chat:
+        if offer_chat and not print_mode:
             input("Press Enter to return...")
         return
 
@@ -1430,6 +1985,13 @@ def display_papers(papers: list = None, title: str = None, context_desc: str = N
 
     header = f"{'=' * 60}\n{title} ({len(papers)} found)\n{'=' * 60}\n"
 
+    if print_mode:
+        print(header)
+        for i, paper in enumerate(papers, 1):
+            print(format_paper(paper, i))
+            print()
+        return
+
     terminal_lines = shutil.get_terminal_size().lines
     lines_per_paper = 3
     papers_per_page = max(3, (terminal_lines - 6) // lines_per_paper)
@@ -1437,14 +1999,75 @@ def display_papers(papers: list = None, title: str = None, context_desc: str = N
     indexed_papers = list(enumerate(papers, 1))
     chat_cb = (lambda: chat_with_papers(papers, context_desc)) if offer_chat else None
 
+    def read_toggle_fzf():
+        """Open fzf to select a paper and toggle its read status."""
+        import subprocess as sp
+        read_set = load_read_set()
+        options = []
+        for i, p in enumerate(papers):
+            mark = "x" if p.openalex_id and p.openalex_id in read_set else "o"
+            authors = ', '.join(a.split()[-1] for a in p.authors[:2]) if p.authors else ''
+            options.append(f"[{mark}] {i+1}. {authors} ({p.pub_date or '?'}) {(p.title or '')[:60]}")
+        try:
+            result = sp.run(
+                ['fzf', '--header=Toggle read status', '--reverse', '--multi'],
+                input='\n'.join(options), capture_output=True, text=True,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                for line in result.stdout.strip().split('\n'):
+                    # Extract index from "[x] 3. ..." or "[o] 3. ..."
+                    parts = line.split('. ', 1)
+                    idx_part = parts[0].split('] ')[-1].strip()
+                    try:
+                        idx = int(idx_part) - 1
+                        if 0 <= idx < len(papers) and papers[idx].openalex_id:
+                            toggle_read(papers[idx].openalex_id)
+                    except ValueError:
+                        pass
+        except FileNotFoundError:
+            pass
+
+    def find_paper_fzf():
+        """Open fzf to fuzzy-find a paper; return its index in `papers` or None."""
+        import subprocess as sp
+        read_set = load_read_set()
+        options = []
+        for i, p in enumerate(papers):
+            mark = "x" if p.openalex_id and p.openalex_id in read_set else " "
+            authors = ', '.join(a.split()[-1] for a in p.authors[:3]) if p.authors else ''
+            j = getattr(p, 'journal', '') or ''
+            options.append(f"{i+1:>4}. [{mark}] {(j or '?'):<5} {p.pub_date or '?':<10} {authors} — {(p.title or '')}")
+        try:
+            result = sp.run(
+                ['fzf', '--header=Find paper (Enter to jump, Esc to cancel)',
+                 '--reverse', '--no-multi'],
+                input='\n'.join(options), capture_output=True, text=True,
+            )
+        except FileNotFoundError:
+            print("fzf not installed — install it to use '/' find.")
+            input("Press Enter to continue...")
+            return None
+        if result.returncode != 0 or not result.stdout.strip():
+            return None
+        line = result.stdout.strip().split('\n')[0]
+        try:
+            return int(line.split('.', 1)[0].strip()) - 1
+        except (ValueError, IndexError):
+            return None
+
     paginate(indexed_papers, page_size=papers_per_page,
              formatter=lambda item: format_paper(item[1], item[0]),
-             header=header, chat_callback=chat_cb)
+             header=header, chat_callback=chat_cb,
+             next_callback=next_callback, next_label=next_label,
+             read_callback=read_toggle_fzf,
+             find_callback=find_paper_fzf)
 
 
 def _display_author_working_papers(author_name: str, years: list = None):
     """Display working papers by an author, optionally filtered by year."""
     papers = search_papers(author=author_name, source='working-papers', years=years)
+    if not papers:
+        return
     title = f"Working Papers by {author_name}"
     if years:
         title += f" ({min(years)}-{max(years)})" if len(years) > 1 else f" ({years[0]})"
@@ -1501,7 +2124,7 @@ def print_author_table(authors: list, title: str = "Author Rankings", paginated:
 
     def print_header():
         print(f"\n{title}\n")
-        print(f"{'Rank':>4} {pubs_label:>4} {'Cites':>6}  {'Author':<20} {'Affil':<10} {'Latest Paper'}")
+        print(f"{'Rank':>4} {pubs_label:>4} {'WPs':>4} {'Cites':>6}  {'Author':<20} {'Affil':<10} {'Latest Paper'}")
         print("=" * width)
 
     def print_page(start_idx: int):
@@ -1516,7 +2139,10 @@ def print_author_table(authors: list, title: str = "Author Rankings", paginated:
             if working_papers:
                 _display_author_working_papers(match, years)
             else:
-                display_papers(author=match, journals=journals, years=years, topic=topic)
+                # Show published papers; on last page Enter continues to working papers
+                wp_cb = lambda: _display_author_working_papers(match, years)
+                display_papers(author=match, journals=journals, years=years, topic=topic,
+                               next_callback=wp_cb, next_label="working papers")
             return True
         else:
             print(f"No author found matching '{name_query}'")
@@ -1633,7 +2259,10 @@ def update_articles(journals: list = None, years: list = None, force: bool = Fal
         print(f"  {'Total':6}     : {total_new:3} new, {total_updated:3} updated")
         print(f"{'='*50}")
 
-    if total_new > 0:
+    if os.environ.get('FP_NON_INTERACTIVE'):
+        if total_new > 0:
+            print(f"\n{total_new} new papers added.")
+    elif total_new > 0:
         new_papers = get_papers_added_since(
             pre_update_timestamp or '1970-01-01',
             expanded,

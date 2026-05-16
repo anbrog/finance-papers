@@ -3,6 +3,7 @@
 
 Usage:
     finance-papers                    # Papers from last update
+    finance-papers -N                 # Peek at new papers (no save)
     finance-papers -a "Fama"          # Search papers by author
     finance-papers -t                 # Browse by topic (fzf)
     finance-papers -r -n 20           # 20 most recent papers
@@ -27,7 +28,10 @@ from finance_papers.core import (
     update_working_papers, export_author_csv, read_author_csv,
     rank_by_working_papers, get_topic_counts,
     get_recent_papers, get_papers_from_last_update,
-    get_last_update_date,
+    get_last_update_date, get_previous_update_date,
+    peek_new_articles, peek_new_working_papers,
+    save_peek_cache, load_peek_cache, peek_cache_age, peek_cache_age_minutes,
+    notify_ntfy, notify_ntfy_heartbeat,
     # Chat
     save_paper_context, load_paper_context, clear_paper_context,
     chat_with_papers, export_papers_to_file,
@@ -376,7 +380,13 @@ def cmd_papers(args):
 
     label = "Working Papers" if args.working_papers else "Papers"
     last_date = get_last_update_date(source=source)
-    date_suffix = f" [{last_date}]" if last_date else ""
+    prev_date = get_previous_update_date(source=source)
+    if last_date and prev_date:
+        date_suffix = f" [{last_date} ← {prev_date}]"
+    elif last_date:
+        date_suffix = f" [{last_date}]"
+    else:
+        date_suffix = ""
     title = f"{label}{date_suffix}"
     if args.author:
         title += f" by {args.author}"
@@ -384,7 +394,9 @@ def cmd_papers(args):
         title += f" on '{topic}'"
 
     context_desc = f"{label.lower()}: {args.author or args.title or topic or 'all'}"
-    display_papers(papers=papers, title=title, context_desc=context_desc, offer_chat=True)
+    print_mode = getattr(args, 'print_output', False)
+    display_papers(papers=papers, title=title, context_desc=context_desc, offer_chat=True,
+                   print_mode=print_mode)
 
 
 def cmd_chat(args):
@@ -442,6 +454,27 @@ def cmd_chat(args):
     print(msg)
 
     chat_with_papers(papers, context_desc)
+
+
+def cmd_notify(args):
+    """Run notify_on.sh / notify_off.sh shipped alongside the package."""
+    import subprocess
+
+    script_name = f"notify_{args.action}.sh"
+    # Scripts live at the repo root (one level up from the package dir).
+    repo_root = Path(__file__).resolve().parent.parent
+    script = repo_root / script_name
+    if not script.exists():
+        print(f"Error: {script} not found.", file=sys.stderr)
+        sys.exit(1)
+    cmd = ['bash', str(script)]
+    if args.action == 'on':
+        cmd.append('working-papers' if args.working_papers else 'articles')
+    elif args.working_papers:
+        print("Note: -w is ignored with 'notify off' (both agents are removed).",
+              file=sys.stderr)
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
 
 
 def interactive_mode():
@@ -565,6 +598,7 @@ Journals (-j):
 
 Examples:
   finance-papers                           # Papers from last update
+  finance-papers -N                        # Peek at new papers (no save)
   finance-papers -r                        # 40 most recent papers
   finance-papers -r -n 20                  # 20 most recent papers
   finance-papers -w                        # Working papers from last update
@@ -595,6 +629,14 @@ Examples:
                        help='Search working papers instead of articles')
     parser.add_argument('-r', '--recent', action='store_true',
                        help='Show most recent papers (use -n to limit, default 40)')
+    parser.add_argument('-N', '--new', action='store_true',
+                       help='Peek at new papers since last update (fetches from API but does not save)')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                       help='With -N: fetch silently and refresh cache, no display. With -N -p: print only papers not yet in the cache; cache is rewritten only if missing or >=30 min old.')
+    parser.add_argument('-p', '--print', action='store_true', dest='print_output',
+                       help='Print all results to stdout without pagination')
+    parser.add_argument('--wet', action='store_true',
+                       help='With -Nqp(w): send a heartbeat ntfy notification even when no new papers are found')
 
     subparsers = parser.add_subparsers(dest='command', metavar='COMMAND')
 
@@ -638,6 +680,21 @@ Examples:
     p_chat.add_argument('--show', '-s', action='store_true', help='Show papers in context')
     p_chat.add_argument('--clear', '-c', action='store_true', help='Clear paper context')
 
+    # notify
+    p_notify = subparsers.add_parser('notify',
+        help='Manage the hourly LaunchAgent that runs `finance-papers -Nqp[w]`',
+        description=(
+            "Install or remove macOS LaunchAgents that run finance-papers hourly "
+            "and append output to ~/logs/finance-papers.log. "
+            "'notify on' installs the articles agent (-Nqp). "
+            "'notify on -w' installs the working-papers agent (-Nqpw) as a second, "
+            "independent agent. 'notify off' removes both. All operations are idempotent."
+        ))
+    p_notify.add_argument('action', choices=['on', 'off'],
+                          help="'on' = install LaunchAgent; 'off' = remove all LaunchAgents")
+    p_notify.add_argument('-w', '--working-papers', action='store_true',
+                          help="With 'on': install the working-papers agent (-Nqpw) instead of articles")
+
     args = parser.parse_args()
 
     # If subcommand specified, dispatch to handler
@@ -646,6 +703,7 @@ Examples:
             'update': cmd_update,
             'rank': cmd_rank,
             'chat': cmd_chat,
+            'notify': cmd_notify,
         }
         handlers[args.command](args)
         return
@@ -655,6 +713,93 @@ Examples:
         interactive_mode()
         return
 
+    # Peek at new papers (fetch from API, don't save)
+    if args.new:
+        source = 'working-papers' if args.working_papers else 'articles'
+        label = "Working Papers" if args.working_papers else "Papers"
+        last_date = get_last_update_date(source=source)
+        since = f" [Since {last_date}]" if last_date else ""
+
+        # Try cache first (unless --quiet forces a fresh fetch)
+        papers = None
+        if not args.quiet:
+            papers = load_peek_cache(source)
+            if papers is not None:
+                age = peek_cache_age(source) or "unknown"
+                title = f"New {label}{since} (cached {age})"
+                if not papers:
+                    print(f"No new {label.lower()} found{since} (cached {age}).")
+                    return
+                display_papers(papers=papers, title=title,
+                               context_desc=f"new {label.lower()} (cached)",
+                               offer_chat=True, print_mode=args.print_output)
+                return
+
+        # Snapshot prior cache ids (any age) before fetching, so -q -p can diff.
+        prior_ids = set()
+        if args.quiet and args.print_output:
+            prior = load_peek_cache(source, max_age_minutes=None) or []
+            prior_ids = {p.openalex_id for p in prior if p.openalex_id}
+
+        # Fetch fresh
+        if not (args.quiet and args.print_output):
+            print(f"Checking for new {label.lower()}{since} (read-only, nothing saved)...")
+        if args.working_papers:
+            papers = peek_new_working_papers(max_authors=args.top)
+        else:
+            journals = args.journals.split(',') if args.journals else None
+            years = parse_years(args.years) if args.years else None
+            papers = peek_new_articles(journals=journals, years=years)
+
+        # Cache write rule:
+        #   - default -N / -N -q : always refresh cache (existing behaviour)
+        #   - -N -q -p           : only refresh if cache is missing or >= 30 min old
+        skip_cache_write = False
+        if args.quiet and args.print_output:
+            age = peek_cache_age_minutes(source)
+            if age is not None and age < 30:
+                skip_cache_write = True
+        if not skip_cache_write:
+            save_peek_cache(papers, source)
+
+        if args.quiet and args.print_output:
+            new_papers = [p for p in papers if not p.openalex_id or p.openalex_id not in prior_ids]
+            ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cache_note = "cache kept" if skip_cache_write else "cache refreshed"
+            print(f"[{ts}] {len(new_papers)} new {label.lower()} since last cache ({len(papers)} total fetched{since}, {cache_note}).")
+            if not new_papers:
+                if args.wet:
+                    sent = notify_ntfy_heartbeat(label=label, since=since,
+                                                 total_fetched=len(papers),
+                                                 working_papers=args.working_papers)
+                    print(f"[{ts}] ntfy heartbeat {'sent' if sent else 'skipped/failed'}.")
+                return
+            sent = notify_ntfy(new_papers, since=since,
+                               working_papers=args.working_papers)
+            print(f"[{ts}] ntfy: sent {sent} notifications for {len(new_papers)} new papers.")
+            title = f"New {label}{since} (delta vs cache)"
+            display_papers(papers=new_papers, title=title,
+                           context_desc=f"new {label.lower()} (delta)",
+                           offer_chat=False, print_mode=True)
+            return
+
+        if args.quiet:
+            ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            count = len(papers)
+            if count:
+                print(f"[{ts}] Fetched {count} new {label.lower()}{since}.")
+            else:
+                print(f"[{ts}] Fetched 0 new {label.lower()}{since}.")
+            return
+
+        if not papers:
+            print(f"No new {label.lower()} found{since}.")
+            return
+        title = f"New {label}{since} (peek, not saved)"
+        display_papers(papers=papers, title=title, context_desc=f"new {label.lower()} (peek)",
+                       offer_chat=True, print_mode=args.print_output)
+        return
+
     # Default: paper search mode
     has_filters = args.author or args.title or args.topic is not None
     if not has_filters:
@@ -662,7 +807,13 @@ Examples:
         label = "Working Papers" if args.working_papers else "Papers"
 
         last_date = get_last_update_date(source=source)
-        date_suffix = f" [{last_date}]" if last_date else ""
+        prev_date = get_previous_update_date(source=source)
+        if last_date and prev_date:
+            date_suffix = f" [{last_date} ← {prev_date}]"
+        elif last_date:
+            date_suffix = f" [{last_date}]"
+        else:
+            date_suffix = ""
 
         if args.recent:
             limit = args.top or 40
@@ -678,7 +829,8 @@ Examples:
             print(f"No {source} in database. Run 'finance-papers update' first.")
             return
 
-        display_papers(papers=papers, title=title, context_desc=context_desc, offer_chat=True)
+        display_papers(papers=papers, title=title, context_desc=context_desc, offer_chat=True,
+                       print_mode=args.print_output)
         return
 
     # Run paper search with the args
